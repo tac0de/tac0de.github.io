@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Site</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Orbitron:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- 로딩 화면 -->
+    <div class="loader-container" id="loader">
+        <div class="loader">
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+        </div>
+    </div>
+
+    <!-- 스크롤 프로그레스 바 -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- 메인 애니메이션 배경 컨테이너 -->
+    <div class="main-bg-container">
+        <!-- 1. 유성 효과 -->
+        <div class="meteor-container" id="meteorContainer"></div>
+
+        <!-- 2. 파티클 시스템 -->
+        <div class="particle-system" id="particleSystem"></div>
+
+        <!-- 3. 움직이는 기하학적 형태 -->
+        <div class="geometric-shapes" id="geometricShapes"></div>
+
+        <!-- 4. 빛의 파동 효과 -->
+        <div class="light-waves" id="lightWaves"></div>
+
+        <!-- 5. 디지털 노이즈 효과 -->
+        <canvas class="digital-noise" id="digitalNoise"></canvas>
+
+        <!-- 6. 유체 시뮬레이션 효과 -->
+        <div class="fluid-simulation">
+            <div class="fluid-blob blob1"></div>
+            <div class="fluid-blob blob2"></div>
+            <div class="fluid-blob blob3"></div>
+        </div>
+
+        <!-- 7. 그리드 라인 효과 -->
+        <div class="grid-lines"></div>
+
+        <!-- 8. 글리치 효과 -->
+        <div class="glitch-effect"></div>
+
+        <!-- 9. 별빛 효과 -->
+        <div id="starlightContainer"></div>
+
+        <!-- 10. 빛줄기 효과 -->
+        <div class="light-rays" id="lightRays"></div>
+    </div>
+
+    <!-- 상호작용 요소 -->
+    <div class="interactive-element" id="interactiveElement"></div>
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <section class="hero" id="home">
+            <h1>Hi, I'm Wonyoung</h1>
+            <p>I am a life-time learner and a developer.</p>
+            <a href="#gallery" class="cta-button">Browse My Works</a>
+        </section>
+
+        <section class="gallery" id="gallery">
+            <h2 class="section-title">My Website Collection</h2>
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <a href="https://tac0de.github.io/personal-art-gallery" target="_blank">
+                        <img src="https://tac0de.github.io/personal-art-gallery/assets/hero_bg.webp"
+                            alt="my-personal-gallery" class="gallery-image">
+                        <div class="gallery-content">
+                            <h3 class="gallery-title">ABYSSAL GALLERY</h3>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/000000/FFFFFF.webp?text=WORK IN PROGRESS"
+                        alt="Placeholder Image" class="gallery-image" />
+                    <div class="gallery-content">
+                        <h3 class="gallery-title">WORK IN PROGRESS</h3>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/000000/FFFFFF.webp?text=WORK IN PROGRESS"
+                        alt="Placeholder Image" class="gallery-image" />
+                    <div class="gallery-content">
+                        <h3 class="gallery-title">WORK IN PROGRESS</h3>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/000000/FFFFFF.webp?text=WORK IN PROGRESS"
+                        alt="Placeholder Image" class="gallery-image" />
+                    <div class="gallery-content">
+                        <h3 class="gallery-title">WORK IN PROGRESS</h3>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/000000/FFFFFF.webp?text=WORK IN PROGRESS"
+                        alt="Placeholder Image" class="gallery-image" />
+                    <div class="gallery-content">
+                        <h3 class="gallery-title">WORK IN PROGRESS</h3>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/000000/FFFFFF.webp?text=WORK IN PROGRESS"
+                        alt="Placeholder Image" class="gallery-image" />
+                    <div class="gallery-content">
+                        <h3 class="gallery-title">WORK IN PROGRESS</h3>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/000000/FFFFFF.webp?text=WORK IN PROGRESS"
+                        alt="Placeholder Image" class="gallery-image" />
+                    <div class="gallery-content">
+                        <h3 class="gallery-title">WORK IN PROGRESS</h3>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/000000/FFFFFF.webp?text=WORK IN PROGRESS"
+                        alt="Placeholder Image" class="gallery-image" />
+                    <div class="gallery-content">
+                        <h3 class="gallery-title">WORK IN PROGRESS</h3>
+                    </div>
+                </div>
+
+                <div class="gallery-item">
+                    <img src="https://placehold.co/400x300/000000/FFFFFF.webp?text=WORK IN PROGRESS"
+                        alt="Placeholder Image" class="gallery-image" />
+                    <div class="gallery-content">
+                        <h3 class="gallery-title">WORK IN PROGRESS</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 푸터 -->
+    <footer>
+        <div class="social-links">
+            <a href="https://github.com/tac0de" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path fill-rule="evenodd"
+                        d="M12 0C5.37 0 0 5.373 0 12a12 12 0 008.208 11.387c.6.11.82-.26.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.388-1.333-1.757-1.333-1.757-1.09-.744.082-.729.082-.729 1.206.084 1.84 1.24 1.84 1.24 1.07 1.834 2.807 1.304 3.492.996.11-.776.42-1.304.762-1.604-2.665-.3-5.466-1.334-5.466-5.933 0-1.31.468-2.38 1.235-3.22-.124-.303-.535-1.52.117-3.165 0 0 1.008-.323 3.3 1.23a11.5 11.5 0 016.003 0c2.29-1.553 3.296-1.23 3.296-1.23.653 1.645.242 2.862.12 3.165.77.84 1.233 1.91 1.233 3.22 0 4.61-2.804 5.63-5.475 5.924.43.37.823 1.096.823 2.21v3.28c0 .32.218.694.825.576A12.003 12.003 0 0024 12c0-6.627-5.373-12-12-12z"
+                        clip-rule="evenodd" />
+                </svg>
+            </a>
+            <a href="mailto:wonyoungchoiseoul@gmail.com">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M2 4a2 2 0 012-2h16a2 2 0 012 2v.01L12 13 2 4.01V4zm0 2.236V20a2 2 0 002 2h16a2 2 0 002-2V6.236l-10 8-10-8z" />
+                </svg>
+
+            </a>
+
+        </div>
+        <p>©<span id="copyright-year">2025</span> All rights reserved.</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
