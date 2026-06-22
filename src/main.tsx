@@ -1,6 +1,6 @@
 import { StrictMode, useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
-import { ArrowUpRight, BookOpenText, Bot, Gamepad2, GitBranch, Globe2, Sparkles } from "lucide-react";
+import { ArrowUpRight, BookOpenText, Bot, Gamepad2, Globe2, Sparkles } from "lucide-react";
 import * as THREE from "three";
 import "./styles.css";
 
@@ -20,7 +20,7 @@ const projects: Project[] = [
     kicker: "KakaoTalk study chatbot",
     description:
       "A KakaoTalk group-room study bot for questions, quizzes, vocabulary, formulas, science memory drills, and Korean idiom review.",
-    url: "https://github.com/tac0de/kakao-study-groupbot",
+    url: "https://pf.kakao.com/_xgryqX",
     image: "./assets/kkomo.png",
     tags: ["Kakao skill", "Study loops", "Reliability"],
     accent: "#ffd449",
@@ -203,9 +203,9 @@ function App() {
               <Sparkles size={18} />
               Projects
             </a>
-            <a href="https://github.com/tac0de" target="_blank" rel="noreferrer" className="secondary-action">
-              <GitBranch size={18} />
-              GitHub
+            <a href="#future" className="secondary-action">
+              <Gamepad2 size={18} />
+              Next worlds
             </a>
           </div>
         </div>
@@ -243,10 +243,6 @@ function App() {
       </section>
 
       <footer>
-        <a href="https://github.com/tac0de" target="_blank" rel="noreferrer">
-          <GitBranch size={16} />
-          github.com/tac0de
-        </a>
         <a href="https://plotnodes.com" target="_blank" rel="noreferrer">
           <Globe2 size={16} />
           plotnodes.com
@@ -255,9 +251,9 @@ function App() {
           <Globe2 size={16} />
           thedivineparadox.com
         </a>
-        <a href="https://github.com/tac0de/kakao-study-groupbot" target="_blank" rel="noreferrer">
+        <a href="https://pf.kakao.com/_xgryqX" target="_blank" rel="noreferrer">
           <Bot size={16} />
-          Kkomo repo
+          Kkomo channel
         </a>
       </footer>
     </main>

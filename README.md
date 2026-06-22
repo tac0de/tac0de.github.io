@@ -1,6 +1,6 @@
-# gh-portfolio
+# tac0de.github.io
 
-Three.js art portfolio for GitHub Pages.
+Three.js art portfolio for the `https://tac0de.github.io` GitHub Pages user site.
 
 ## Run
 
@@ -15,12 +15,11 @@ npm run dev
 npm run build
 ```
 
-The production output is `dist/`. `vite.config.ts` uses `base: "./"` so the same build can work on either a user site such as `tac0de.github.io` or a project page such as `tac0de.github.io/gh-portfolio`.
+The production output is `dist/`. `vite.config.ts` uses `base: "./"` so the build is portable, including the user site at `tac0de.github.io`.
 
 ## Deploy Options
 
-- User page: push this repo as `tac0de.github.io`, build with GitHub Pages, and publish `dist`.
-- Project page: push as `gh-portfolio`, enable GitHub Pages, and publish the built `dist` folder through a Pages workflow.
+- User page: push this repo as `tac0de.github.io`, build with GitHub Pages, and publish `dist` through the Pages workflow.
 
 ## Content
 
