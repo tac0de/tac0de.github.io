@@ -1,7 +1,6 @@
-import { StrictMode, useEffect, useRef } from "react";
+import { StrictMode, useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { ArrowUpRight, Bot, Gamepad2, Globe2, Sparkles, Waves } from "lucide-react";
-import * as THREE from "three";
+import { ArrowUpRight, Gamepad2, Sparkles, Waves } from "lucide-react";
 import "./styles.css";
 
 type Locale = "en" | "ko";
@@ -90,11 +89,12 @@ const copy = {
     stackHeading: "Framework and game stack.",
     portfolioStack: "Portfolio",
     portfolioBody:
-      "Keep this as a Vite + React + TypeScript site with Three.js for the hero scene. CSS should carry the mood: scanlines, grain, offset cards, flicker, and responsive typographic pressure.",
+      "Keep this as a Vite + React + TypeScript site. Let CSS carry the mood: scanlines, grain, offset cards, flicker, spotlight masks, and responsive typographic pressure.",
     gameStack: "Horror game",
     gameBody:
       "Build the prototype with Three.js first. Add Rapier only when collision/physics becomes real, and use Zustand only when game state grows beyond a few rooms.",
     languageNote: "Language: browser auto-detects English or Korean.",
+    languageToggle: "Language",
     cssNotes: [
       "CRT scanline layer with low opacity and slow vertical drift.",
       "Pointer-light / surveillance-cone hover states for project stills.",
@@ -116,11 +116,12 @@ const copy = {
     stackHeading: "프레임워크와 게임 스택.",
     portfolioStack: "포트폴리오",
     portfolioBody:
-      "포트폴리오는 Vite + React + TypeScript로 유지하고, 히어로 장면은 Three.js로 간다. 분위기는 CSS가 맡는다: scanline, grain, 비스듬한 카드, flicker, 반응형 타이포 압력.",
+      "포트폴리오는 Vite + React + TypeScript로 유지한다. 분위기는 CSS가 맡는다: scanline, grain, 비스듬한 카드, flicker, spotlight mask, 반응형 타이포 압력.",
     gameStack: "공포게임",
     gameBody:
       "프로토타입은 Three.js로 먼저 만든다. 충돌/물리가 실제로 필요해지는 시점에만 Rapier를 추가하고, 게임 상태가 방 몇 개를 넘어서면 Zustand를 쓴다.",
     languageNote: "언어: 브라우저 언어에 따라 영어/한국어 자동 지정.",
+    languageToggle: "언어",
     cssNotes: [
       "낮은 불투명도의 CRT scanline 레이어와 느린 세로 drift.",
       "프로젝트 스틸에 pointer-light / 감시등 hover 상태.",
@@ -135,105 +136,22 @@ function getBrowserLocale(): Locale {
   return navigator.language.toLowerCase().startsWith("ko") ? "ko" : "en";
 }
 
-function ArtScene() {
-  const mountRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const node = mountRef.current;
-    if (!node) return;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(52, node.clientWidth / node.clientHeight, 0.1, 100);
-    camera.position.set(0, 1.7, 6.2);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(node.clientWidth, node.clientHeight);
-    node.appendChild(renderer.domElement);
-
-    const group = new THREE.Group();
-    group.position.set(1.55, -0.32, 0);
-    scene.add(group);
-
-    const floorGeometry = new THREE.IcosahedronGeometry(1.9, 2);
-    const floorMaterial = new THREE.MeshStandardMaterial({
-      color: 0x1d2329,
-      roughness: 0.86,
-      metalness: 0.12,
-      flatShading: true,
-    });
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-    floor.scale.set(2.2, 0.28, 1.15);
-    floor.rotation.z = -0.08;
-    group.add(floor);
-
-    const shardMaterial = new THREE.MeshStandardMaterial({
-      color: 0xd7e4dd,
-      emissive: 0x14201d,
-      roughness: 0.68,
-      metalness: 0.18,
-      flatShading: true,
-    });
-
-    for (let index = 0; index < 22; index += 1) {
-      const shard = new THREE.Mesh(new THREE.TetrahedronGeometry(0.12 + (index % 5) * 0.025), shardMaterial);
-      const angle = (index / 22) * Math.PI * 2;
-      const radius = 1.3 + Math.sin(index * 2.1) * 0.38;
-      shard.position.set(Math.cos(angle) * radius, 0.1 + (index % 4) * 0.18, Math.sin(angle) * radius * 0.72);
-      shard.rotation.set(index * 0.29, index * 0.17, index * 0.11);
-      group.add(shard);
-    }
-
-    const prismMaterial = new THREE.MeshStandardMaterial({
-      color: 0x8bd3ff,
-      emissive: 0x164a62,
-      roughness: 0.36,
-      metalness: 0.28,
-      transparent: true,
-      opacity: 0.8,
-      flatShading: true,
-    });
-    const prism = new THREE.Mesh(new THREE.OctahedronGeometry(0.78, 1), prismMaterial);
-    prism.position.set(0.18, 0.88, 0.05);
-    group.add(prism);
-
-    const pointLight = new THREE.PointLight(0xffd19a, 36, 9);
-    pointLight.position.set(-2.8, 2.4, 3.4);
-    scene.add(pointLight);
-    scene.add(new THREE.HemisphereLight(0xb8d8ff, 0x101317, 2.2));
-
-    let frameId = 0;
-    const clock = new THREE.Clock();
-
-    const onResize = () => {
-      camera.aspect = node.clientWidth / node.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(node.clientWidth, node.clientHeight);
-    };
-
-    const animate = () => {
-      const time = clock.getElapsedTime();
-      group.rotation.y = time * 0.16;
-      prism.rotation.y = time * 0.42;
-      prism.rotation.x = Math.sin(time * 0.8) * 0.16;
-      prism.position.y = 0.92 + Math.sin(time * 1.2) * 0.08;
-      pointLight.position.x = Math.sin(time * 0.55) * 3.2;
-      renderer.render(scene, camera);
-      frameId = requestAnimationFrame(animate);
-    };
-
-    window.addEventListener("resize", onResize);
-    animate();
-
-    return () => {
-      cancelAnimationFrame(frameId);
-      window.removeEventListener("resize", onResize);
-      renderer.dispose();
-      renderer.domElement.remove();
-    };
-  }, []);
-
-  return <div className="art-scene" ref={mountRef} aria-hidden="true" />;
+function HeroArt() {
+  return (
+    <div className="hero-art" aria-hidden="true">
+      <div className="surveillance-frame" />
+      <div className="light-cone" />
+      <div className="signal-strip strip-a" />
+      <div className="signal-strip strip-b" />
+      <div className="room-map">
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className="timestamp">03:17:42 / CAM-04</div>
+    </div>
+  );
 }
 
 function ProjectCard({ project, locale }: { project: Project; locale: Locale }) {
@@ -262,19 +180,36 @@ function ProjectCard({ project, locale }: { project: Project; locale: Locale }) 
 }
 
 function App() {
-  const locale = getBrowserLocale();
+  const [locale, setLocale] = useState<Locale>(() => getBrowserLocale());
   const text = copy[locale];
 
   useEffect(() => {
     document.documentElement.lang = locale;
+    document.title = locale === "ko" ? "tac0de - 불안한 시스템과 웹 공포게임" : "tac0de - Haunted systems and web horror";
+    document
+      .querySelector('meta[name="description"]')
+      ?.setAttribute(
+        "content",
+        locale === "ko"
+          ? "tac0de 포트폴리오: 학습 챗봇, 관계 중심 캐릭터 AI, 시드 기반 3D 웹, 그리고 lofi 웹 공포게임."
+          : "tac0de portfolio: learning bots, relationship-driven character AI, seeded 3D web worlds, and lofi web horror games.",
+      );
   }, [locale]);
 
   return (
     <main>
       <div className="grain" aria-hidden="true" />
       <div className="scanline" aria-hidden="true" />
+      <div className="language-toggle" aria-label={text.languageToggle}>
+        <button type="button" aria-pressed={locale === "en"} onClick={() => setLocale("en")}>
+          EN
+        </button>
+        <button type="button" aria-pressed={locale === "ko"} onClick={() => setLocale("ko")}>
+          KO
+        </button>
+      </div>
       <section className="hero">
-        <ArtScene />
+        <HeroArt />
         <div className="hero-copy">
           <p className="eyebrow">{text.eyebrow}</p>
           <h1 className="hero-title" data-title={text.title}>
@@ -353,20 +288,6 @@ function App() {
         </div>
       </section>
 
-      <footer>
-        <a href="https://plotnodes.com" target="_blank" rel="noreferrer">
-          <Globe2 size={16} />
-          plotnodes.com
-        </a>
-        <a href="https://thedivineparadox.com" target="_blank" rel="noreferrer">
-          <Globe2 size={16} />
-          thedivineparadox.com
-        </a>
-        <a href="https://pf.kakao.com/_xgryqX" target="_blank" rel="noreferrer">
-          <Bot size={16} />
-          Kkomo channel
-        </a>
-      </footer>
     </main>
   );
 }

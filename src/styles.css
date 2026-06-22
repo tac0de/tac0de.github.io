@@ -36,6 +36,11 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+button {
+  color: inherit;
+  font: inherit;
+}
+
 main {
   overflow: hidden;
 }
@@ -69,6 +74,38 @@ main {
   animation: scan-drift 11s linear infinite;
 }
 
+.language-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 30;
+  display: inline-grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(5, 7, 7, 0.72);
+  backdrop-filter: blur(14px);
+}
+
+.language-toggle button {
+  min-width: 2.65rem;
+  min-height: 2rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #aebdb7;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.language-toggle button[aria-pressed="true"] {
+  background: #edf3ef;
+  color: #0c0f0e;
+}
+
 .hero {
   position: relative;
   min-height: 94vh;
@@ -88,17 +125,130 @@ main {
   z-index: -1;
 }
 
-.art-scene {
+.hero-art {
   position: absolute;
   inset: 0;
   z-index: -2;
-  opacity: 0.9;
+  overflow: hidden;
+  opacity: 0.96;
 }
 
-.art-scene canvas {
-  width: 100%;
-  height: 100%;
+.surveillance-frame {
+  position: absolute;
+  right: max(1.5rem, 9vw);
+  top: 23vh;
+  width: min(38vw, 34rem);
+  aspect-ratio: 1.24;
+  border: 1px solid rgba(148, 255, 228, 0.22);
+  background:
+    linear-gradient(90deg, rgba(148, 255, 228, 0.16), transparent 12% 88%, rgba(255, 215, 168, 0.13)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.055) 0 1px, transparent 1px 28px),
+    rgba(5, 8, 8, 0.44);
+  clip-path: polygon(8% 0, 100% 11%, 91% 100%, 0 85%);
+  box-shadow: 0 0 80px rgba(116, 212, 255, 0.12);
+  animation: frame-breath 8s ease-in-out infinite;
+}
+
+.surveillance-frame::before,
+.surveillance-frame::after {
+  content: "";
+  position: absolute;
+  inset: 13%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transform: rotate(-5deg);
+}
+
+.surveillance-frame::after {
+  inset: auto 13% 18%;
+  height: 2px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 215, 168, 0.88), transparent);
+  animation: sweep 4.8s ease-in-out infinite;
+}
+
+.light-cone {
+  position: absolute;
+  right: -8vw;
+  top: 12vh;
+  width: min(58vw, 52rem);
+  height: min(56vw, 48rem);
+  background: conic-gradient(from 218deg, transparent, rgba(148, 255, 228, 0.18), transparent 32%);
+  filter: blur(2px);
+  opacity: 0.64;
+  transform-origin: 68% 32%;
+  animation: cone-search 12s ease-in-out infinite;
+}
+
+.signal-strip {
+  position: absolute;
+  height: 0.55rem;
+  background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.38) 0 1rem, transparent 1rem 1.45rem);
+  opacity: 0.18;
+  transform: skewX(-18deg);
+}
+
+.strip-a {
+  right: 8vw;
+  top: 68vh;
+  width: min(48vw, 34rem);
+  animation: signal-slide 9s linear infinite;
+}
+
+.strip-b {
+  right: 23vw;
+  top: 76vh;
+  width: min(28vw, 22rem);
+  animation: signal-slide 7s linear infinite reverse;
+}
+
+.room-map {
+  position: absolute;
+  right: max(1rem, 16vw);
+  bottom: 12vh;
+  width: min(35vw, 32rem);
+  height: 11rem;
+  transform: perspective(520px) rotateX(62deg) rotateZ(-2deg);
+  transform-origin: center;
+  background:
+    linear-gradient(90deg, transparent 0 24%, rgba(255, 255, 255, 0.08) 25% 26%, transparent 27%),
+    linear-gradient(180deg, transparent 0 48%, rgba(255, 255, 255, 0.08) 49% 50%, transparent 51%),
+    rgba(14, 17, 17, 0.78);
+  clip-path: polygon(0 12%, 100% 0, 88% 100%, 9% 86%);
+  box-shadow: 0 34px 90px rgba(0, 0, 0, 0.42);
+}
+
+.room-map span {
+  position: absolute;
   display: block;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+.room-map span:nth-child(1) {
+  inset: 16% 55% 48% 8%;
+}
+
+.room-map span:nth-child(2) {
+  inset: 20% 15% 55% 52%;
+}
+
+.room-map span:nth-child(3) {
+  inset: 54% 50% 14% 18%;
+}
+
+.room-map span:nth-child(4) {
+  inset: 50% 12% 18% 54%;
+  border-color: rgba(255, 215, 168, 0.4);
+}
+
+.timestamp {
+  position: absolute;
+  right: max(1rem, 12vw);
+  top: 17vh;
+  color: rgba(237, 243, 239, 0.66);
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  text-shadow: 0 0 18px rgba(148, 255, 228, 0.45);
+  animation: time-flicker 5.5s steps(1, end) infinite;
 }
 
 .hero-copy {
@@ -157,8 +307,7 @@ h1 {
 }
 
 .hero-actions,
-.tag-row,
-footer {
+.tag-row {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -428,18 +577,6 @@ footer {
   padding-left: 1.1rem;
 }
 
-footer {
-  padding: 2rem max(1.25rem, calc((100vw - 1180px) / 2)) 3rem;
-  color: #b4c3bc;
-}
-
-footer a {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  min-height: 2rem;
-}
-
 @media (max-width: 900px) {
   .hero {
     min-height: 88vh;
@@ -460,6 +597,30 @@ footer a {
 
   .project-card:nth-child(2) {
     transform: none;
+  }
+
+  .surveillance-frame {
+    right: -10rem;
+    top: 42vh;
+    width: 30rem;
+  }
+
+  .light-cone {
+    right: -18rem;
+    top: 30vh;
+    width: 42rem;
+    height: 42rem;
+  }
+
+  .room-map {
+    right: -7rem;
+    bottom: 10vh;
+    width: 30rem;
+  }
+
+  .timestamp,
+  .signal-strip {
+    display: none;
   }
 }
 
@@ -518,5 +679,76 @@ footer a {
   .future-band {
     padding-top: 4rem;
     padding-bottom: 4rem;
+  }
+
+  .tech-band {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .language-toggle {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+}
+
+@keyframes frame-breath {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+    opacity: 0.78;
+  }
+  50% {
+    transform: translateY(0.7rem) rotate(1deg);
+    opacity: 0.96;
+  }
+}
+
+@keyframes sweep {
+  0%,
+  100% {
+    transform: translateY(-3rem) rotate(-5deg);
+    opacity: 0.25;
+  }
+  50% {
+    transform: translateY(5.5rem) rotate(-5deg);
+    opacity: 0.72;
+  }
+}
+
+@keyframes cone-search {
+  0%,
+  100% {
+    transform: rotate(-7deg);
+    opacity: 0.44;
+  }
+  50% {
+    transform: rotate(8deg);
+    opacity: 0.68;
+  }
+}
+
+@keyframes signal-slide {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: 9rem;
+  }
+}
+
+@keyframes time-flicker {
+  0%,
+  60%,
+  100% {
+    opacity: 0.62;
+  }
+  61%,
+  63% {
+    opacity: 0.18;
+  }
+  64%,
+  68% {
+    opacity: 0.8;
   }
 }
