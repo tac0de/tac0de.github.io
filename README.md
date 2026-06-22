@@ -1,6 +1,8 @@
 # Night Shift 03:17
 
-A playable lofi 3D browser horror prototype for `https://tac0de.github.io`.
+A silent lofi 3D browser horror game for `https://tac0de.github.io`.
+
+The room shows what is about to happen on the monitor before it happens around the player.
 
 ## Run
 
@@ -19,5 +21,5 @@ The production output is `dist/`. GitHub Pages deploys it through the Pages work
 
 ## Controls
 
-- Desktop: WASD move, mouse look, E or click inspect, Esc release pointer.
-- Mobile: drag to look, hold lower screen to move, tap to inspect.
+- Desktop: WASD move, mouse look, click or E interact.
+- Mobile: drag to look, hold lower screen to move, tap interact.

@@ -3,119 +3,24 @@ import { createRoot } from "react-dom/client";
 import * as THREE from "three";
 import "./styles.css";
 
-type Locale = "en" | "ko";
-type HotspotId = "breaker" | "phone" | "tape" | "door";
+type HotspotId = "phone" | "breaker" | "tape" | "door";
 
-type Hotspot = {
-  id: HotspotId;
-  title: Record<Locale, string>;
-  meshName: string;
-  label: Record<Locale, string>;
-  body: Record<Locale, string>;
-};
-
-const hotspots: Hotspot[] = [
-  {
-    id: "breaker",
-    meshName: "hotspot-breaker",
-    title: { en: "Breaker box", ko: "차단기" },
-    label: { en: "BREAKER", ko: "차단기" },
-    body: {
-      en: "The switch is taped down. Someone wrote: do not restore hallway power after 03:17.",
-      ko: "스위치가 테이프로 고정돼 있다. 누군가 적었다: 03:17 이후 복도 전원을 올리지 말 것.",
-    },
-  },
-  {
-    id: "phone",
-    meshName: "hotspot-phone",
-    title: { en: "Wall phone", ko: "벽 전화기" },
-    label: { en: "DO NOT ANSWER", ko: "받지 마" },
-    body: {
-      en: "The handset is warm. The first ring came from the line. The second one came from inside the wall.",
-      ko: "수화기가 따뜻하다. 첫 번째 벨은 선에서 울렸다. 두 번째 벨은 벽 안에서 울렸다.",
-    },
-  },
-  {
-    id: "tape",
-    meshName: "hotspot-tape",
-    title: { en: "VHS tape", ko: "비디오테이프" },
-    label: { en: "PLAY ME", ko: "재생해" },
-    body: {
-      en: "A label reads: SHIFT 12. The tape is already rewound to the moment you entered the room.",
-      ko: "라벨에는 SHIFT 12라고 적혀 있다. 테이프는 이미 당신이 방에 들어온 순간으로 되감겨 있다.",
-    },
-  },
-  {
-    id: "door",
-    meshName: "hotspot-door",
-    title: { en: "Exit door", ko: "출구 문" },
-    label: { en: "EXIT", ko: "출구" },
-    body: {
-      en: "The exit is locked from your side. The gap under the door is breathing.",
-      ko: "출구는 안쪽에서 잠겨 있다. 문 아래 틈이 숨을 쉬고 있다.",
-    },
-  },
-];
-
-const copy = {
-  en: {
-    enter: "Start shift",
-    subtitle: "03:17 AM. You are alone in the monitoring room.",
-    controls: "WASD move / mouse look / E or click inspect / Esc release",
-    mobileControls: "Drag to look / hold lower screen to move / tap to inspect",
-    close: "Back away",
-    language: "Language",
-    objective: "Restore the room log. Do not answer the second call.",
-    proximity: "The air is moving near you.",
-  },
-  ko: {
-    enter: "근무 시작",
-    subtitle: "오전 3시 17분. 감시실에는 당신 혼자뿐입니다.",
-    controls: "WASD 이동 / 마우스 시점 / E 또는 클릭 조사 / Esc 해제",
-    mobileControls: "드래그로 보기 / 화면 아래 길게 눌러 이동 / 탭으로 조사",
-    close: "물러서기",
-    language: "언어",
-    objective: "근무 기록을 복구하세요. 두 번째 전화는 받지 마세요.",
-    proximity: "근처의 공기가 움직이고 있습니다.",
-  },
-};
-
-function getBrowserLocale(): Locale {
-  if (typeof navigator === "undefined") return "en";
-  return navigator.language.toLowerCase().startsWith("ko") ? "ko" : "en";
-}
-
-function createLabelTexture(text: string, accent = "#9affe7") {
-  const canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 128;
-  const ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = "#050707";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.strokeStyle = accent;
-  ctx.globalAlpha = 0.72;
-  ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = accent;
-  ctx.font = "800 38px ui-monospace, Menlo, monospace";
-  ctx.fillText(text, 34, 76);
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  return texture;
+function setMeshGlow(mesh: THREE.Mesh, intensity: number) {
+  const material = mesh.material as THREE.MeshBasicMaterial;
+  material.opacity = Math.max(0, Math.min(1, intensity));
+  material.needsUpdate = true;
 }
 
 function GameScene({
-  locale,
   entered,
   onEnter,
-  onInspect,
-  onNear,
+  onFocus,
+  onBlackout,
 }: {
-  locale: Locale;
   entered: boolean;
   onEnter: () => void;
-  onInspect: (id: HotspotId) => void;
-  onNear: (isNear: boolean) => void;
+  onFocus: (focused: boolean) => void;
+  onBlackout: (active: boolean) => void;
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const enteredRef = useRef(entered);
@@ -130,41 +35,50 @@ function GameScene({
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x020303);
-    scene.fog = new THREE.Fog(0x020303, 3.8, 15);
+    scene.fog = new THREE.Fog(0x020303, 5.6, 17.5);
 
-    const camera = new THREE.PerspectiveCamera(73, mount.clientWidth / mount.clientHeight, 0.1, 45);
-    camera.position.set(0, 1.52, 5.5);
+    const camera = new THREE.PerspectiveCamera(72, mount.clientWidth / mount.clientHeight, 0.1, 45);
+    camera.position.set(0.7, 1.52, 5.05);
     camera.rotation.order = "YXZ";
 
     const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
-    renderer.setPixelRatio(0.52);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1) * 0.62);
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.domElement.className = "game-canvas";
     mount.appendChild(renderer.domElement);
 
-    const interactables: THREE.Object3D[] = [];
     const raycaster = new THREE.Raycaster();
-    const pointer = new THREE.Vector2();
+    const pointer = new THREE.Vector2(0, 0);
+    const interactables: THREE.Object3D[] = [];
     const velocity = new THREE.Vector3();
     const keys = new Set<string>();
     const startedAt = performance.now();
     let lastFrameAt = startedAt;
+    let frameId = 0;
     let yaw = 0;
     let pitch = 0;
-    let frameId = 0;
+    let phase = 0;
+    let phaseStarted = 0;
     let scarePulse = 0;
-    let lastNear = false;
+    let lastFocused = false;
     let touchLooking = false;
     let touchMoving = false;
     let lastTouchX = 0;
     let lastTouchY = 0;
+    let finalTriggered = false;
 
-    const wall = new THREE.MeshStandardMaterial({ color: 0x101514, roughness: 0.96, metalness: 0.04 });
-    const floor = new THREE.MeshStandardMaterial({ color: 0x171312, roughness: 1, metalness: 0.02 });
-    const metal = new THREE.MeshStandardMaterial({ color: 0x070909, roughness: 0.76, metalness: 0.42 });
-    const green = new THREE.MeshBasicMaterial({ color: 0x80ffd8 });
-    const red = new THREE.MeshBasicMaterial({ color: 0xff455c });
-    const amber = new THREE.MeshBasicMaterial({ color: 0xffcf89 });
+    const mats = {
+      wall: new THREE.MeshStandardMaterial({ color: 0x101514, roughness: 0.98, metalness: 0.02 }),
+      floor: new THREE.MeshStandardMaterial({ color: 0x171312, roughness: 1, metalness: 0.02 }),
+      darkMetal: new THREE.MeshStandardMaterial({ color: 0x060807, roughness: 0.8, metalness: 0.42 }),
+      redBody: new THREE.MeshStandardMaterial({ color: 0x421119, roughness: 0.72, metalness: 0.12 }),
+      bone: new THREE.MeshStandardMaterial({ color: 0xbeb6a4, roughness: 0.82, metalness: 0.03 }),
+      glass: new THREE.MeshBasicMaterial({ color: 0x233f3a, transparent: true, opacity: 0.62 }),
+      cyan: new THREE.MeshBasicMaterial({ color: 0x8affdf, transparent: true, opacity: 0.78 }),
+      red: new THREE.MeshBasicMaterial({ color: 0xff3651, transparent: true, opacity: 0.0 }),
+      amber: new THREE.MeshBasicMaterial({ color: 0xffc268, transparent: true, opacity: 0.0 }),
+      blackGhost: new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.0 }),
+    };
 
     const addBox = (
       name: string,
@@ -181,72 +95,93 @@ function GameScene({
       return mesh;
     };
 
-    addBox("floor", [10.5, 0.18, 12.5], [0, -0.1, 0], floor);
-    addBox("ceiling", [10.5, 0.16, 12.5], [0, 3.05, 0], wall);
-    addBox("back-wall", [10.5, 3.3, 0.18], [0, 1.52, -6.25], wall);
-    addBox("front-wall-left", [3.1, 3.3, 0.18], [-3.8, 1.52, 6.25], wall);
-    addBox("front-wall-right", [3.1, 3.3, 0.18], [3.8, 1.52, 6.25], wall);
-    addBox("left-wall", [0.18, 3.3, 12.5], [-5.25, 1.52, 0], wall);
-    addBox("right-wall", [0.18, 3.3, 12.5], [5.25, 1.52, 0], wall);
+    const addGlowPlane = (
+      name: string,
+      size: [number, number],
+      position: [number, number, number],
+      material: THREE.MeshBasicMaterial,
+      rotation: [number, number, number] = [0, 0, 0],
+    ) => {
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(...size), material);
+      mesh.name = name;
+      mesh.position.set(...position);
+      mesh.rotation.set(...rotation);
+      scene.add(mesh);
+      return mesh;
+    };
 
-    for (let i = 0; i < 9; i += 1) {
-      addBox(`floor-seam-${i}`, [0.035, 0.012, 12.1], [-4.8 + i * 1.2, 0.01, 0], metal);
+    addBox("floor", [10.6, 0.18, 12.6], [0, -0.1, 0], mats.floor);
+    addBox("ceiling", [10.6, 0.16, 12.6], [0, 3.05, 0], mats.wall);
+    addBox("monitor-wall", [10.6, 3.3, 0.18], [0, 1.52, -6.25], mats.wall);
+    addBox("door-wall-left", [3.15, 3.3, 0.18], [-3.75, 1.52, 6.25], mats.wall);
+    addBox("door-wall-right", [3.15, 3.3, 0.18], [3.75, 1.52, 6.25], mats.wall);
+    addBox("left-wall", [0.18, 3.3, 12.6], [-5.25, 1.52, 0], mats.wall);
+    addBox("right-wall", [0.18, 3.3, 12.6], [5.25, 1.52, 0], mats.wall);
+
+    for (let i = 0; i < 8; i += 1) {
+      addBox(`floor-stripe-${i}`, [0.028, 0.015, 12.0], [-4.2 + i * 1.2, 0.02, 0], mats.darkMetal);
+    }
+    for (let i = 0; i < 5; i += 1) {
+      addBox(`ceiling-rib-${i}`, [10.2, 0.06, 0.08], [0, 2.91, -4.8 + i * 2.2], mats.darkMetal);
     }
 
-    addBox("desk", [3.2, 0.2, 1.1], [-2.7, 0.8, -3.55], metal, 0.08);
-    addBox("monitor-body", [0.9, 0.56, 0.2], [-2.7, 1.22, -4.0], metal, 0.08);
-    addBox("monitor-screen", [0.72, 0.38, 0.05], [-2.7, 1.24, -4.12], green, 0.08);
+    addBox("desk-top", [3.3, 0.22, 1.12], [-2.55, 0.82, -3.72], mats.darkMetal, 0.08);
+    addBox("desk-leg-a", [0.16, 0.82, 0.16], [-3.86, 0.34, -3.25], mats.darkMetal);
+    addBox("desk-leg-b", [0.16, 0.82, 0.16], [-1.28, 0.34, -4.1], mats.darkMetal);
+    addBox("cable-a", [0.07, 0.035, 5.3], [-3.08, 0.03, -1.2], mats.darkMetal, -0.18);
+    addBox("cable-b", [0.055, 0.035, 4.2], [-0.8, 0.032, 1.85], mats.darkMetal, 0.34);
 
-    const tape = addBox("hotspot-tape", [0.55, 0.11, 0.34], [-1.58, 0.98, -3.48], amber, -0.15);
-    tape.userData.hotspot = "tape";
+    const monitorBody = addBox("monitor-body", [1.06, 0.66, 0.26], [-2.62, 1.26, -4.2], mats.darkMetal, 0.08);
+    const monitorScreen = addBox("monitor-screen", [0.78, 0.44, 0.045], [-2.62, 1.28, -4.35], mats.cyan, 0.08);
+    addBox("monitor-neck", [0.16, 0.26, 0.18], [-2.62, 0.94, -4.03], mats.darkMetal, 0.08);
+    addBox("monitor-base", [0.72, 0.08, 0.42], [-2.62, 0.83, -3.95], mats.darkMetal, 0.08);
+
+    const futurePhone = addGlowPlane("future-phone", [0.14, 0.27], [-2.42, 1.28, -4.38], mats.red, [0, 0.08, 0]);
+    const futureDoor = addGlowPlane("future-door", [0.26, 0.34], [-2.68, 1.28, -4.38], mats.red, [0, 0.08, 0]);
+    const futureBreaker = addGlowPlane("future-breaker", [0.2, 0.24], [-2.82, 1.28, -4.38], mats.amber, [0, 0.08, 0]);
+    const futureBehind = addGlowPlane("future-behind", [0.34, 0.44], [-2.62, 1.29, -4.39], mats.blackGhost, [0, 0.08, 0]);
+
+    const tape = addBox("tape", [0.58, 0.11, 0.34], [-1.48, 0.98, -3.56], mats.bone, -0.2);
+    tape.userData.hotspot = "tape" satisfies HotspotId;
     interactables.push(tape);
 
-    const breaker = addBox("hotspot-breaker", [0.85, 1.15, 0.13], [-5.14, 1.55, -2.1], metal, Math.PI / 2);
-    breaker.userData.hotspot = "breaker";
+    const breaker = addBox("breaker", [0.86, 1.18, 0.13], [-5.14, 1.55, -2.05], mats.darkMetal, Math.PI / 2);
+    breaker.userData.hotspot = "breaker" satisfies HotspotId;
     interactables.push(breaker);
-    addBox("breaker-red", [0.08, 0.22, 0.08], [-5.06, 1.7, -1.86], red, Math.PI / 2);
+    const breakerGlow = addGlowPlane("breaker-glow", [0.68, 0.9], [-5.04, 1.55, -2.05], mats.amber, [0, Math.PI / 2, 0]);
 
-    const phone = addBox("hotspot-phone", [0.52, 0.72, 0.12], [3.15, 1.42, -6.12], red, 0);
-    phone.userData.hotspot = "phone";
+    const phone = addBox("phone", [0.58, 0.78, 0.13], [3.12, 1.42, -6.13], mats.redBody);
+    phone.userData.hotspot = "phone" satisfies HotspotId;
     interactables.push(phone);
-    addBox("phone-cord", [0.04, 0.78, 0.04], [3.15, 0.88, -6.04], metal);
+    addBox("phone-cord", [0.04, 0.78, 0.04], [3.12, 0.88, -6.04], mats.darkMetal);
+    const phoneGlow = addGlowPlane("phone-glow", [0.74, 0.95], [3.12, 1.42, -6.04], mats.red, [0, 0, 0]);
 
-    const door = addBox("hotspot-door", [1.45, 2.2, 0.12], [0, 1.05, 6.18], metal, 0);
-    door.userData.hotspot = "door";
+    const door = addBox("door", [1.46, 2.22, 0.14], [0, 1.06, 6.16], mats.darkMetal);
+    door.userData.hotspot = "door" satisfies HotspotId;
     interactables.push(door);
-    addBox("door-gap", [1.36, 0.045, 0.05], [0, 0.08, 6.08], red);
+    const doorGap = addGlowPlane("door-gap", [1.5, 0.12], [0, 0.12, 6.06], mats.red, [-Math.PI / 2, 0, 0]);
+    const doorEye = addGlowPlane("door-eye", [0.18, 0.18], [0.28, 1.48, 6.06], mats.red);
 
-    const mirror = addBox("mirror", [1.2, 1.7, 0.08], [5.14, 1.65, 1.2], green, Math.PI / 2);
-    mirror.scale.x = 0.9;
+    addBox("mirror-frame", [1.34, 1.84, 0.12], [5.14, 1.62, 0.96], mats.darkMetal, Math.PI / 2);
+    addGlowPlane("mirror-glass", [1.05, 1.5], [5.05, 1.62, 0.96], mats.glass, [0, -Math.PI / 2, 0]);
+    const mirrorShape = addGlowPlane("mirror-shape", [0.58, 1.16], [5.045, 1.44, 0.96], mats.blackGhost, [0, -Math.PI / 2, 0]);
 
-    hotspots.forEach((spot, index) => {
-      const target = interactables.find((item) => item.name === spot.meshName);
-      if (!target) return;
-      const label = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.62, 0.4),
-        new THREE.MeshBasicMaterial({
-          map: createLabelTexture(spot.label[locale], index === 1 || index === 3 ? "#ff6b88" : "#9affe7"),
-          transparent: true,
-        }),
-      );
-      label.position.copy(target.position);
-      label.position.y += 0.72;
-      label.userData.followCamera = true;
-      scene.add(label);
-    });
+    const behindShape = addGlowPlane("behind-shape", [0.68, 1.65], [0.7, 1.28, 5.08], mats.blackGhost);
+    const ceilingFlash = new THREE.PointLight(0xff3556, 0, 7);
+    ceilingFlash.position.set(0, 2.6, 4.8);
+    scene.add(ceilingFlash);
 
-    const ambient = new THREE.AmbientLight(0x1d2927, 0.58);
-    scene.add(ambient);
-    const bulb = new THREE.PointLight(0x9affe7, 20, 8);
-    bulb.position.set(-2.8, 2.35, 0.7);
-    scene.add(bulb);
-    const exitLight = new THREE.PointLight(0xff3448, 11, 5);
-    exitLight.position.set(0, 1.5, 5.35);
-    scene.add(exitLight);
-    const sweepLight = new THREE.SpotLight(0xcffff3, 18, 13, Math.PI / 6, 0.65, 1.2);
-    sweepLight.position.set(2.1, 2.8, 2.6);
-    sweepLight.target.position.set(0, 0.8, -2.4);
-    scene.add(sweepLight, sweepLight.target);
+    const ambient = new THREE.AmbientLight(0x192b26, 0.62);
+    const monitorLight = new THREE.PointLight(0x82ffe2, 24, 8.5);
+    monitorLight.position.copy(monitorBody.position).add(new THREE.Vector3(0, 0.15, 0.5));
+    const doorLight = new THREE.PointLight(0xff344f, 0, 5.2);
+    doorLight.position.set(0, 0.6, 5.55);
+    const phoneLight = new THREE.PointLight(0xff3552, 0, 4.3);
+    phoneLight.position.set(3.05, 1.55, -5.7);
+    const sweepLight = new THREE.SpotLight(0xcffff3, 12, 13, Math.PI / 7, 0.7, 1.2);
+    sweepLight.position.set(2.3, 2.9, 2.4);
+    sweepLight.target.position.set(-1.2, 0.8, -3.2);
+    scene.add(ambient, monitorLight, doorLight, phoneLight, sweepLight, sweepLight.target);
 
     const resize = () => {
       camera.aspect = mount.clientWidth / mount.clientHeight;
@@ -254,53 +189,64 @@ function GameScene({
       renderer.setSize(mount.clientWidth, mount.clientHeight);
     };
 
-    const lockPointer = () => {
+    const begin = () => {
+      enteredRef.current = true;
+      onEnter();
+      window.history.replaceState(null, "", "#play");
       renderer.domElement.requestPointerLock?.();
     };
 
-    const enterAndLock = () => {
-      enteredRef.current = true;
-      onEnter();
-      lockPointer();
-    };
-
-    const look = (movementX: number, movementY: number, scale = 0.0022) => {
+    const look = (movementX: number, movementY: number, scale = 0.002) => {
       yaw -= movementX * scale;
       pitch -= movementY * scale;
-      pitch = Math.max(-1.05, Math.min(1.0, pitch));
+      pitch = Math.max(-1.05, Math.min(0.92, pitch));
     };
 
-    const rayAt = (x: number, y: number) => {
-      pointer.set(x, y);
+    const centerHit = () => {
+      pointer.set(0, 0);
       raycaster.setFromCamera(pointer, camera);
       const hit = raycaster.intersectObjects(interactables, false)[0];
-      if (hit?.object.userData.hotspot && hit.distance < 3.1) {
-        onInspect(hit.object.userData.hotspot);
-        scarePulse = 1;
-        return true;
-      }
-      return false;
+      if (hit?.object.userData.hotspot && hit.distance < 3.05) return hit.object.userData.hotspot as HotspotId;
+      return null;
     };
 
-    const inspectCenter = () => rayAt(0, 0);
-
-    const inspectScreen = (clientX: number, clientY: number) => {
+    const screenHit = (clientX: number, clientY: number) => {
       const rect = renderer.domElement.getBoundingClientRect();
-      const x = ((clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -(((clientY - rect.top) / rect.height) * 2 - 1);
-      return rayAt(x, y);
+      pointer.set(((clientX - rect.left) / rect.width) * 2 - 1, -(((clientY - rect.top) / rect.height) * 2 - 1));
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObjects(interactables, false)[0];
+      if (hit?.object.userData.hotspot && hit.distance < 3.05) return hit.object.userData.hotspot as HotspotId;
+      return null;
+    };
+
+    const advance = (hotspot: HotspotId | null) => {
+      if (!hotspot) {
+        scarePulse = Math.max(scarePulse, 0.14);
+        return;
+      }
+      const elapsed = (performance.now() - startedAt) / 1000;
+      const phaseAge = elapsed - phaseStarted;
+      const expected: HotspotId[] = ["phone", "breaker", "tape", "door"];
+      if (expected[phase] === hotspot && phaseAge > 2.35) {
+        phase += 1;
+        phaseStarted = elapsed;
+        scarePulse = 1.05;
+      } else {
+        scarePulse = Math.max(scarePulse, 0.34);
+      }
     };
 
     const click = (event: MouseEvent) => {
       if (!enteredRef.current) {
-        enterAndLock();
+        begin();
         return;
       }
-      if (document.pointerLockElement === renderer.domElement) {
-        if (!inspectCenter()) scarePulse = 0.2;
-      } else if (!inspectScreen(event.clientX, event.clientY)) {
-        lockPointer();
+      if (document.pointerLockElement !== renderer.domElement) {
+        renderer.domElement.requestPointerLock?.();
+        advance(screenHit(event.clientX, event.clientY));
+        return;
       }
+      advance(centerHit());
     };
 
     const mouseMove = (event: MouseEvent) => {
@@ -308,19 +254,20 @@ function GameScene({
     };
 
     const keyDown = (event: KeyboardEvent) => {
-      keys.add(event.key.toLowerCase());
-      if (event.key.toLowerCase() === "e" && enteredRef.current) inspectCenter();
+      const key = event.key.toLowerCase();
+      keys.add(key);
+      if ((key === "e" || key === " ") && enteredRef.current) advance(centerHit());
     };
     const keyUp = (event: KeyboardEvent) => keys.delete(event.key.toLowerCase());
 
     const touchStart = (event: TouchEvent) => {
-      if (!enteredRef.current) onEnter();
+      if (!enteredRef.current) begin();
       const touch = event.touches[0];
       lastTouchX = touch.clientX;
       lastTouchY = touch.clientY;
       touchLooking = true;
       touchMoving = touch.clientY > window.innerHeight * 0.58;
-      if (!touchMoving) inspectScreen(touch.clientX, touch.clientY);
+      if (!touchMoving) advance(screenHit(touch.clientX, touch.clientY));
     };
     const touchMove = (event: TouchEvent) => {
       const touch = event.touches[0];
@@ -328,7 +275,7 @@ function GameScene({
       const dy = touch.clientY - lastTouchY;
       lastTouchX = touch.clientX;
       lastTouchY = touch.clientY;
-      if (touchLooking) look(dx, dy, 0.0048);
+      if (touchLooking) look(dx, dy, 0.0046);
     };
     const touchEnd = () => {
       touchLooking = false;
@@ -346,14 +293,15 @@ function GameScene({
 
     const animate = () => {
       const now = performance.now();
-      const delta = Math.min((now - lastFrameAt) / 1000, 0.05);
+      const delta = Math.min((now - lastFrameAt) / 1000, 0.045);
       const elapsed = (now - startedAt) / 1000;
+      const phaseAge = elapsed - phaseStarted;
       lastFrameAt = now;
 
       camera.rotation.y = yaw;
       camera.rotation.x = pitch;
 
-      const forward = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw) * -1);
+      const forward = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw));
       const right = new THREE.Vector3(Math.cos(yaw), 0, Math.sin(yaw));
       velocity.set(0, 0, 0);
       if (enteredRef.current) {
@@ -362,29 +310,60 @@ function GameScene({
         if (keys.has("a") || keys.has("arrowleft")) velocity.sub(right);
         if (keys.has("d") || keys.has("arrowright")) velocity.add(right);
       }
-      if (velocity.lengthSq() > 0) {
-        velocity.normalize().multiplyScalar(delta * 2.35);
+      const moving = velocity.lengthSq() > 0;
+      if (moving) {
+        velocity.normalize().multiplyScalar(delta * 2.15);
         camera.position.add(velocity);
       }
-      camera.position.x = Math.max(-4.65, Math.min(4.65, camera.position.x));
-      camera.position.z = Math.max(-5.55, Math.min(5.55, camera.position.z));
-      camera.position.y = 1.52 + Math.sin(elapsed * 8) * (velocity.lengthSq() > 0 ? 0.018 : 0.006);
+      camera.position.x = Math.max(-4.7, Math.min(4.7, camera.position.x));
+      camera.position.z = Math.max(-5.55, Math.min(5.5, camera.position.z));
+      camera.position.y = 1.52 + Math.sin(elapsed * 8.8) * (moving ? 0.02 : 0.006);
 
-      const near = interactables.some((item) => item.position.distanceTo(camera.position) < 2.25);
-      if (near !== lastNear) {
-        lastNear = near;
-        onNear(near);
+      const focused = Boolean(centerHit());
+      if (focused !== lastFocused) {
+        lastFocused = focused;
+        onFocus(focused);
       }
 
-      bulb.intensity = 13 + Math.sin(elapsed * 7.7) * 4 + (Math.random() > 0.975 ? 18 : 0);
-      exitLight.intensity = 7 + Math.sin(elapsed * 2.4) * 3 + scarePulse * 14;
-      sweepLight.target.position.x = Math.sin(elapsed * 0.7) * 2.8;
+      const breath = (Math.sin(elapsed * 4.2) + 1) / 2;
+      const hardBlink = Math.random() > 0.985 ? 1 : 0;
       scarePulse *= 0.9;
 
-      scene.traverse((item) => {
-        if (item.userData.followCamera) item.lookAt(camera.position);
-        if (item.name.startsWith("hotspot")) item.rotation.z = Math.sin(elapsed * 2 + item.position.x) * 0.02;
-      });
+      const phoneFuture = phase === 0 ? 0.28 + breath * 0.7 : 0;
+      const breakerFuture = phase === 1 ? 0.28 + breath * 0.7 : 0;
+      const tapeFuture = phase === 2 ? 0.18 + breath * 0.55 : 0;
+      const behindFuture = phase >= 3 ? 0.16 + breath * 0.55 : 0;
+      setMeshGlow(futurePhone, phoneFuture);
+      setMeshGlow(futureBreaker, breakerFuture);
+      setMeshGlow(futureDoor, phase === 3 ? 0.3 + breath * 0.7 : 0);
+      setMeshGlow(futureBehind, behindFuture);
+
+      const phoneActual = phase === 0 && phaseAge > 3 ? 0.24 + breath * 0.75 + hardBlink * 0.6 : 0;
+      const breakerActual = phase === 1 && phaseAge > 3 ? 0.18 + breath * 0.64 : 0;
+      const tapeActual = phase === 2 && phaseAge > 3 ? 0.12 + breath * 0.45 : 0;
+      const doorActual = phase === 3 && phaseAge > 3 ? 0.32 + breath * 0.7 + hardBlink * 0.5 : phase >= 4 ? 0.85 : 0;
+      setMeshGlow(phoneGlow, phoneActual);
+      setMeshGlow(breakerGlow, breakerActual);
+      setMeshGlow(doorGap, doorActual);
+      setMeshGlow(doorEye, phase >= 4 ? 0.9 : Math.max(0, doorActual - 0.2));
+      setMeshGlow(mirrorShape, tapeActual + (phase >= 3 ? 0.25 + breath * 0.28 : 0));
+      setMeshGlow(behindShape, phase >= 4 ? 0.56 + breath * 0.24 : 0);
+
+      monitorScreen.scale.x = 1 + Math.sin(elapsed * 22) * 0.015;
+      monitorLight.intensity = 16 + breath * 14 + scarePulse * 18 + hardBlink * 16;
+      phoneLight.intensity = phoneActual * 24;
+      doorLight.intensity = doorActual * 22 + scarePulse * 7;
+      ceilingFlash.intensity = scarePulse * 26 + (phase >= 4 ? 10 + hardBlink * 24 : 0);
+      sweepLight.target.position.x = Math.sin(elapsed * 0.72) * 2.7;
+      door.position.x = phase >= 4 ? Math.sin(elapsed * 13) * 0.025 : 0;
+      phone.rotation.z = phoneActual > 0 ? Math.sin(elapsed * 40) * 0.035 : 0;
+      tape.rotation.y = -0.2 + (tapeActual > 0 ? Math.sin(elapsed * 18) * 0.08 : 0);
+      breaker.rotation.z = breakerActual > 0 ? Math.sin(elapsed * 19) * 0.02 : 0;
+
+      if (phase >= 4 && !finalTriggered && phaseAge > 3.4) {
+        finalTriggered = true;
+        onBlackout(true);
+      }
 
       renderer.render(scene, camera);
       frameId = requestAnimationFrame(animate);
@@ -401,83 +380,38 @@ function GameScene({
       window.removeEventListener("keydown", keyDown);
       window.removeEventListener("keyup", keyUp);
       window.removeEventListener("resize", resize);
+      onFocus(false);
       renderer.dispose();
       renderer.domElement.remove();
     };
-  }, [locale, onEnter, onInspect, onNear]);
+  }, [onBlackout, onEnter, onFocus]);
 
   return <div className="scene" ref={mountRef} />;
 }
 
 function App() {
-  const [locale, setLocale] = useState<Locale>(() => getBrowserLocale());
   const [entered, setEntered] = useState(() => window.location.hash === "#play");
-  const [selectedId, setSelectedId] = useState<HotspotId | null>(null);
-  const [near, setNear] = useState(false);
-  const selected = selectedId ? hotspots.find((spot) => spot.id === selectedId) : undefined;
-  const text = copy[locale];
+  const [focused, setFocused] = useState(false);
+  const [blackout, setBlackout] = useState(false);
 
   const handleEnter = useCallback(() => setEntered(true), []);
-  const handleInspect = useCallback((id: HotspotId) => setSelectedId(id), []);
-  const handleNear = useCallback((isNear: boolean) => setNear(isNear), []);
+  const handleFocus = useCallback((active: boolean) => setFocused(active), []);
+  const handleBlackout = useCallback((active: boolean) => setBlackout(active), []);
 
   useEffect(() => {
-    document.documentElement.lang = locale;
-    document.title = locale === "ko" ? "Night Shift 03:17" : "Night Shift 03:17";
-    document
-      .querySelector('meta[name="description"]')
-      ?.setAttribute(
-        "content",
-        locale === "ko"
-          ? "브라우저에서 플레이하는 로우파이 3D 공포게임 초안. 야간 감시실에서 두 번째 전화를 피하세요."
-          : "A playable lofi 3D browser horror prototype. Survive the monitoring room and do not answer the second call.",
-      );
-  }, [locale]);
+    document.documentElement.lang = "en";
+    document.title = "Night Shift 03:17";
+    document.querySelector('meta[name="description"]')?.setAttribute("content", "A silent lofi 3D browser horror game.");
+  }, []);
 
   return (
     <main className={entered ? "entered" : ""}>
-      <GameScene locale={locale} entered={entered} onEnter={handleEnter} onInspect={handleInspect} onNear={handleNear} />
+      <GameScene entered={entered} onEnter={handleEnter} onFocus={handleFocus} onBlackout={handleBlackout} />
       <div className="noise" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
-
-      <div className="language-toggle" aria-label={text.language}>
-        <button type="button" aria-pressed={locale === "en"} onClick={() => setLocale("en")}>
-          EN
-        </button>
-        <button type="button" aria-pressed={locale === "ko"} onClick={() => setLocale("ko")}>
-          KO
-        </button>
-      </div>
-
-      {!entered && (
-        <button className="enter-screen" type="button" onClick={() => setEntered(true)}>
-          <span>{text.enter}</span>
-          <small>{text.subtitle}</small>
-        </button>
-      )}
-
-      <div className="hud top-left">
-        <strong>Night Shift / 03:17</strong>
-        <span>{text.objective}</span>
-      </div>
-      <div className="hud bottom-left">
-        <span>{navigator.maxTouchPoints > 0 ? text.mobileControls : text.controls}</span>
-        {near && <strong className="signal">{text.proximity}</strong>}
-      </div>
-      <div className="reticle" aria-hidden="true" />
-
-      {selected && (
-        <section className="inspect-panel" aria-live="polite">
-          <p>{selected.label[locale]}</p>
-          <h1>{selected.title[locale]}</h1>
-          <span>{selected.body[locale]}</span>
-          <div className="inspect-actions">
-            <button type="button" onClick={() => setSelectedId(null)}>
-              {text.close}
-            </button>
-          </div>
-        </section>
-      )}
+      <div className={focused ? "reticle focused" : "reticle"} aria-hidden="true" />
+      <div className="start-veil" aria-hidden="true" />
+      <div className={blackout ? "blackout active" : "blackout"} aria-hidden="true" />
     </main>
   );
 }
