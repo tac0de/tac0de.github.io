@@ -19,7 +19,7 @@ const projects: Project[] = [
     title: "Kkomo",
     kicker: "KakaoTalk study chatbot",
     description:
-      "카카오톡 그룹방 안에서 질문, 퀴즈, 영어 단어, 공식, 과학 암기, 사자성어 복습을 다루는 학습 챗봇.",
+      "A KakaoTalk group-room study bot for questions, quizzes, vocabulary, formulas, science memory drills, and Korean idiom review.",
     url: "https://github.com/tac0de/kakao-study-groupbot",
     image: "./assets/kkomo.png",
     tags: ["Kakao skill", "Study loops", "Reliability"],
@@ -29,7 +29,7 @@ const projects: Project[] = [
     title: "PlotNodes",
     kicker: "Relationship-driven character AI",
     description:
-      "한국어 DM 감성의 캐릭터 AI 채팅 앱. 대화 뒤에서 기억, 애착, 긴장, 오해가 관계 상태로 누적된다.",
+      "A Korean-first character AI chat app where memory, attachment, tension, and controlled misreadings accumulate behind each DM.",
     url: "https://plotnodes.com",
     image: "./assets/plotnodes-live.png",
     tags: ["Next.js", "Firebase", "OpenAI"],
@@ -39,7 +39,7 @@ const projects: Project[] = [
     title: "The Divine Paradox",
     kicker: "Seeded 3D observation world",
     description:
-      "숫자 seed마다 같은 저폴리 세계가 열리는 3D 관찰 웹. 공유 가능한 개인 세계라는 감각을 목표로 만든다.",
+      "A seeded 3D observation world: every numeric URL opens a deterministic low-poly place that can be shared like an identity.",
     url: "https://thedivineparadox.com",
     image: "./assets/thedivineparadox-live.png",
     tags: ["Three.js", "Procedural", "Firebase"],
@@ -51,12 +51,12 @@ const futureWorks = [
   {
     title: "3D lofi horror game",
     icon: Gamepad2,
-    body: "낮은 해상도, 느린 카메라, 불편한 정적을 핵심 감각으로 삼는 웹 기반 공포 게임.",
+    body: "A browser horror game shaped by late-night job simulators, cheap indie dread, surveillance screens, slow cameras, and awkward silence.",
   },
   {
     title: "Fantasy long-form novel",
     icon: BookOpenText,
-    body: "긴 호흡의 세계관, 인물 관계, 신화적 모순을 축으로 쌓아 가는 장편 판타지 소설.",
+    body: "A long fantasy novel built around mythic contradiction, unstable faith, political memory, and relationships that change the world.",
   },
 ];
 
@@ -164,7 +164,7 @@ function ArtScene() {
 function ProjectCard({ project }: { project: Project }) {
   return (
     <article className="project-card" style={{ "--accent": project.accent } as React.CSSProperties}>
-      <a className="project-media" href={project.url} target="_blank" rel="noreferrer" aria-label={`${project.title} 열기`}>
+      <a className="project-media" href={project.url} target="_blank" rel="noreferrer" aria-label={`Open ${project.title}`}>
         <img src={project.image} alt={`${project.title} screenshot`} />
       </a>
       <div className="project-copy">
@@ -189,13 +189,14 @@ function ProjectCard({ project }: { project: Project }) {
 function App() {
   return (
     <main>
+      <div className="grain" aria-hidden="true" />
       <section className="hero">
         <ArtScene />
         <div className="hero-copy">
-          <p className="eyebrow">tac0de / web, AI, worlds</p>
-          <h1>불안한 세계와 쓸모 있는 도구를 같이 만드는 포트폴리오.</h1>
+          <p className="eyebrow">tac0de / web, AI, haunted systems</p>
+          <h1>Useful tools for uneasy worlds.</h1>
           <p className="hero-lead">
-            학습 챗봇, 관계형 캐릭터 AI, seed 기반 3D 월드, 그리고 앞으로 만들 lofi 공포게임과 판타지 장편까지.
+            I build learning bots, relationship-driven character AI, seeded 3D worlds, and the next layer: lofi horror games and long-form fantasy fiction.
           </p>
           <div className="hero-actions">
             <a href="#projects" className="primary-action">
@@ -213,7 +214,7 @@ function App() {
       <section className="section-shell" id="projects">
         <div className="section-heading">
           <p className="eyebrow">selected work</p>
-          <h2>제품이 먼저 보이고, 기술은 뒤에서 받치게.</h2>
+          <h2>Products with a strange pulse under the interface.</h2>
         </div>
         <div className="project-grid">
           {projects.map((project) => (
@@ -225,7 +226,7 @@ function App() {
       <section className="future-band" id="future">
         <div className="section-heading">
           <p className="eyebrow">next worlds</p>
-          <h2>다음에는 플레이 가능한 어둠과 긴 호흡의 이야기를 만든다.</h2>
+          <h2>Next: playable dread and a fantasy world with consequences.</h2>
         </div>
         <div className="future-grid">
           {futureWorks.map((work) => {
