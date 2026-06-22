@@ -155,6 +155,7 @@ export class Game {
     if (action?.type === "answer-phone") this.horror.mark("phone");
     if (action?.type === "inspect-203") this.horror.mark("room203");
     if (action?.type === "take-key") this.horror.mark("key");
+    if (action?.type === "reset-breaker") this.horror.mark("breaker");
     if (action?.type === "exit") this.finish();
   }
 

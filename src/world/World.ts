@@ -16,6 +16,7 @@ type InteractableMeta = {
 };
 
 const interactable = new WeakMap<THREE.Object3D, InteractableMeta>();
+const ROOM_SIGN_SIZE: [number, number] = [0.58, 0.26];
 
 export class World {
   readonly group = new THREE.Group();
@@ -29,17 +30,24 @@ export class World {
   private room203Occupied = false;
   private parkingGhost?: THREE.Group;
   private readonly clockHand: THREE.Mesh;
+  private readonly roomSigns: THREE.Mesh[] = [];
+  private readonly keyMesh: THREE.Mesh;
+  private readonly bookPage: THREE.Mesh;
+  private keyRemoved = false;
 
   constructor() {
     this.group.name = "NoVacancyWorld";
-    this.group.add(new THREE.AmbientLight(0x322b25, 0.9));
-    this.group.add(this.makeLight(-1.9, 2.25, 2.2, 0xffc066, 1.7, 5));
-    this.group.add(this.makeLight(0, 2.55, -4, 0x9ac2ff, 0.9, 6));
-    this.group.add(this.makeLight(0, 2.2, -12, 0xff8b57, 1.2, 6));
+    this.group.add(new THREE.AmbientLight(0xb6a897, 2.45));
+    this.group.add(this.makeLight(-1.9, 2.25, 2.2, 0xffd08b, 3.4, 8.5));
+    this.group.add(this.makeLight(0, 2.55, -4, 0xb7d1ff, 2.15, 10));
+    this.group.add(this.makeLight(0, 2.2, -12, 0xffa978, 2.45, 9));
     this.flashlight.target.position.set(0, 1.6, 0);
     this.group.add(this.flashlight, this.flashlight.target);
     this.clockHand = this.makeClock();
     this.buildMotel();
+    this.keyMesh = this.getInteractableMesh("key203");
+    this.bookPage = this.makeBookPage("201 WALK-IN\\n202 EMPTY\\n203 VACANT", [-2.98, 1.14, 3.43]);
+    this.group.add(this.bookPage);
     this.threat = this.makeThreat();
     this.threat.visible = false;
     this.threat.position.set(0, 0, -16);
@@ -95,6 +103,36 @@ export class World {
     this.parkingGhost.visible = visible;
   }
 
+  setCctvFigureStage(stage: number): void {
+    this.setParkingGhostVisible(true);
+    const ghost = this.parkingGhost;
+    if (!ghost) return;
+    ghost.position.set(stage % 2 === 0 ? 0.65 : -0.9, 0, 8.2 + stage * 1.25);
+    ghost.scale.setScalar(0.92 + stage * 0.16);
+  }
+
+  changeRoomNumbersTo203(): void {
+    for (const sign of this.roomSigns) {
+      const material = sign.material as THREE.MeshBasicMaterial;
+      material.map?.dispose();
+      material.map = this.makeLabelTexture("203", "#e7d7b1", "#362620");
+      material.needsUpdate = true;
+    }
+  }
+
+  corruptGuestBook(): void {
+    const material = this.bookPage.material as THREE.MeshBasicMaterial;
+    material.map?.dispose();
+    material.map = this.makeLabelTexture("203 OCCUPIED\\n203 OCCUPIED\\nYOUR NAME", "#130f0e", "#d8cba8");
+    material.needsUpdate = true;
+  }
+
+  removeDeskKey(): void {
+    if (this.keyRemoved) return;
+    this.keyRemoved = true;
+    this.keyMesh.visible = false;
+  }
+
   occupyRoom203(): void {
     if (this.room203Occupied) return;
     this.room203Occupied = true;
@@ -137,36 +175,40 @@ export class World {
   }
 
   private buildMotel(): void {
-    this.group.add(this.box(0x171311, [12, 0.08, 30], [0, -0.04, -4]));
-    this.group.add(this.box(0x2c241f, [10, 2.7, 0.18], [0, 1.35, 7.6]));
-    this.group.add(this.box(0x2c241f, [0.18, 2.7, 7.3], [-4.9, 1.35, 3.9]));
-    this.group.add(this.box(0x2c241f, [0.18, 2.7, 7.3], [4.9, 1.35, 3.9]));
-    this.group.add(this.box(0x211a17, [3.2, 2.7, 0.18], [-3.4, 1.35, 0.3]));
-    this.group.add(this.box(0x211a17, [3.2, 2.7, 0.18], [3.4, 1.35, 0.3]));
-    this.group.add(this.box(0x3a241d, [4.2, 1, 1.1], [-1.4, 0.5, 4.2]));
-    this.addInteractable(this.box(0x101924, [0.72, 0.42, 0.18], [-2.2, 1.18, 3.56]), "cctv", "Check CCTV", "cctv");
-    this.addInteractable(this.box(0x111111, [0.36, 0.16, 0.28], [-0.8, 1.1, 3.63]), "phone", "Answer phone", "answer-phone");
+    this.group.add(this.box(0x51463c, [12, 0.08, 30], [0, -0.04, -4]));
+    this.group.add(this.box(0x705f52, [10, 2.7, 0.18], [0, 1.35, 7.6]));
+    this.group.add(this.box(0x66574d, [0.18, 2.7, 7.3], [-4.9, 1.35, 3.9]));
+    this.group.add(this.box(0x66574d, [0.18, 2.7, 7.3], [4.9, 1.35, 3.9]));
+    this.group.add(this.box(0x5c4f45, [3.2, 2.7, 0.18], [-3.4, 1.35, 0.3]));
+    this.group.add(this.box(0x5c4f45, [3.2, 2.7, 0.18], [3.4, 1.35, 0.3]));
+    this.group.add(this.box(0x6a4a37, [4.2, 1, 1.1], [-1.4, 0.5, 4.2]));
+    this.addInteractable(this.box(0x17263a, [0.72, 0.42, 0.18], [-2.2, 1.18, 3.56]), "cctv", "Check CCTV", "cctv");
+    this.addInteractable(this.box(0x1b1816, [0.36, 0.16, 0.28], [-0.8, 1.1, 3.63]), "phone", "Answer phone", "answer-phone");
     this.addInteractable(this.box(0xf1c64d, [0.22, 0.05, 0.42], [-1.48, 1.05, 3.62]), "key203", "Take key 203", "take-key");
-    this.addInteractable(this.box(0x5d3a25, [0.52, 0.08, 0.72], [-2.98, 1.06, 3.62]), "book", "Read guest book", "read-book");
-    this.group.add(this.box(0x1f1815, [2.8, 0.08, 15.2], [0, -0.02, -6.4]));
-    this.group.add(this.box(0x33251f, [0.18, 2.55, 15], [-1.5, 1.27, -6.3]));
-    this.group.add(this.box(0x33251f, [0.18, 2.55, 15], [1.5, 1.27, -6.3]));
+    this.addInteractable(this.box(0x745338, [0.52, 0.08, 0.72], [-2.98, 1.06, 3.62]), "book", "Read guest book", "read-book");
+    this.group.add(this.box(0x574a40, [2.8, 0.08, 15.2], [0, -0.02, -6.4]));
+    this.group.add(this.box(0x6b584b, [0.18, 2.55, 15], [-1.5, 1.27, -6.3]));
+    this.group.add(this.box(0x6b584b, [0.18, 2.55, 15], [1.5, 1.27, -6.3]));
     this.makeDoor("room203", [1.57, 1.05, -8.7], 0.68, false, "Room 203", "open-door");
-    this.group.add(this.box(0x2a1f1c, [4, 2.45, 0.16], [3.6, 1.2, -7.8]));
-    this.group.add(this.box(0x2a1f1c, [0.16, 2.45, 4.6], [1.58, 1.2, -10]));
-    this.group.add(this.box(0x2a1f1c, [0.16, 2.45, 4.6], [5.6, 1.2, -10]));
-    this.group.add(this.box(0x2a1f1c, [4, 2.45, 0.16], [3.6, 1.2, -12.3]));
+    this.group.add(this.makeRoomSign("203", [1.46, 1.78, -8.05], Math.PI / 2));
+    this.group.add(this.makeRoomSign("201", [-1.46, 1.78, -7.2], -Math.PI / 2));
+    this.group.add(this.makeRoomSign("204", [-1.46, 1.78, -10.7], -Math.PI / 2));
+    this.group.add(this.box(0x473931, [4, 2.45, 0.16], [3.6, 1.2, -7.8]));
+    this.group.add(this.box(0x473931, [0.16, 2.45, 4.6], [1.58, 1.2, -10]));
+    this.group.add(this.box(0x473931, [0.16, 2.45, 4.6], [5.6, 1.2, -10]));
+    this.group.add(this.box(0x473931, [4, 2.45, 0.16], [3.6, 1.2, -12.3]));
     this.addInteractable(this.box(0x6a4a36, [1.5, 0.45, 0.9], [4.2, 0.35, -10.8]), "inspect203", "Inspect Room 203", "inspect-203");
     this.makeDoor("storage", [-1.57, 1.05, -4.7], -0.68, true, "Storage", "open-door");
-    this.group.add(this.box(0x211b18, [4, 2.45, 0.16], [-3.6, 1.2, -3.3]));
-    this.group.add(this.box(0x211b18, [0.16, 2.45, 3.6], [-1.58, 1.2, -5]));
-    this.group.add(this.box(0x211b18, [0.16, 2.45, 3.6], [-5.6, 1.2, -5]));
-    this.group.add(this.box(0x211b18, [4, 2.45, 0.16], [-3.6, 1.2, -6.9]));
-    this.group.add(this.box(0x493d31, [0.8, 1.2, 0.4], [-4.5, 0.6, -5.8]));
+    this.group.add(this.box(0x40362f, [4, 2.45, 0.16], [-3.6, 1.2, -3.3]));
+    this.group.add(this.box(0x40362f, [0.16, 2.45, 3.6], [-1.58, 1.2, -5]));
+    this.group.add(this.box(0x40362f, [0.16, 2.45, 3.6], [-5.6, 1.2, -5]));
+    this.group.add(this.box(0x40362f, [4, 2.45, 0.16], [-3.6, 1.2, -6.9]));
+    this.group.add(this.box(0x6b5d4d, [0.8, 1.2, 0.4], [-4.5, 0.6, -5.8]));
+    this.addInteractable(this.box(0xc9b77b, [0.45, 0.62, 0.14], [-3.45, 1.02, -3.42]), "breaker", "Reset breaker", "reset-breaker");
     this.addInteractable(this.box(0x22262a, [0.75, 0.12, 0.45], [-3.2, 0.92, -5.3]), "exit", "Run outside", "exit");
-    this.group.add(this.box(0x111315, [10.2, 0.08, 5.5], [0, -0.03, 10]));
-    this.group.add(this.box(0x1b2024, [1.8, 0.12, 3.6], [-2.1, 0.02, 10.3]));
-    this.group.add(this.box(0x1b2024, [1.8, 0.12, 3.6], [2.1, 0.02, 10.3]));
+    this.group.add(this.box(0x2f3232, [10.2, 0.08, 5.5], [0, -0.03, 10]));
+    this.group.add(this.box(0x353b3e, [1.8, 0.12, 3.6], [-2.1, 0.02, 10.3]));
+    this.group.add(this.box(0x353b3e, [1.8, 0.12, 3.6], [2.1, 0.02, 10.3]));
     this.group.add(this.clockHand);
   }
 
@@ -203,6 +245,56 @@ export class World {
     );
     mesh.position.set(position[0], position[1], position[2]);
     return mesh;
+  }
+
+  private getInteractableMesh(id: string): THREE.Mesh {
+    for (const child of this.group.children) {
+      const meta = interactable.get(child);
+      if (meta?.id === id && child instanceof THREE.Mesh) return child;
+    }
+    throw new Error(`Missing interactable mesh: ${id}`);
+  }
+
+  private makeRoomSign(text: string, position: [number, number, number], rotationY: number): THREE.Mesh {
+    const sign = new THREE.Mesh(
+      new THREE.PlaneGeometry(ROOM_SIGN_SIZE[0], ROOM_SIGN_SIZE[1]),
+      new THREE.MeshBasicMaterial({ map: this.makeLabelTexture(text, "#241c18", "#efd7a2") }),
+    );
+    sign.position.set(position[0], position[1], position[2]);
+    sign.rotation.y = rotationY;
+    this.roomSigns.push(sign);
+    return sign;
+  }
+
+  private makeBookPage(text: string, position: [number, number, number]): THREE.Mesh {
+    const page = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.48, 0.42),
+      new THREE.MeshBasicMaterial({ map: this.makeLabelTexture(text, "#efe2bd", "#2b211b") }),
+    );
+    page.position.set(position[0], position[1], position[2]);
+    page.rotation.x = -Math.PI / 2;
+    return page;
+  }
+
+  private makeLabelTexture(text: string, background: string, foreground: string): THREE.CanvasTexture {
+    const canvas = document.createElement("canvas");
+    canvas.width = 256;
+    canvas.height = 128;
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Missing 2D canvas context");
+    context.fillStyle = background;
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = foreground;
+    context.font = "700 34px monospace";
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    const lines = text.split("\\n");
+    lines.forEach((line, index) => {
+      context.fillText(line, canvas.width / 2, 40 + index * 34);
+    });
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
   }
 
   private makeLight(x: number, y: number, z: number, color: number, intensity: number, distance: number): THREE.PointLight {

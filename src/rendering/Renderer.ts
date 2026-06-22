@@ -10,7 +10,10 @@ export class Renderer {
       antialias: false,
       powerPreference: "high-performance",
     });
-    this.renderer.setClearColor(0x050505);
+    this.renderer.setClearColor(0x2d2926);
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.18;
     this.renderer.shadowMap.enabled = false;
     root.append(this.renderer.domElement);
     window.addEventListener("resize", () => this.resize());
@@ -19,7 +22,7 @@ export class Renderer {
 
   setPixelStyle(): void {
     this.renderer.domElement.className = "game-canvas";
-    this.scene.fog = new THREE.FogExp2(0x050505, 0.055);
+    this.scene.fog = new THREE.FogExp2(0x2d2926, 0.042);
   }
 
   setAnimationLoop(callback: () => void): void {

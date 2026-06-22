@@ -4,6 +4,7 @@ export class UI {
   private readonly overlay: HTMLDivElement;
   private readonly message: HTMLDivElement;
   private readonly prompt: HTMLDivElement;
+  private readonly tasks: HTMLDivElement;
   private readonly startPanel: HTMLDivElement;
   private readonly cctv: HTMLDivElement;
   private readonly ending: HTMLDivElement;
@@ -20,6 +21,7 @@ export class UI {
     this.overlay.className = "hud";
     this.message = this.make("div", "message");
     this.prompt = this.make("div", "prompt");
+    this.tasks = this.make("div", "tasks");
     this.cctv = this.make("div", "cctv hidden", "CAM 02 - PARKING LOT");
     this.ending = this.make("div", "ending hidden");
     this.startPanel = this.make(
@@ -35,6 +37,7 @@ export class UI {
     this.overlay.append(
       this.message,
       this.prompt,
+      this.tasks,
       this.cctv,
       this.startPanel,
       this.ending,
@@ -64,6 +67,17 @@ export class UI {
     this.prompt.textContent = text;
   }
 
+  setTasks(tasks: string[], completed = new Set<string>(), corrupt = false): void {
+    this.tasks.classList.toggle("corrupt", corrupt);
+    this.tasks.innerHTML = `<h2>Night Audit</h2>${tasks
+      .map((task) => {
+        const done = completed.has(task);
+        const label = corrupt && !done ? this.corruptText(task) : task;
+        return `<div class="${done ? "done" : ""}"><span>${done ? "[x]" : "[ ]"}</span>${label}</div>`;
+      })
+      .join("")}`;
+  }
+
   setCctv(active: boolean): void {
     this.cctv.classList.toggle("hidden", !active);
     this.showMessage(active ? "CCTV feed. Press E or USE to leave." : "", 1800);
@@ -87,6 +101,13 @@ export class UI {
 
   private dispatchStart(): void {
     window.dispatchEvent(new CustomEvent("game-start"));
+  }
+
+  private corruptText(text: string): string {
+    return text
+      .replace(/[aeiou]/gi, "0")
+      .replace(/Room 203/i, "R00m 203")
+      .replace(/CCTV/i, "CAM ??");
   }
 
   private bindJoystick(input: InputSystem): void {

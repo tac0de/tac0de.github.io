@@ -42,7 +42,7 @@ export class InteractionSystem {
       this.ui.showMessage(opened ? "The door gives way." : "Locked.", 1800);
     }
     if (action.id === "book") {
-      this.ui.showMessage("Guest book: 201, 202, 203. Your name is already written below them.", 5200);
+      this.ui.showMessage("Guest book: 201 checked out. 202 empty. 203 vacant.", 4200);
     }
     if (action.id === "phone") {
       this.audio.bell();
@@ -52,10 +52,13 @@ export class InteractionSystem {
       this.ui.showMessage("Key 203. The tag is warm.", 2600);
     }
     if (action.id === "inspect203") {
-      this.ui.showMessage("Room 203 smells like rain. The bed has just been used.", 3600);
+      this.ui.showMessage("Room 203 is readable now: bed, window, bathroom door. No guest.", 4200);
     }
     if (action.id === "cctv") {
-      this.ui.showMessage("The parking lot camera is live.", 2600);
+      this.ui.showMessage("CCTV shows the parking lot from above the office.", 3000);
+    }
+    if (action.id === "breaker") {
+      this.ui.showMessage("Breaker reset. The hallway lights hum in the wrong order.", 4200);
     }
     return { type: action.type, id: action.id };
   }

@@ -9,7 +9,7 @@ body,
   height: 100%;
   margin: 0;
   overflow: hidden;
-  background: #050505;
+  background: #2d2926;
   color: #f0dfbc;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
@@ -39,8 +39,8 @@ button {
   inset: 0;
   pointer-events: none;
   background:
-    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.16), rgba(0, 0, 0, 0.16) 1px, transparent 2px, transparent 4px),
-    radial-gradient(circle at center, transparent 45%, rgba(0, 0, 0, 0.58));
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05) 1px, transparent 2px, transparent 4px),
+    radial-gradient(circle at center, transparent 62%, rgba(0, 0, 0, 0.18));
   mix-blend-mode: multiply;
 }
 
@@ -65,6 +65,47 @@ button {
   font-size: 14px;
   letter-spacing: 0;
   white-space: nowrap;
+}
+
+.tasks {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: min(330px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 211, 106, 0.42);
+  background: rgba(21, 17, 14, 0.58);
+  color: #f4e3bd;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.tasks:empty {
+  display: none;
+}
+
+.tasks h2 {
+  margin: 0 0 8px;
+  color: #ffd36a;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.tasks div {
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 7px;
+  align-items: start;
+}
+
+.tasks .done {
+  color: rgba(244, 227, 189, 0.52);
+  text-decoration: line-through;
+}
+
+.tasks.corrupt {
+  border-color: rgba(217, 77, 55, 0.72);
+  color: #ffb49c;
 }
 
 .start-panel,
