@@ -160,7 +160,8 @@ function GameScene({
     mount.appendChild(renderer.domElement);
 
     const interactables: THREE.Object3D[] = [];
-    const clock = new THREE.Clock();
+    const startedAt = performance.now();
+    let lastFrameAt = startedAt;
     const keys = new Set<string>();
     const pointer = new THREE.Vector2();
     const raycaster = new THREE.Raycaster();
@@ -348,8 +349,10 @@ function GameScene({
     window.addEventListener("keyup", onKeyUp);
 
     const animate = () => {
-      const delta = Math.min(clock.getDelta(), 0.05);
-      const elapsed = clock.elapsedTime;
+      const now = performance.now();
+      const delta = Math.min((now - lastFrameAt) / 1000, 0.05);
+      const elapsed = (now - startedAt) / 1000;
+      lastFrameAt = now;
 
       camera.rotation.y = yaw;
       camera.rotation.x = pitch;
