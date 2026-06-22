@@ -1,6 +1,6 @@
-# tac0de.github.io
+# Night Shift 03:17
 
-Three.js art portfolio for the `https://tac0de.github.io` GitHub Pages user site.
+A playable lofi 3D browser horror prototype for `https://tac0de.github.io`.
 
 ## Run
 
@@ -15,15 +15,9 @@ npm run dev
 npm run build
 ```
 
-The production output is `dist/`. `vite.config.ts` uses `base: "./"` so the build is portable, including the user site at `tac0de.github.io`.
+The production output is `dist/`. GitHub Pages deploys it through the Pages workflow.
 
-## Deploy Options
+## Controls
 
-- User page: push this repo as `tac0de.github.io`, build with GitHub Pages, and publish `dist` through the Pages workflow.
-
-## Content
-
-- Kkomo: KakaoTalk study chatbot project.
-- PlotNodes: relationship-driven character AI chat app.
-- The Divine Paradox: seeded 3D observation world.
-- Future work: 3D lofi horror game.
+- Desktop: WASD move, mouse look, E or click inspect, Esc release pointer.
+- Mobile: drag to look, hold lower screen to move, tap to inspect.

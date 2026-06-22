@@ -268,7 +268,6 @@ main {
   margin-top: 0.25rem;
 }
 
-.inspect-actions a,
 .inspect-actions button {
   display: inline-flex;
   align-items: center;
@@ -282,11 +281,6 @@ main {
   color: #edf3ef;
   cursor: pointer;
   font-weight: 850;
-}
-
-.inspect-actions a {
-  background: #edf3ef;
-  color: #070908;
 }
 
 @media (max-width: 720px) {

@@ -1,94 +1,82 @@
 import { StrictMode, useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { ExternalLink } from "lucide-react";
 import * as THREE from "three";
 import "./styles.css";
 
 type Locale = "en" | "ko";
-type HotspotId = "kkomo" | "plotnodes" | "divine" | "locked";
+type HotspotId = "breaker" | "phone" | "tape" | "door";
 
 type Hotspot = {
   id: HotspotId;
-  title: string;
-  url?: string;
+  title: Record<Locale, string>;
   meshName: string;
   label: Record<Locale, string>;
   body: Record<Locale, string>;
-  hint: Record<Locale, string>;
 };
 
 const hotspots: Hotspot[] = [
   {
-    id: "kkomo",
-    title: "Kkomo",
-    url: "https://pf.kakao.com/_xgryqX",
-    meshName: "hotspot-kkomo",
-    label: { en: "Study terminal", ko: "학습 단말기" },
+    id: "breaker",
+    meshName: "hotspot-breaker",
+    title: { en: "Breaker box", ko: "차단기" },
+    label: { en: "BREAKER", ko: "차단기" },
     body: {
-      en: "A KakaoTalk study bot. The machine keeps asking questions even after the room is empty.",
-      ko: "카카오톡 학습 챗봇. 빈 방에서도 단말기는 계속 문제를 낸다.",
+      en: "The switch is taped down. Someone wrote: do not restore hallway power after 03:17.",
+      ko: "스위치가 테이프로 고정돼 있다. 누군가 적었다: 03:17 이후 복도 전원을 올리지 말 것.",
     },
-    hint: { en: "Open Kakao channel", ko: "카카오 채널 열기" },
   },
   {
-    id: "plotnodes",
-    title: "PlotNodes",
-    url: "https://plotnodes.com",
-    meshName: "hotspot-plotnodes",
-    label: { en: "Messenger room", ko: "메신저 방" },
+    id: "phone",
+    meshName: "hotspot-phone",
+    title: { en: "Wall phone", ko: "벽 전화기" },
+    label: { en: "DO NOT ANSWER", ko: "받지 마" },
     body: {
-      en: "A relationship-driven character AI chat app. The last message is typing by itself.",
-      ko: "관계 중심 캐릭터 AI 채팅 앱. 마지막 메시지가 혼자 입력되고 있다.",
+      en: "The handset is warm. The first ring came from the line. The second one came from inside the wall.",
+      ko: "수화기가 따뜻하다. 첫 번째 벨은 선에서 울렸다. 두 번째 벨은 벽 안에서 울렸다.",
     },
-    hint: { en: "Open PlotNodes", ko: "PlotNodes 열기" },
   },
   {
-    id: "divine",
-    title: "The Divine Paradox",
-    url: "https://thedivineparadox.com",
-    meshName: "hotspot-divine",
-    label: { en: "Seed window", ko: "시드 창문" },
+    id: "tape",
+    meshName: "hotspot-tape",
+    title: { en: "VHS tape", ko: "비디오테이프" },
+    label: { en: "PLAY ME", ko: "재생해" },
     body: {
-      en: "A seeded 3D observation world. The number on the glass keeps changing when you look away.",
-      ko: "시드 기반 3D 관찰 세계. 고개를 돌리면 유리창의 숫자가 바뀐다.",
+      en: "A label reads: SHIFT 12. The tape is already rewound to the moment you entered the room.",
+      ko: "라벨에는 SHIFT 12라고 적혀 있다. 테이프는 이미 당신이 방에 들어온 순간으로 되감겨 있다.",
     },
-    hint: { en: "Open world", ko: "세계 열기" },
   },
   {
-    id: "locked",
-    title: "Locked door",
-    meshName: "hotspot-locked",
-    label: { en: "Do not enter", ko: "출입 금지" },
+    id: "door",
+    meshName: "hotspot-door",
+    title: { en: "Exit door", ko: "출구 문" },
+    label: { en: "EXIT", ko: "출구" },
     body: {
-      en: "This is where the horror game starts. It is not ready, but something behind it is already awake.",
-      ko: "공포게임은 여기서 시작된다. 아직 준비되지 않았지만, 문 뒤의 무언가는 이미 깨어 있다.",
+      en: "The exit is locked from your side. The gap under the door is breathing.",
+      ko: "출구는 안쪽에서 잠겨 있다. 문 아래 틈이 숨을 쉬고 있다.",
     },
-    hint: { en: "Stay in the room", ko: "방에 남기" },
   },
 ];
 
 const copy = {
   en: {
-    enter: "Click to enter",
-    subtitle: "This is not a portfolio. You have to walk through it.",
-    controls: "WASD move / mouse look / click objects / Esc release",
-    mobileControls: "Drag to look / touch the lower screen to move / tap objects",
-    inspect: "Inspect",
-    close: "Stay here",
+    enter: "Start shift",
+    subtitle: "03:17 AM. You are alone in the monitoring room.",
+    controls: "WASD move / mouse look / E or click inspect / Esc release",
+    mobileControls: "Drag to look / hold lower screen to move / tap to inspect",
+    close: "Back away",
     language: "Language",
-    objective: "Find the three exits disguised as projects.",
-    proximity: "Something nearby is broadcasting.",
+    objective: "Restore the room log. Do not answer the second call.",
+    proximity: "The air is moving near you.",
   },
   ko: {
-    enter: "클릭해서 들어가기",
-    subtitle: "이건 포트폴리오가 아닙니다. 안으로 걸어 들어가야 합니다.",
-    controls: "WASD 이동 / 마우스 시점 / 오브젝트 클릭 / Esc 해제",
-    mobileControls: "드래그로 보기 / 화면 아래 터치로 이동 / 오브젝트 탭",
-    inspect: "조사",
-    close: "여기에 남기",
+    enter: "근무 시작",
+    subtitle: "오전 3시 17분. 감시실에는 당신 혼자뿐입니다.",
+    controls: "WASD 이동 / 마우스 시점 / E 또는 클릭 조사 / Esc 해제",
+    mobileControls: "드래그로 보기 / 화면 아래 길게 눌러 이동 / 탭으로 조사",
+    close: "물러서기",
     language: "언어",
-    objective: "프로젝트로 위장한 세 개의 출구를 찾으세요.",
-    proximity: "근처에서 신호가 송출되고 있습니다.",
+    objective: "근무 기록을 복구하세요. 두 번째 전화는 받지 마세요.",
+    proximity: "근처의 공기가 움직이고 있습니다.",
   },
 };
 
@@ -105,11 +93,11 @@ function createLabelTexture(text: string, accent = "#9affe7") {
   ctx.fillStyle = "#050707";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.strokeStyle = accent;
-  ctx.globalAlpha = 0.75;
+  ctx.globalAlpha = 0.72;
   ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
   ctx.globalAlpha = 1;
   ctx.fillStyle = accent;
-  ctx.font = "700 38px ui-monospace, Menlo, monospace";
+  ctx.font = "800 38px ui-monospace, Menlo, monospace";
   ctx.fillText(text, 34, 76);
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -131,56 +119,52 @@ function GameScene({
 }) {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const enteredRef = useRef(entered);
-  const localeRef = useRef(locale);
 
   useEffect(() => {
     enteredRef.current = entered;
   }, [entered]);
 
   useEffect(() => {
-    localeRef.current = locale;
-  }, [locale]);
-
-  useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x030404);
-    scene.fog = new THREE.Fog(0x030404, 4, 18);
+    scene.background = new THREE.Color(0x020303);
+    scene.fog = new THREE.Fog(0x020303, 3.8, 15);
 
-    const camera = new THREE.PerspectiveCamera(72, mount.clientWidth / mount.clientHeight, 0.1, 55);
-    camera.position.set(0, 1.55, 5.7);
+    const camera = new THREE.PerspectiveCamera(73, mount.clientWidth / mount.clientHeight, 0.1, 45);
+    camera.position.set(0, 1.52, 5.5);
     camera.rotation.order = "YXZ";
 
     const renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
-    renderer.setPixelRatio(0.55);
+    renderer.setPixelRatio(0.52);
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.domElement.className = "game-canvas";
     mount.appendChild(renderer.domElement);
 
     const interactables: THREE.Object3D[] = [];
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    const velocity = new THREE.Vector3();
+    const keys = new Set<string>();
     const startedAt = performance.now();
     let lastFrameAt = startedAt;
-    const keys = new Set<string>();
-    const pointer = new THREE.Vector2();
-    const raycaster = new THREE.Raycaster();
-    const velocity = new THREE.Vector3();
     let yaw = 0;
     let pitch = 0;
-    let lookDragging = false;
-    let moveTouch = false;
+    let frameId = 0;
+    let scarePulse = 0;
+    let lastNear = false;
+    let touchLooking = false;
+    let touchMoving = false;
     let lastTouchX = 0;
     let lastTouchY = 0;
-    let scarePulse = 0;
-    let frameId = 0;
-    let lastNear = false;
 
-    const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x111615, roughness: 0.92, metalness: 0.05 });
-    const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x191513, roughness: 0.98, metalness: 0.02 });
-    const glowGreen = new THREE.MeshBasicMaterial({ color: 0x7cffd8 });
-    const redGlow = new THREE.MeshBasicMaterial({ color: 0xff4a5f });
-    const darkMetal = new THREE.MeshStandardMaterial({ color: 0x0b0d0d, roughness: 0.7, metalness: 0.35 });
+    const wall = new THREE.MeshStandardMaterial({ color: 0x101514, roughness: 0.96, metalness: 0.04 });
+    const floor = new THREE.MeshStandardMaterial({ color: 0x171312, roughness: 1, metalness: 0.02 });
+    const metal = new THREE.MeshStandardMaterial({ color: 0x070909, roughness: 0.76, metalness: 0.42 });
+    const green = new THREE.MeshBasicMaterial({ color: 0x80ffd8 });
+    const red = new THREE.MeshBasicMaterial({ color: 0xff455c });
+    const amber = new THREE.MeshBasicMaterial({ color: 0xffcf89 });
 
     const addBox = (
       name: string,
@@ -197,101 +181,100 @@ function GameScene({
       return mesh;
     };
 
-    addBox("floor", [11, 0.18, 13], [0, -0.1, 0], floorMaterial);
-    addBox("ceiling", [11, 0.16, 13], [0, 3.2, 0], wallMaterial);
-    addBox("back-wall", [11, 3.4, 0.18], [0, 1.58, -6.5], wallMaterial);
-    addBox("front-wall-left", [3.2, 3.4, 0.18], [-3.9, 1.58, 6.5], wallMaterial);
-    addBox("front-wall-right", [3.2, 3.4, 0.18], [3.9, 1.58, 6.5], wallMaterial);
-    addBox("left-wall", [0.18, 3.4, 13], [-5.5, 1.58, 0], wallMaterial);
-    addBox("right-wall", [0.18, 3.4, 13], [5.5, 1.58, 0], wallMaterial);
+    addBox("floor", [10.5, 0.18, 12.5], [0, -0.1, 0], floor);
+    addBox("ceiling", [10.5, 0.16, 12.5], [0, 3.05, 0], wall);
+    addBox("back-wall", [10.5, 3.3, 0.18], [0, 1.52, -6.25], wall);
+    addBox("front-wall-left", [3.1, 3.3, 0.18], [-3.8, 1.52, 6.25], wall);
+    addBox("front-wall-right", [3.1, 3.3, 0.18], [3.8, 1.52, 6.25], wall);
+    addBox("left-wall", [0.18, 3.3, 12.5], [-5.25, 1.52, 0], wall);
+    addBox("right-wall", [0.18, 3.3, 12.5], [5.25, 1.52, 0], wall);
 
-    for (let i = 0; i < 8; i += 1) {
-      addBox(`floor-tile-${i}`, [0.04, 0.012, 12.5], [-5 + i * 1.4, 0.01, 0], darkMetal);
-    }
-    for (let i = 0; i < 7; i += 1) {
-      addBox(`wall-mark-${i}`, [0.05, 0.012, 1.2], [-5.4, 0.75 + i * 0.32, -4 + (i % 3) * 2.2], glowGreen, Math.PI / 2);
+    for (let i = 0; i < 9; i += 1) {
+      addBox(`floor-seam-${i}`, [0.035, 0.012, 12.1], [-4.8 + i * 1.2, 0.01, 0], metal);
     }
 
-    const desk = addBox("desk", [3.6, 0.22, 1.2], [-2.8, 0.82, -3.5], darkMetal, 0.1);
-    addBox("desk-leg-a", [0.16, 0.9, 0.16], [-4.25, 0.35, -3.92], darkMetal);
-    addBox("desk-leg-b", [0.16, 0.9, 0.16], [-1.45, 0.35, -3.1], darkMetal);
-    desk.userData.silent = true;
+    addBox("desk", [3.2, 0.2, 1.1], [-2.7, 0.8, -3.55], metal, 0.08);
+    addBox("monitor-body", [0.9, 0.56, 0.2], [-2.7, 1.22, -4.0], metal, 0.08);
+    addBox("monitor-screen", [0.72, 0.38, 0.05], [-2.7, 1.24, -4.12], green, 0.08);
 
-    const kkomo = addBox("hotspot-kkomo", [0.92, 0.62, 0.14], [-2.85, 1.24, -3.97], glowGreen, 0.12);
-    kkomo.userData.hotspot = "kkomo";
-    interactables.push(kkomo);
+    const tape = addBox("hotspot-tape", [0.55, 0.11, 0.34], [-1.58, 0.98, -3.48], amber, -0.15);
+    tape.userData.hotspot = "tape";
+    interactables.push(tape);
 
-    const plot = addBox("hotspot-plotnodes", [1.15, 0.72, 0.16], [3.0, 1.38, -5.98], redGlow, 0);
-    plot.userData.hotspot = "plotnodes";
-    interactables.push(plot);
+    const breaker = addBox("hotspot-breaker", [0.85, 1.15, 0.13], [-5.14, 1.55, -2.1], metal, Math.PI / 2);
+    breaker.userData.hotspot = "breaker";
+    interactables.push(breaker);
+    addBox("breaker-red", [0.08, 0.22, 0.08], [-5.06, 1.7, -1.86], red, Math.PI / 2);
 
-    const divine = addBox("hotspot-divine", [1.45, 1.45, 0.08], [5.39, 1.75, -1.65], glowGreen, Math.PI / 2);
-    divine.userData.hotspot = "divine";
-    interactables.push(divine);
+    const phone = addBox("hotspot-phone", [0.52, 0.72, 0.12], [3.15, 1.42, -6.12], red, 0);
+    phone.userData.hotspot = "phone";
+    interactables.push(phone);
+    addBox("phone-cord", [0.04, 0.78, 0.04], [3.15, 0.88, -6.04], metal);
 
-    const door = addBox("hotspot-locked", [1.5, 2.25, 0.12], [0, 1.1, 6.42], darkMetal, 0);
-    door.userData.hotspot = "locked";
+    const door = addBox("hotspot-door", [1.45, 2.2, 0.12], [0, 1.05, 6.18], metal, 0);
+    door.userData.hotspot = "door";
     interactables.push(door);
-    addBox("door-light", [0.28, 0.08, 0.08], [0.54, 1.88, 6.32], redGlow, 0);
+    addBox("door-gap", [1.36, 0.045, 0.05], [0, 0.08, 6.08], red);
+
+    const mirror = addBox("mirror", [1.2, 1.7, 0.08], [5.14, 1.65, 1.2], green, Math.PI / 2);
+    mirror.scale.x = 0.9;
 
     hotspots.forEach((spot, index) => {
       const target = interactables.find((item) => item.name === spot.meshName);
       if (!target) return;
-      const plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(1.7, 0.42),
+      const label = new THREE.Mesh(
+        new THREE.PlaneGeometry(1.62, 0.4),
         new THREE.MeshBasicMaterial({
-          map: createLabelTexture(spot.label[localeRef.current], index === 1 ? "#ff6b88" : "#9affe7"),
+          map: createLabelTexture(spot.label[locale], index === 1 || index === 3 ? "#ff6b88" : "#9affe7"),
           transparent: true,
         }),
       );
-      plane.name = `${spot.meshName}-label`;
-      plane.position.copy(target.position);
-      plane.position.y += 0.75;
-      plane.userData.followCamera = true;
-      scene.add(plane);
+      label.position.copy(target.position);
+      label.position.y += 0.72;
+      label.userData.followCamera = true;
+      scene.add(label);
     });
 
-    const ambient = new THREE.AmbientLight(0x243331, 0.72);
+    const ambient = new THREE.AmbientLight(0x1d2927, 0.58);
     scene.add(ambient);
-    const mainLight = new THREE.PointLight(0x8fffe3, 18, 9);
-    mainLight.position.set(-2.4, 2.4, 1.8);
-    scene.add(mainLight);
-    const redLight = new THREE.PointLight(0xff3048, 11, 5);
-    redLight.position.set(0, 1.6, 5.4);
-    scene.add(redLight);
-    const flickerLight = new THREE.SpotLight(0xc7fff0, 26, 14, Math.PI / 5, 0.6, 1.4);
-    flickerLight.position.set(1.3, 3.0, 2.3);
-    flickerLight.target.position.set(0, 0.8, -2.2);
-    scene.add(flickerLight, flickerLight.target);
+    const bulb = new THREE.PointLight(0x9affe7, 20, 8);
+    bulb.position.set(-2.8, 2.35, 0.7);
+    scene.add(bulb);
+    const exitLight = new THREE.PointLight(0xff3448, 11, 5);
+    exitLight.position.set(0, 1.5, 5.35);
+    scene.add(exitLight);
+    const sweepLight = new THREE.SpotLight(0xcffff3, 18, 13, Math.PI / 6, 0.65, 1.2);
+    sweepLight.position.set(2.1, 2.8, 2.6);
+    sweepLight.target.position.set(0, 0.8, -2.4);
+    scene.add(sweepLight, sweepLight.target);
 
-    const onResize = () => {
+    const resize = () => {
       camera.aspect = mount.clientWidth / mount.clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(mount.clientWidth, mount.clientHeight);
     };
 
-    const requestLock = () => {
-      if (!enteredRef.current) {
-        onEnter();
-        return;
-      }
+    const lockPointer = () => {
       renderer.domElement.requestPointerLock?.();
     };
 
-    const onMouseMove = (event: MouseEvent) => {
-      if (document.pointerLockElement !== renderer.domElement) return;
-      yaw -= event.movementX * 0.0022;
-      pitch -= event.movementY * 0.0022;
-      pitch = Math.max(-1.1, Math.min(1.05, pitch));
+    const enterAndLock = () => {
+      enteredRef.current = true;
+      onEnter();
+      lockPointer();
     };
 
-    const cast = (clientX: number, clientY: number) => {
-      const rect = renderer.domElement.getBoundingClientRect();
-      pointer.x = ((clientX - rect.left) / rect.width) * 2 - 1;
-      pointer.y = -(((clientY - rect.top) / rect.height) * 2 - 1);
+    const look = (movementX: number, movementY: number, scale = 0.0022) => {
+      yaw -= movementX * scale;
+      pitch -= movementY * scale;
+      pitch = Math.max(-1.05, Math.min(1.0, pitch));
+    };
+
+    const rayAt = (x: number, y: number) => {
+      pointer.set(x, y);
       raycaster.setFromCamera(pointer, camera);
       const hit = raycaster.intersectObjects(interactables, false)[0];
-      if (hit?.object.userData.hotspot) {
+      if (hit?.object.userData.hotspot && hit.distance < 3.1) {
         onInspect(hit.object.userData.hotspot);
         scarePulse = 1;
         return true;
@@ -299,54 +282,67 @@ function GameScene({
       return false;
     };
 
-    const onClick = (event: MouseEvent) => {
-      if (!enteredRef.current) {
-        onEnter();
-        requestLock();
-        return;
-      }
-      if (!cast(event.clientX, event.clientY)) requestLock();
+    const inspectCenter = () => rayAt(0, 0);
+
+    const inspectScreen = (clientX: number, clientY: number) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      const x = ((clientX - rect.left) / rect.width) * 2 - 1;
+      const y = -(((clientY - rect.top) / rect.height) * 2 - 1);
+      return rayAt(x, y);
     };
 
-    const onKeyDown = (event: KeyboardEvent) => keys.add(event.key.toLowerCase());
-    const onKeyUp = (event: KeyboardEvent) => keys.delete(event.key.toLowerCase());
+    const click = (event: MouseEvent) => {
+      if (!enteredRef.current) {
+        enterAndLock();
+        return;
+      }
+      if (document.pointerLockElement === renderer.domElement) {
+        if (!inspectCenter()) scarePulse = 0.2;
+      } else if (!inspectScreen(event.clientX, event.clientY)) {
+        lockPointer();
+      }
+    };
 
-    const onTouchStart = (event: TouchEvent) => {
+    const mouseMove = (event: MouseEvent) => {
+      if (document.pointerLockElement === renderer.domElement) look(event.movementX, event.movementY);
+    };
+
+    const keyDown = (event: KeyboardEvent) => {
+      keys.add(event.key.toLowerCase());
+      if (event.key.toLowerCase() === "e" && enteredRef.current) inspectCenter();
+    };
+    const keyUp = (event: KeyboardEvent) => keys.delete(event.key.toLowerCase());
+
+    const touchStart = (event: TouchEvent) => {
       if (!enteredRef.current) onEnter();
       const touch = event.touches[0];
       lastTouchX = touch.clientX;
       lastTouchY = touch.clientY;
-      lookDragging = true;
-      moveTouch = touch.clientY > window.innerHeight * 0.55;
-      if (event.touches.length === 1) cast(touch.clientX, touch.clientY);
+      touchLooking = true;
+      touchMoving = touch.clientY > window.innerHeight * 0.58;
+      if (!touchMoving) inspectScreen(touch.clientX, touch.clientY);
     };
-
-    const onTouchMove = (event: TouchEvent) => {
+    const touchMove = (event: TouchEvent) => {
       const touch = event.touches[0];
       const dx = touch.clientX - lastTouchX;
       const dy = touch.clientY - lastTouchY;
       lastTouchX = touch.clientX;
       lastTouchY = touch.clientY;
-      if (lookDragging) {
-        yaw -= dx * 0.005;
-        pitch -= dy * 0.004;
-        pitch = Math.max(-1.1, Math.min(1.05, pitch));
-      }
+      if (touchLooking) look(dx, dy, 0.0048);
+    };
+    const touchEnd = () => {
+      touchLooking = false;
+      touchMoving = false;
     };
 
-    const onTouchEnd = () => {
-      lookDragging = false;
-      moveTouch = false;
-    };
-
-    renderer.domElement.addEventListener("click", onClick);
-    renderer.domElement.addEventListener("touchstart", onTouchStart, { passive: true });
-    renderer.domElement.addEventListener("touchmove", onTouchMove, { passive: true });
-    renderer.domElement.addEventListener("touchend", onTouchEnd);
-    window.addEventListener("resize", onResize);
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("keydown", onKeyDown);
-    window.addEventListener("keyup", onKeyUp);
+    renderer.domElement.addEventListener("click", click);
+    renderer.domElement.addEventListener("touchstart", touchStart, { passive: true });
+    renderer.domElement.addEventListener("touchmove", touchMove, { passive: true });
+    renderer.domElement.addEventListener("touchend", touchEnd);
+    window.addEventListener("mousemove", mouseMove);
+    window.addEventListener("keydown", keyDown);
+    window.addEventListener("keyup", keyUp);
+    window.addEventListener("resize", resize);
 
     const animate = () => {
       const now = performance.now();
@@ -361,34 +357,33 @@ function GameScene({
       const right = new THREE.Vector3(Math.cos(yaw), 0, Math.sin(yaw));
       velocity.set(0, 0, 0);
       if (enteredRef.current) {
-        if (keys.has("w") || keys.has("arrowup") || moveTouch) velocity.add(forward);
+        if (keys.has("w") || keys.has("arrowup") || touchMoving) velocity.add(forward);
         if (keys.has("s") || keys.has("arrowdown")) velocity.sub(forward);
         if (keys.has("a") || keys.has("arrowleft")) velocity.sub(right);
         if (keys.has("d") || keys.has("arrowright")) velocity.add(right);
       }
       if (velocity.lengthSq() > 0) {
-        velocity.normalize().multiplyScalar(delta * 2.55);
+        velocity.normalize().multiplyScalar(delta * 2.35);
         camera.position.add(velocity);
       }
-      camera.position.x = Math.max(-4.85, Math.min(4.85, camera.position.x));
-      camera.position.z = Math.max(-5.85, Math.min(5.85, camera.position.z));
+      camera.position.x = Math.max(-4.65, Math.min(4.65, camera.position.x));
+      camera.position.z = Math.max(-5.55, Math.min(5.55, camera.position.z));
       camera.position.y = 1.52 + Math.sin(elapsed * 8) * (velocity.lengthSq() > 0 ? 0.018 : 0.006);
 
-      const distanceToAny = interactables.some((item) => item.position.distanceTo(camera.position) < 2.25);
-      if (distanceToAny !== lastNear) {
-        lastNear = distanceToAny;
-        onNear(distanceToAny);
+      const near = interactables.some((item) => item.position.distanceTo(camera.position) < 2.25);
+      if (near !== lastNear) {
+        lastNear = near;
+        onNear(near);
       }
 
-      flickerLight.intensity = 16 + Math.sin(elapsed * 11) * 4 + (Math.random() > 0.965 ? 18 : 0);
-      redLight.intensity = 7 + Math.sin(elapsed * 2.8) * 3 + scarePulse * 14;
+      bulb.intensity = 13 + Math.sin(elapsed * 7.7) * 4 + (Math.random() > 0.975 ? 18 : 0);
+      exitLight.intensity = 7 + Math.sin(elapsed * 2.4) * 3 + scarePulse * 14;
+      sweepLight.target.position.x = Math.sin(elapsed * 0.7) * 2.8;
       scarePulse *= 0.9;
 
       scene.traverse((item) => {
         if (item.userData.followCamera) item.lookAt(camera.position);
-        if (item.name.startsWith("hotspot")) {
-          item.rotation.z = Math.sin(elapsed * 2 + item.position.x) * 0.025;
-        }
+        if (item.name.startsWith("hotspot")) item.rotation.z = Math.sin(elapsed * 2 + item.position.x) * 0.02;
       });
 
       renderer.render(scene, camera);
@@ -398,14 +393,14 @@ function GameScene({
 
     return () => {
       cancelAnimationFrame(frameId);
-      renderer.domElement.removeEventListener("click", onClick);
-      renderer.domElement.removeEventListener("touchstart", onTouchStart);
-      renderer.domElement.removeEventListener("touchmove", onTouchMove);
-      renderer.domElement.removeEventListener("touchend", onTouchEnd);
-      window.removeEventListener("resize", onResize);
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("keydown", onKeyDown);
-      window.removeEventListener("keyup", onKeyUp);
+      renderer.domElement.removeEventListener("click", click);
+      renderer.domElement.removeEventListener("touchstart", touchStart);
+      renderer.domElement.removeEventListener("touchmove", touchMove);
+      renderer.domElement.removeEventListener("touchend", touchEnd);
+      window.removeEventListener("mousemove", mouseMove);
+      window.removeEventListener("keydown", keyDown);
+      window.removeEventListener("keyup", keyUp);
+      window.removeEventListener("resize", resize);
       renderer.dispose();
       renderer.domElement.remove();
     };
@@ -419,22 +414,23 @@ function App() {
   const [entered, setEntered] = useState(() => window.location.hash === "#play");
   const [selectedId, setSelectedId] = useState<HotspotId | null>(null);
   const [near, setNear] = useState(false);
-  const text = copy[locale];
   const selected = selectedId ? hotspots.find((spot) => spot.id === selectedId) : undefined;
+  const text = copy[locale];
+
   const handleEnter = useCallback(() => setEntered(true), []);
   const handleInspect = useCallback((id: HotspotId) => setSelectedId(id), []);
   const handleNear = useCallback((isNear: boolean) => setNear(isNear), []);
 
   useEffect(() => {
     document.documentElement.lang = locale;
-    document.title = locale === "ko" ? "tac0de - 걸어 들어가는 공포 포트폴리오" : "tac0de - A haunted playable portfolio";
+    document.title = locale === "ko" ? "Night Shift 03:17" : "Night Shift 03:17";
     document
       .querySelector('meta[name="description"]')
       ?.setAttribute(
         "content",
         locale === "ko"
-          ? "tac0de의 플레이 가능한 3D 로우파이 공포 포트폴리오. 방 안 오브젝트를 조사해 프로젝트 출구를 찾으세요."
-          : "A playable 3D lofi horror portfolio by tac0de. Walk through the room, inspect objects, and find project exits.",
+          ? "브라우저에서 플레이하는 로우파이 3D 공포게임 초안. 야간 감시실에서 두 번째 전화를 피하세요."
+          : "A playable lofi 3D browser horror prototype. Survive the monitoring room and do not answer the second call.",
       );
   }, [locale]);
 
@@ -443,6 +439,7 @@ function App() {
       <GameScene locale={locale} entered={entered} onEnter={handleEnter} onInspect={handleInspect} onNear={handleNear} />
       <div className="noise" aria-hidden="true" />
       <div className="vignette" aria-hidden="true" />
+
       <div className="language-toggle" aria-label={text.language}>
         <button type="button" aria-pressed={locale === "en"} onClick={() => setLocale("en")}>
           EN
@@ -460,7 +457,7 @@ function App() {
       )}
 
       <div className="hud top-left">
-        <strong>tac0de / CAM-04</strong>
+        <strong>Night Shift / 03:17</strong>
         <span>{text.objective}</span>
       </div>
       <div className="hud bottom-left">
@@ -472,15 +469,9 @@ function App() {
       {selected && (
         <section className="inspect-panel" aria-live="polite">
           <p>{selected.label[locale]}</p>
-          <h1>{selected.title}</h1>
+          <h1>{selected.title[locale]}</h1>
           <span>{selected.body[locale]}</span>
           <div className="inspect-actions">
-            {selected.url && (
-              <a href={selected.url} target="_blank" rel="noreferrer">
-                <ExternalLink size={16} />
-                {selected.hint[locale]}
-              </a>
-            )}
             <button type="button" onClick={() => setSelectedId(null)}>
               {text.close}
             </button>
