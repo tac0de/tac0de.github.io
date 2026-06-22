@@ -53,6 +53,22 @@ main {
   background-size: 3px 3px;
 }
 
+.scanline {
+  position: fixed;
+  inset: -20% 0;
+  z-index: 19;
+  pointer-events: none;
+  opacity: 0.12;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 7px,
+    rgba(255, 255, 255, 0.22) 8px,
+    transparent 9px
+  );
+  animation: scan-drift 11s linear infinite;
+}
+
 .hero {
   position: relative;
   min-height: 94vh;
@@ -117,6 +133,21 @@ h1 {
   text-wrap: balance;
 }
 
+.hero-title {
+  position: relative;
+}
+
+.hero-title::after {
+  content: attr(data-title);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: rgba(148, 255, 228, 0.18);
+  transform: translate(0.04em, 0.025em);
+  clip-path: inset(0 0 52% 0);
+  animation: title-flicker 6.5s steps(1, end) infinite;
+}
+
 .hero-lead {
   max-width: 650px;
   margin: 0 0 2rem;
@@ -174,7 +205,8 @@ footer {
 }
 
 .section-shell,
-.future-band {
+.future-band,
+.tech-band {
   position: relative;
   padding: 6rem max(1.25rem, calc((100vw - 1180px) / 2));
 }
@@ -312,6 +344,10 @@ footer {
   gap: 1rem;
 }
 
+.future-grid.single {
+  grid-template-columns: minmax(0, 0.72fr);
+}
+
 .future-item {
   min-height: 220px;
   display: grid;
@@ -327,6 +363,69 @@ footer {
 
 .future-item svg {
   color: #ffd7a8;
+}
+
+.tech-band {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent 32%),
+    #070a0a;
+}
+
+.tech-grid {
+  display: grid;
+  grid-template-columns: 1.08fr 0.96fr 0.96fr;
+  gap: 0.85rem;
+}
+
+.tech-panel {
+  position: relative;
+  min-height: 250px;
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 2px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(148, 255, 228, 0.08), transparent 38%),
+    rgba(8, 11, 11, 0.82);
+}
+
+.tech-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  background:
+    linear-gradient(90deg, transparent 0 84%, rgba(255, 255, 255, 0.18) 85%, transparent 86%),
+    linear-gradient(180deg, transparent 0 76%, rgba(255, 255, 255, 0.12) 77%, transparent 78%);
+  background-size: 4.5rem 4.5rem;
+}
+
+.tech-panel svg {
+  color: #ffd7a8;
+}
+
+.tech-panel h3 {
+  margin: 0.8rem 0 0.75rem;
+  font-size: 1.15rem;
+  line-height: 1.1;
+}
+
+.tech-panel p,
+.tech-panel li {
+  color: #bac8c1;
+  font-size: 0.95rem;
+}
+
+.tech-panel p,
+.tech-panel ul {
+  margin: 0;
+}
+
+.tech-panel ul {
+  display: grid;
+  gap: 0.55rem;
+  padding-left: 1.1rem;
 }
 
 footer {
@@ -347,7 +446,9 @@ footer a {
   }
 
   .project-grid,
-  .future-grid {
+  .future-grid,
+  .future-grid.single,
+  .tech-grid {
     grid-template-columns: 1fr;
     transform: none;
   }
@@ -359,6 +460,39 @@ footer a {
 
   .project-card:nth-child(2) {
     transform: none;
+  }
+}
+
+@keyframes scan-drift {
+  from {
+    transform: translateY(-8%);
+  }
+  to {
+    transform: translateY(8%);
+  }
+}
+
+@keyframes title-flicker {
+  0%,
+  82%,
+  100% {
+    opacity: 0;
+    transform: translate(0.04em, 0.025em);
+  }
+  83% {
+    opacity: 1;
+    transform: translate(0.065em, 0.025em);
+  }
+  84% {
+    opacity: 0.28;
+    transform: translate(-0.025em, 0.015em);
+  }
+  86% {
+    opacity: 0.65;
+    transform: translate(0.035em, -0.01em);
+  }
+  88% {
+    opacity: 0;
   }
 }
 

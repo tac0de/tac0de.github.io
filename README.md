@@ -26,4 +26,4 @@ The production output is `dist/`. `vite.config.ts` uses `base: "./"` so the buil
 - Kkomo: KakaoTalk study chatbot project.
 - PlotNodes: relationship-driven character AI chat app.
 - The Divine Paradox: seeded 3D observation world.
-- Future work: 3D lofi horror game and long-form fantasy novel.
+- Future work: 3D lofi horror game.
