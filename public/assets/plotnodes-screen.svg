@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">PlotNodes app screenshot illustration</title>
+  <desc id="desc">Dark mobile messenger interface for a Korean character AI chat product.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#171114"/>
+      <stop offset="0.55" stop-color="#24171b"/>
+      <stop offset="1" stop-color="#090c10"/>
+    </linearGradient>
+    <linearGradient id="phone" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#26202a"/>
+      <stop offset="1" stop-color="#0e1015"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="760" fill="url(#bg)"/>
+  <circle cx="190" cy="122" r="180" fill="#f46f8f" opacity=".14"/>
+  <circle cx="990" cy="642" r="260" fill="#73d7ff" opacity=".12"/>
+  <rect x="105" y="98" width="325" height="545" rx="42" fill="url(#phone)" stroke="#ffffff" stroke-opacity=".14" stroke-width="2"/>
+  <rect x="137" y="148" width="262" height="58" rx="22" fill="#ffffff" opacity=".08"/>
+  <circle cx="170" cy="177" r="18" fill="#f46f8f"/>
+  <rect x="205" y="166" width="112" height="10" rx="5" fill="#f4e6eb"/>
+  <rect x="205" y="184" width="72" height="8" rx="4" fill="#f4e6eb" opacity=".48"/>
+  <rect x="150" y="245" width="190" height="58" rx="18" fill="#ffffff" opacity=".12"/>
+  <rect x="203" y="326" width="172" height="64" rx="20" fill="#f46f8f" opacity=".92"/>
+  <rect x="151" y="414" width="224" height="74" rx="20" fill="#ffffff" opacity=".1"/>
+  <rect x="137" y="550" width="262" height="54" rx="20" fill="#ffffff" opacity=".08"/>
+  <rect x="500" y="130" width="575" height="96" rx="28" fill="#ffffff" opacity=".08"/>
+  <text x="532" y="176" fill="#fff0f5" font-family="system-ui, sans-serif" font-size="32" font-weight="700">PlotNodes</text>
+  <text x="532" y="204" fill="#d8c6ce" font-family="system-ui, sans-serif" font-size="18">relationship-driven character AI chat</text>
+  <g fill="none" stroke="#f46f8f" stroke-width="4" stroke-linecap="round" opacity=".9">
+    <path d="M615 396 C686 285 796 290 853 394"/>
+    <path d="M615 396 C698 480 782 500 853 394"/>
+    <path d="M734 248 L734 543"/>
+  </g>
+  <g>
+    <circle cx="615" cy="396" r="56" fill="#181c22" stroke="#f46f8f" stroke-width="3"/>
+    <circle cx="734" cy="248" r="48" fill="#181c22" stroke="#ffd7a8" stroke-width="3"/>
+    <circle cx="853" cy="394" r="56" fill="#181c22" stroke="#8bd3ff" stroke-width="3"/>
+    <circle cx="734" cy="543" r="48" fill="#181c22" stroke="#94ffe4" stroke-width="3"/>
+  </g>
+  <text x="584" y="402" fill="#edf3ef" font-family="system-ui, sans-serif" font-size="18" font-weight="700">trust</text>
+  <text x="703" y="254" fill="#edf3ef" font-family="system-ui, sans-serif" font-size="18" font-weight="700">memory</text>
+  <text x="818" y="400" fill="#edf3ef" font-family="system-ui, sans-serif" font-size="18" font-weight="700">tension</text>
+  <text x="696" y="549" fill="#edf3ef" font-family="system-ui, sans-serif" font-size="18" font-weight="700">jealousy</text>
+  <rect x="514" y="616" width="514" height="46" rx="16" fill="#ffffff" opacity=".08"/>
+  <text x="542" y="646" fill="#d8c6ce" font-family="system-ui, sans-serif" font-size="18">same character, different emotional state</text>
+</svg>
