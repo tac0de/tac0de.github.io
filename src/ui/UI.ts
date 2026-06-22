@@ -1,0 +1,133 @@
+import type { InputSystem } from "../input/InputSystem";
+
+export class UI {
+  private readonly overlay: HTMLDivElement;
+  private readonly message: HTMLDivElement;
+  private readonly prompt: HTMLDivElement;
+  private readonly startPanel: HTMLDivElement;
+  private readonly cctv: HTMLDivElement;
+  private readonly ending: HTMLDivElement;
+  private readonly joystick: HTMLDivElement;
+  private readonly knob: HTMLDivElement;
+  private readonly interact: HTMLButtonElement;
+  private readonly flash: HTMLButtonElement;
+  private messageTimer = 0;
+  private started = false;
+  onReset?: () => void;
+
+  constructor(root: HTMLElement) {
+    this.overlay = document.createElement("div");
+    this.overlay.className = "hud";
+    this.message = this.make("div", "message");
+    this.prompt = this.make("div", "prompt");
+    this.cctv = this.make("div", "cctv hidden", "CAM 02 - PARKING LOT");
+    this.ending = this.make("div", "ending hidden");
+    this.startPanel = this.make(
+      "div",
+      "start-panel",
+      "<h1>NO VACANCY</h1><p>Night audit. 11:43 PM.</p><button>Start Shift</button>",
+    );
+    this.joystick = this.make("div", "joystick");
+    this.knob = this.make("div", "knob");
+    this.interact = this.make("button", "touch-button interact-button", "USE");
+    this.flash = this.make("button", "touch-button flash-button", "LIGHT");
+    this.joystick.append(this.knob);
+    this.overlay.append(
+      this.message,
+      this.prompt,
+      this.cctv,
+      this.startPanel,
+      this.ending,
+      this.joystick,
+      this.interact,
+      this.flash,
+    );
+    root.append(this.overlay);
+    this.startPanel.querySelector("button")?.addEventListener("click", () => this.start());
+  }
+
+  bindInput(input: InputSystem): void {
+    this.interact.addEventListener("click", () => input.interact());
+    this.flash.addEventListener("click", () => input.flashlight());
+    this.bindJoystick(input);
+  }
+
+  start(): void {
+    if (this.started) return;
+    this.started = true;
+    this.startPanel.classList.add("hidden");
+    this.message.textContent = "";
+    this.dispatchStart();
+  }
+
+  setPrompt(text: string): void {
+    this.prompt.textContent = text;
+  }
+
+  setCctv(active: boolean): void {
+    this.cctv.classList.toggle("hidden", !active);
+    this.showMessage(active ? "CCTV feed. Press E or USE to leave." : "", 1800);
+  }
+
+  showMessage(text: string, ms = 3200): void {
+    this.message.textContent = text;
+    window.clearTimeout(this.messageTimer);
+    if (text) {
+      this.messageTimer = window.setTimeout(() => {
+        this.message.textContent = "";
+      }, ms);
+    }
+  }
+
+  showEnding(text: string): void {
+    this.ending.innerHTML = `<h2>SHIFT COMPLETE</h2><p>${text}</p><button>Reset</button>`;
+    this.ending.classList.remove("hidden");
+    this.ending.querySelector("button")?.addEventListener("click", () => this.onReset?.());
+  }
+
+  private dispatchStart(): void {
+    window.dispatchEvent(new CustomEvent("game-start"));
+  }
+
+  private bindJoystick(input: InputSystem): void {
+    let active = false;
+    const update = (clientX: number, clientY: number) => {
+      const rect = this.joystick.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = clientX - cx;
+      const dy = clientY - cy;
+      const len = Math.min(Math.hypot(dx, dy), 46);
+      const angle = Math.atan2(dy, dx);
+      const x = Math.cos(angle) * len;
+      const y = Math.sin(angle) * len;
+      this.knob.style.transform = `translate(${x}px, ${y}px)`;
+      input.bindJoystick(true, x / 46, -y / 46);
+    };
+    this.joystick.addEventListener("pointerdown", (event) => {
+      active = true;
+      this.joystick.setPointerCapture(event.pointerId);
+      update(event.clientX, event.clientY);
+    });
+    this.joystick.addEventListener("pointermove", (event) => {
+      if (active) update(event.clientX, event.clientY);
+    });
+    this.joystick.addEventListener("pointerup", () => {
+      active = false;
+      this.knob.style.transform = "translate(0, 0)";
+      input.bindJoystick(false, 0, 0);
+    });
+    window.addEventListener("game-start", () => input.start());
+  }
+
+  private make<K extends keyof HTMLElementTagNameMap>(
+    tag: K,
+    className: string,
+    html = "",
+  ): HTMLElementTagNameMap[K] {
+    const element = document.createElement(tag);
+    element.className = className;
+    element.innerHTML = html;
+    return element;
+  }
+}
