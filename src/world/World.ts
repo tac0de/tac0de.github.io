@@ -37,9 +37,9 @@ export class World {
 
   constructor(private readonly loop: number) {
     this.group.name = "NoVacancyWorld";
-    this.group.add(new THREE.AmbientLight(0xb6a897, 2.45));
-    this.group.add(this.makeLight(-1.9, 2.25, 2.2, 0xffd08b, 3.4, 8.5));
-    this.group.add(this.makeLight(0, 2.55, -4, 0xb7d1ff, 2.15, 10));
+    this.group.add(new THREE.AmbientLight(0xb6a897, 2.85));
+    this.group.add(this.makeLight(-1.9, 2.25, 2.2, 0xffd08b, 3.8, 8.5));
+    this.group.add(this.makeLight(0, 2.55, -4, 0xb7d1ff, 2.45, 10));
     this.group.add(this.makeLight(0, 2.2, -12, 0xffa978, 2.45, 9));
     this.flashlight.target.position.set(0, 1.6, 0);
     this.group.add(this.flashlight, this.flashlight.target);
@@ -191,40 +191,115 @@ export class World {
   }
 
   private buildMotel(): void {
-    this.group.add(this.box(0x51463c, [12, 0.08, 30], [0, -0.04, -4]));
-    this.group.add(this.box(0x705f52, [10, 2.7, 0.18], [0, 1.35, 7.6]));
-    this.group.add(this.box(0x66574d, [0.18, 2.7, 7.3], [-4.9, 1.35, 3.9]));
-    this.group.add(this.box(0x66574d, [0.18, 2.7, 7.3], [4.9, 1.35, 3.9]));
-    this.group.add(this.box(0x5c4f45, [3.2, 2.7, 0.18], [-3.4, 1.35, 0.3]));
-    this.group.add(this.box(0x5c4f45, [3.2, 2.7, 0.18], [3.4, 1.35, 0.3]));
-    this.group.add(this.box(0x6a4a37, [4.2, 1, 1.1], [-1.4, 0.5, 4.2]));
-    this.addInteractable(this.box(0x17263a, [0.72, 0.42, 0.18], [-2.2, 1.18, 3.56]), "cctv", "Check CCTV", "cctv");
-    this.addInteractable(this.box(0x1b1816, [0.36, 0.16, 0.28], [-0.8, 1.1, 3.63]), "phone", "Answer phone", "answer-phone");
-    this.addInteractable(this.box(0xf1c64d, [0.22, 0.05, 0.42], [-1.48, 1.05, 3.62]), "key203", "Take key 203", "take-key");
-    this.addInteractable(this.box(0x745338, [0.52, 0.08, 0.72], [-2.98, 1.06, 3.62]), "book", "Read guest book", "read-book");
-    this.group.add(this.box(0x574a40, [2.8, 0.08, 15.2], [0, -0.02, -6.4]));
-    this.group.add(this.box(0x6b584b, [0.18, 2.55, 15], [-1.5, 1.27, -6.3]));
-    this.group.add(this.box(0x6b584b, [0.18, 2.55, 15], [1.5, 1.27, -6.3]));
+    this.group.add(this.box(0x312821, [12, 0.08, 30], [0, -0.04, -4]));
+
+    // Front office / lobby shell.
+    this.group.add(this.box(0x6a5849, [10, 2.9, 0.18], [0, 1.45, 7.6]));
+    this.group.add(this.box(0x4c4036, [1.7, 2.45, 0.22], [-4.15, 1.23, 7.42]));
+    this.group.add(this.box(0x4c4036, [1.7, 2.45, 0.22], [4.15, 1.23, 7.42]));
+    this.group.add(this.box(0x1d2b30, [2.2, 1.12, 0.08], [-2.25, 1.58, 7.28]));
+    this.group.add(this.box(0x1d2b30, [2.2, 1.12, 0.08], [2.25, 1.58, 7.28]));
+    this.group.add(this.box(0x382f29, [1.15, 2.2, 0.16], [0, 1.1, 7.35]));
+    this.group.add(this.makeLabel("OFFICE", [0, 2.32, 7.22], [1.1, 0.24], "#281d18", "#f2d48e"));
+    this.group.add(this.box(0x6a5648, [0.18, 2.8, 7.3], [-4.9, 1.4, 3.9]));
+    this.group.add(this.box(0x6a5648, [0.18, 2.8, 7.3], [4.9, 1.4, 3.9]));
+    this.group.add(this.box(0x5f5045, [3.15, 2.8, 0.18], [-3.42, 1.4, 0.3]));
+    this.group.add(this.box(0x5f5045, [3.15, 2.8, 0.18], [3.42, 1.4, 0.3]));
+    this.group.add(this.box(0x4a3f37, [10, 0.16, 7.4], [0, 2.82, 3.95]));
+
+    // Reception desk and readable work objects.
+    this.group.add(this.box(0x6c4933, [4.6, 0.9, 1.05], [-1.45, 0.45, 4.25]));
+    this.group.add(this.box(0x8d6644, [4.8, 0.16, 1.18], [-1.45, 0.96, 4.25]));
+    this.group.add(this.box(0x2b211b, [4.35, 0.2, 0.12], [-1.45, 0.9, 4.86]));
+    this.group.add(this.makeLabel("FRONT DESK", [-1.45, 1.2, 4.94], [1.9, 0.28], "#2b211b", "#f2d48e"));
+    this.group.add(this.box(0x15110f, [0.92, 1.3, 0.08], [-3.75, 1.45, 3.72]));
+    this.group.add(this.makeLabel("KEYS", [-3.75, 2.25, 3.66], [0.82, 0.22], "#201712", "#f0d49a"));
+    for (let i = 0; i < 4; i += 1) {
+      this.group.add(this.box(0xd2b05a, [0.12, 0.2, 0.05], [-4.03 + i * 0.18, 1.55, 3.64]));
+    }
+    this.addInteractable(this.box(0x10284a, [0.76, 0.5, 0.16], [-2.18, 1.28, 3.56]), "cctv", "Check CCTV", "cctv");
+    this.group.add(this.makeLabel("CAM", [-2.18, 1.3, 3.46], [0.54, 0.18], "#10284a", "#b8f2d1"));
+    this.addInteractable(this.box(0x0d0b0a, [0.38, 0.16, 0.28], [-0.78, 1.08, 3.64]), "phone", "Answer phone", "answer-phone");
+    this.addInteractable(this.box(0xf1c64d, [0.24, 0.05, 0.42], [-1.48, 1.07, 3.64]), "key203", "Take key 203", "take-key");
+    this.addInteractable(this.box(0x765338, [0.58, 0.08, 0.78], [-2.98, 1.08, 3.64]), "book", "Read guest book", "read-book");
+    this.group.add(this.box(0xb99450, [0.22, 0.1, 0.22], [0.15, 1.05, 3.68]));
+
+    // Hallway spine with motel-room rhythm.
+    this.group.add(this.box(0x332820, [2.9, 0.09, 15.2], [0, -0.02, -6.4]));
+    this.group.add(this.box(0x5f5148, [0.18, 2.65, 15], [-1.5, 1.33, -6.3]));
+    this.group.add(this.box(0x5f5148, [0.18, 2.65, 15], [1.5, 1.33, -6.3]));
+    this.group.add(this.box(0x3a332e, [2.95, 0.12, 15.2], [0, 2.68, -6.4]));
+    this.group.add(this.box(0x48362d, [0.07, 0.02, 14.6], [0, 0.02, -6.5]));
+    for (let i = 0; i < 6; i += 1) {
+      const z = -1.5 - i * 2.25;
+      this.group.add(this.box(0xd8c081, [0.38, 0.05, 0.12], [0, 2.36, z]));
+      this.group.add(this.makeLight(i % 2 === 0 ? -0.88 : 0.88, 2.18, z, 0xcfe2ff, 0.75, 3.6));
+    }
     this.makeDoor("room203", [1.57, 1.05, -8.7], 0.68, false, "Room 203", "open-door");
     this.group.add(this.makeRoomSign("203", [1.46, 1.78, -8.05], Math.PI / 2));
-    this.group.add(this.makeRoomSign("201", [-1.46, 1.78, -7.2], -Math.PI / 2));
-    this.group.add(this.makeRoomSign("204", [-1.46, 1.78, -10.7], -Math.PI / 2));
-    this.group.add(this.box(0x473931, [4, 2.45, 0.16], [3.6, 1.2, -7.8]));
-    this.group.add(this.box(0x473931, [0.16, 2.45, 4.6], [1.58, 1.2, -10]));
-    this.group.add(this.box(0x473931, [0.16, 2.45, 4.6], [5.6, 1.2, -10]));
-    this.group.add(this.box(0x473931, [4, 2.45, 0.16], [3.6, 1.2, -12.3]));
-    this.addInteractable(this.box(0x6a4a36, [1.5, 0.45, 0.9], [4.2, 0.35, -10.8]), "inspect203", "Inspect Room 203", "inspect-203");
+    this.group.add(this.makeRoomSign("201", [-1.46, 1.78, -3.75], -Math.PI / 2));
+    this.group.add(this.makeRoomSign("202", [-1.46, 1.78, -6.95], -Math.PI / 2));
+    this.group.add(this.makeRoomSign("204", [-1.46, 1.78, -10.75], -Math.PI / 2));
+    this.group.add(this.makeLabel("201", [-1.34, 1.18, -3.75], [0.52, 0.22], "#130f0d", "#f2d48e", -Math.PI / 2));
+    this.group.add(this.makeLabel("202", [-1.34, 1.18, -6.95], [0.52, 0.22], "#130f0d", "#f2d48e", -Math.PI / 2));
+    this.group.add(this.makeLabel("203", [1.34, 1.18, -8.7], [0.52, 0.22], "#130f0d", "#f2d48e", Math.PI / 2));
+    this.group.add(this.makeLabel("204", [-1.34, 1.18, -10.75], [0.52, 0.22], "#130f0d", "#f2d48e", -Math.PI / 2));
+    this.group.add(this.makeLabel("201 <", [0, 2.12, -3.75], [0.78, 0.24], "#211915", "#e7d7a4"));
+    this.group.add(this.makeLabel("202 <", [0, 2.12, -6.95], [0.78, 0.24], "#211915", "#e7d7a4"));
+    this.group.add(this.makeLabel("> 203", [0, 2.12, -8.7], [0.78, 0.24], "#211915", "#e7d7a4"));
+    this.group.add(this.box(0x8a5a37, [0.62, 0.04, 0.92], [-1.05, 0.02, -3.75]));
+    this.group.add(this.box(0x8a5a37, [0.62, 0.04, 0.92], [-1.05, 0.02, -6.95]));
+    this.group.add(this.box(0x8a5a37, [0.62, 0.04, 0.92], [-1.05, 0.02, -10.75]));
+    this.group.add(this.box(0x94613c, [0.62, 0.04, 0.92], [1.05, 0.02, -8.7]));
+    this.group.add(this.box(0x211915, [0.06, 1.95, 1.12], [-1.39, 0.98, -3.75]));
+    this.group.add(this.box(0x211915, [0.06, 1.95, 1.12], [-1.39, 0.98, -6.95]));
+    this.group.add(this.box(0x211915, [0.06, 1.95, 1.12], [-1.39, 0.98, -10.75]));
+    this.group.add(this.box(0x211915, [0.06, 1.95, 1.12], [1.39, 0.98, -8.7]));
+    this.group.add(this.box(0x3d3029, [0.1, 1.8, 0.86], [-1.56, 0.9, -3.75]));
+    this.group.add(this.box(0x3d3029, [0.1, 1.8, 0.86], [-1.56, 0.9, -6.95]));
+    this.group.add(this.box(0x3d3029, [0.1, 1.8, 0.86], [-1.56, 0.9, -10.75]));
+
+    // Room 203.
+    this.group.add(this.box(0x49382f, [4, 2.45, 0.16], [3.6, 1.2, -7.8]));
+    this.group.add(this.box(0x49382f, [0.16, 2.45, 4.6], [1.58, 1.2, -10]));
+    this.group.add(this.box(0x49382f, [0.16, 2.45, 4.6], [5.6, 1.2, -10]));
+    this.group.add(this.box(0x49382f, [4, 2.45, 0.16], [3.6, 1.2, -12.3]));
+    this.group.add(this.box(0x2e2622, [4.1, 0.09, 4.7], [3.6, 0, -10]));
+    this.group.add(this.box(0x332b27, [4.1, 0.12, 4.7], [3.6, 2.45, -10]));
+    this.addInteractable(this.box(0x76513c, [1.75, 0.48, 0.96], [4.25, 0.36, -10.75]), "inspect203", "Inspect Room 203", "inspect-203");
+    this.group.add(this.box(0xd8c7a2, [1.62, 0.18, 0.86], [4.25, 0.78, -10.75]));
+    this.group.add(this.box(0x2d2420, [0.55, 0.42, 0.55], [2.55, 0.28, -10.72]));
+    this.group.add(this.box(0xc49b55, [0.16, 0.46, 0.16], [2.55, 0.74, -10.72]));
+    this.group.add(this.box(0xffd88b, [0.42, 0.18, 0.42], [2.55, 1.06, -10.72]));
+    this.group.add(this.box(0x0d1115, [0.95, 0.58, 0.08], [5.48, 1.38, -9.45]));
+    this.group.add(this.box(0x111517, [0.7, 1.0, 0.06], [3.6, 1.38, -12.19]));
+
+    // Storage / utility room.
     this.makeDoor("storage", [-1.57, 1.05, -4.7], -0.68, true, "Storage", "open-door");
-    this.group.add(this.box(0x40362f, [4, 2.45, 0.16], [-3.6, 1.2, -3.3]));
-    this.group.add(this.box(0x40362f, [0.16, 2.45, 3.6], [-1.58, 1.2, -5]));
-    this.group.add(this.box(0x40362f, [0.16, 2.45, 3.6], [-5.6, 1.2, -5]));
-    this.group.add(this.box(0x40362f, [4, 2.45, 0.16], [-3.6, 1.2, -6.9]));
+    this.group.add(this.box(0x40352e, [4, 2.45, 0.16], [-3.6, 1.2, -3.3]));
+    this.group.add(this.box(0x40352e, [0.16, 2.45, 3.6], [-1.58, 1.2, -5]));
+    this.group.add(this.box(0x40352e, [0.16, 2.45, 3.6], [-5.6, 1.2, -5]));
+    this.group.add(this.box(0x40352e, [4, 2.45, 0.16], [-3.6, 1.2, -6.9]));
+    this.group.add(this.box(0x2c2924, [4.05, 0.09, 3.7], [-3.6, 0, -5.1]));
     this.group.add(this.box(0x6b5d4d, [0.8, 1.2, 0.4], [-4.5, 0.6, -5.8]));
+    this.group.add(this.box(0x918a7b, [1.2, 0.12, 0.42], [-4.35, 1.45, -3.5]));
+    this.group.add(this.box(0x918a7b, [1.2, 0.12, 0.42], [-4.35, 0.95, -3.5]));
+    this.group.add(this.box(0xbfc0b5, [0.34, 0.28, 0.32], [-4.75, 1.18, -3.48]));
+    this.group.add(this.box(0x44535a, [0.42, 0.52, 0.42], [-2.35, 0.28, -6.15]));
     this.addInteractable(this.box(0xc9b77b, [0.45, 0.62, 0.14], [-3.45, 1.02, -3.42]), "breaker", "Reset breaker", "reset-breaker");
     this.addInteractable(this.box(0x22262a, [0.75, 0.12, 0.45], [-3.2, 0.92, -5.3]), "exit", "Run outside", "exit");
-    this.group.add(this.box(0x2f3232, [10.2, 0.08, 5.5], [0, -0.03, 10]));
-    this.group.add(this.box(0x353b3e, [1.8, 0.12, 3.6], [-2.1, 0.02, 10.3]));
-    this.group.add(this.box(0x353b3e, [1.8, 0.12, 3.6], [2.1, 0.02, 10.3]));
+
+    // Parking visible through the lobby windows.
+    this.group.add(this.box(0x24292a, [10.2, 0.08, 5.5], [0, -0.03, 10]));
+    this.group.add(this.box(0xe7d7a4, [0.08, 0.02, 4.6], [-0.3, 0.02, 10.1]));
+    this.group.add(this.box(0xe7d7a4, [0.08, 0.02, 4.6], [0.3, 0.02, 10.1]));
+    this.group.add(this.box(0x30383d, [1.8, 0.28, 3.45], [-2.15, 0.18, 10.45]));
+    this.group.add(this.box(0x48525a, [1.5, 0.44, 1.75], [-2.15, 0.54, 10.3]));
+    this.group.add(this.box(0x272d31, [1.8, 0.28, 3.45], [2.3, 0.18, 10.6]));
+    this.group.add(this.box(0x5a4639, [1.5, 0.44, 1.75], [2.3, 0.54, 10.45]));
+    this.group.add(this.box(0x15191a, [0.12, 2.3, 0.12], [4.55, 1.15, 10.2]));
+    this.group.add(this.box(0xd8c982, [0.75, 0.16, 0.75], [4.55, 2.35, 10.2]));
+    this.group.add(this.makeLabel("NO VACANCY", [0, 2.25, 12.28], [2.2, 0.46], "#11100f", "#d24d3d"));
     this.group.add(this.clockHand);
   }
 
@@ -296,6 +371,26 @@ export class World {
     sign.rotation.y = rotationY;
     this.roomSigns.push(sign);
     return sign;
+  }
+
+  private makeLabel(
+    text: string,
+    position: [number, number, number],
+    size: [number, number],
+    background: string,
+    foreground: string,
+    rotationY = 0,
+  ): THREE.Mesh {
+    const label = new THREE.Mesh(
+      new THREE.PlaneGeometry(size[0], size[1]),
+      new THREE.MeshBasicMaterial({
+        map: this.makeLabelTexture(text, background, foreground),
+        side: THREE.DoubleSide,
+      }),
+    );
+    label.position.set(position[0], position[1], position[2]);
+    label.rotation.y = rotationY;
+    return label;
   }
 
   private makeBookPage(text: string, position: [number, number, number]): THREE.Mesh {

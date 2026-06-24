@@ -4,6 +4,7 @@
 
 ```sh
 npm run build
+npm run check:screenshot -- <image.png> [more.png]
 ```
 
 There is currently no separate lint script.
@@ -23,7 +24,7 @@ There is currently no separate lint script.
 - The tiny overlay explains WASD, mouse, E, and ESC.
 - Approaching the `NO VACANCY` door and pressing E starts the game.
 - `NO VACANCY` starts without a separate how-to-play panel.
-- Task list appears after game start.
+- In-game HUD elements are hidden while the motel floor blockout is being rebuilt.
 - No console exceptions during start.
 - Mobile viewport does not have major UI overlap.
 

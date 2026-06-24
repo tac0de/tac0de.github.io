@@ -375,6 +375,13 @@ button {
   text-align: center;
 }
 
+.message,
+.prompt,
+.tasks,
+.cctv {
+  display: none !important;
+}
+
 .prompt {
   position: absolute;
   left: 50%;

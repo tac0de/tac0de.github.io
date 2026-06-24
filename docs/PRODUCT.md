@@ -36,6 +36,10 @@ the motel records are not documenting reality; they are rewriting it.
 Entry rule: entering from the portal starts the shift immediately. Do not show a
 separate how-to-play panel before gameplay.
 
+Current UI rule: keep the in-game HUD removed while the motel floor is being
+rebuilt. The first playable version should communicate through space, props,
+lighting, and interaction feedback before adding any task UI back.
+
 ## Horror Core
 
 The game should not rely on darkness. Horror comes from:
@@ -52,9 +56,9 @@ Records and cameras change first. The physical motel follows later.
 
 ## Core Loop
 
-1. Read the task list.
-2. Move to the relevant motel area.
-3. Interact with a clear object.
+1. Enter the motel floor.
+2. Read the space: front desk, hallway, Room 203, storage, parking view.
+3. Interact with clear props.
 4. Receive normal feedback.
 5. Return to a known space.
 6. Notice that a record, camera view, object, or room state changed.
