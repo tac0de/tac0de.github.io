@@ -1,13 +1,24 @@
 import * as THREE from "three";
 import "./style.css";
 
-type PortalData = {
-  id: string;
-  title: string;
-  desc: string;
-  position: THREE.Vector3;
-  color: number;
-  playable: boolean;
+type Mode = "portal" | "room";
+
+type TouchLook = {
+  active: boolean;
+  pointerId: number;
+  x: number;
+  y: number;
+  startX: number;
+  startY: number;
+};
+
+type TouchMove = {
+  active: boolean;
+  pointerId: number;
+  originX: number;
+  originY: number;
+  x: number;
+  y: number;
 };
 
 function qs<T extends Element>(selector: string): T {
@@ -17,485 +28,413 @@ function qs<T extends Element>(selector: string): T {
 }
 
 const canvas = qs<HTMLCanvasElement>("#scene");
-const card = qs<HTMLDivElement>("#card");
-const cardTitle = qs<HTMLDivElement>("#card-title");
-const cardDesc = qs<HTMLDivElement>("#card-desc");
-const playButton = qs<HTMLButtonElement>("#play-button");
 const hint = qs<HTMLDivElement>("#hint");
+const touchMove = qs<HTMLDivElement>("#touch-move");
+const touchStick = qs<HTMLDivElement>("#touch-stick");
+const touchInteract = qs<HTMLButtonElement>("#touch-interact");
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x050607);
-scene.fog = new THREE.FogExp2(0x050607, 0.045);
-
 const camera = new THREE.PerspectiveCamera(
   62,
   window.innerWidth / window.innerHeight,
-  0.1,
-  80,
+  0.08,
+  52,
 );
-camera.position.set(0, 1.55, 6.8);
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
-  antialias: true,
+  antialias: false,
   powerPreference: "high-performance",
 });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.35));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-const startedAt = performance.now();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
 const keys = new Set<string>();
+const look: TouchLook = {
+  active: false,
+  pointerId: -1,
+  x: 0,
+  y: 0,
+  startX: 0,
+  startY: 0,
+};
+const moveTouch: TouchMove = {
+  active: false,
+  pointerId: -1,
+  originX: 0,
+  originY: 0,
+  x: 0,
+  y: 0,
+};
 
-const portals: PortalData[] = [
-  {
-    id: "room-203",
-    title: "ROOM 203",
-    desc: "A short lo-fi horror loop. Walk the hall. Open the room. Return once.",
-    position: new THREE.Vector3(-2.6, 1.35, 0),
-    color: 0xd6b574,
-    playable: true,
-  },
-  {
-    id: "night-shift",
-    title: "NIGHT SHIFT",
-    desc: "A quiet clerk simulator that becomes wrong after 2AM.",
-    position: new THREE.Vector3(0, 1.35, -0.65),
-    color: 0x89a7b1,
-    playable: false,
-  },
-  {
-    id: "static-door",
-    title: "STATIC DOOR",
-    desc: "A CCTV-only horror experiment. Some things exist only on the monitor.",
-    position: new THREE.Vector3(2.6, 1.35, 0),
-    color: 0xc06b5c,
-    playable: false,
-  },
-];
+const reusableForward = new THREE.Vector3();
+const reusableRight = new THREE.Vector3();
+const reusableMove = new THREE.Vector3();
+const startedAt = performance.now();
 
-const portalMeshes: THREE.Mesh[] = [];
-let hoveredPortal: PortalData | null = null;
-let selectedPortal: PortalData | null = null;
-let mode: "portal" | "room203" = "portal";
-let roomStage = 0;
+let mode: Mode = "portal";
+let yaw = 0;
+let pitch = -0.03;
+let stage = 0;
 let doorOpen = false;
-let doorMesh: THREE.Mesh | null = null;
+let activeDoor: THREE.Mesh | null = null;
+let portalDoor: THREE.Mesh | null = null;
 
-function makeMaterial(color: number, roughness = 0.92): THREE.MeshStandardMaterial {
+const mats = {
+  white: mat(0xe9e6dc, 0.96),
+  whiteDark: mat(0xd7d2c8, 0.98),
+  trim: mat(0xb9b0a2, 0.96),
+  black: mat(0x050505, 0.9),
+  floor: mat(0x30271f, 0.98),
+  wall: mat(0x6a5848, 0.98),
+  wallDark: mat(0x493b32, 0.99),
+  wood: mat(0x3b241a, 0.94),
+  red: mat(0x5e1917, 0.96),
+  sheet: mat(0xc6b894, 0.98),
+  sickGreen: mat(0x6b715d, 0.95),
+};
+
+function mat(color: number, roughness = 0.92): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
     color,
     roughness,
-    metalness: 0.04,
+    metalness: 0.02,
   });
 }
 
-function clearScene() {
-  for (const child of [...scene.children]) {
-    scene.remove(child);
-  }
-  portalMeshes.length = 0;
+function box(
+  size: [number, number, number],
+  position: [number, number, number],
+  material: THREE.Material,
+): THREE.Mesh {
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
+  mesh.position.set(...position);
+  scene.add(mesh);
+  return mesh;
 }
 
-function makeLabel(text: string, width = 1.2, height = 0.42): THREE.Mesh {
+function textPlane(
+  text: string,
+  width: number,
+  height: number,
+  fg = "#e8e2d2",
+  bg = "#080808",
+): THREE.Mesh {
   const labelCanvas = document.createElement("canvas");
-  labelCanvas.width = 256;
-  labelCanvas.height = 96;
+  labelCanvas.width = 512;
+  labelCanvas.height = 256;
+
   const ctx = labelCanvas.getContext("2d");
   if (!ctx) throw new Error("Missing label canvas context");
-  ctx.fillStyle = "#090909";
+
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, labelCanvas.width, labelCanvas.height);
-  ctx.fillStyle = "#d8cfb7";
-  ctx.font = "bold 34px monospace";
+  ctx.fillStyle = fg;
+  ctx.font = "bold 112px monospace";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(text, labelCanvas.width / 2, labelCanvas.height / 2);
+  ctx.fillText(text, labelCanvas.width / 2, labelCanvas.height / 2 + 6);
+
   const texture = new THREE.CanvasTexture(labelCanvas);
   texture.colorSpace = THREE.SRGBColorSpace;
+  texture.magFilter = THREE.NearestFilter;
+  texture.minFilter = THREE.NearestFilter;
+
   return new THREE.Mesh(
     new THREE.PlaneGeometry(width, height),
     new THREE.MeshBasicMaterial({ map: texture }),
   );
 }
 
-function addRoom() {
-  const floor = new THREE.Mesh(
-    new THREE.BoxGeometry(11, 0.18, 12),
-    makeMaterial(0x171819),
-  );
-  floor.position.set(0, -0.1, 0);
-  floor.receiveShadow = true;
-  scene.add(floor);
-
-  const backWall = new THREE.Mesh(
-    new THREE.BoxGeometry(11, 4.2, 0.18),
-    makeMaterial(0x202123),
-  );
-  backWall.position.set(0, 2, -3.3);
-  scene.add(backWall);
-
-  const leftWall = new THREE.Mesh(
-    new THREE.BoxGeometry(0.18, 4.2, 12),
-    makeMaterial(0x141517),
-  );
-  leftWall.position.set(-5.5, 2, 1.2);
-  scene.add(leftWall);
-
-  const rightWall = new THREE.Mesh(
-    new THREE.BoxGeometry(0.18, 4.2, 12),
-    makeMaterial(0x141517),
-  );
-  rightWall.position.set(5.5, 2, 1.2);
-  scene.add(rightWall);
-
-  const ceiling = new THREE.Mesh(
-    new THREE.BoxGeometry(11, 0.16, 12),
-    makeMaterial(0x101113),
-  );
-  ceiling.position.set(0, 4.08, 1.2);
-  scene.add(ceiling);
-
-  const path = new THREE.Mesh(
-    new THREE.PlaneGeometry(8.5, 0.85),
-    new THREE.MeshBasicMaterial({
-      color: 0x7d765f,
-      transparent: true,
-      opacity: 0.18,
-    }),
-  );
-  path.rotation.x = -Math.PI / 2;
-  path.position.set(0, 0.01, 3.25);
-  scene.add(path);
+function clearScene() {
+  for (const child of [...scene.children]) scene.remove(child);
+  activeDoor = null;
+  portalDoor = null;
 }
 
-function addLights() {
-  const ambient = new THREE.AmbientLight(0x8b95a1, 0.42);
-  scene.add(ambient);
-
-  const frontLight = new THREE.PointLight(0xffe2aa, 1.8, 8);
-  frontLight.position.set(0, 3.1, 3.2);
-  scene.add(frontLight);
-
-  const backLight = new THREE.PointLight(0x8ea8b8, 1.2, 7);
-  backLight.position.set(0, 2.6, -2.2);
-  scene.add(backLight);
-
-  const redExit = new THREE.PointLight(0xb54a3a, 1.1, 4);
-  redExit.position.set(4.8, 2.1, -1.8);
-  scene.add(redExit);
+function resetCamera(x: number, y: number, z: number, nextYaw = 0, nextPitch = -0.03) {
+  camera.position.set(x, y, z);
+  yaw = nextYaw;
+  pitch = nextPitch;
 }
 
-function addPortalLabel(text: string, parent: THREE.Object3D) {
-  const canvas = document.createElement("canvas");
-  canvas.width = 512;
-  canvas.height = 256;
+function buildPortalRoom() {
+  clearScene();
+  mode = "portal";
+  scene.background = new THREE.Color(0xf3f0e8);
+  scene.fog = new THREE.Fog(0xf3f0e8, 4.8, 9.5);
 
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xbeb3a7, 1.55));
+  const doorLight = new THREE.PointLight(0xffffff, 1.4, 5.5);
+  doorLight.position.set(0, 2.5, -1.25);
+  scene.add(doorLight);
 
-  ctx.fillStyle = "#0a0b0c";
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  box([3.15, 0.14, 5.2], [0, -0.07, 0], mats.whiteDark);
+  box([3.15, 0.12, 5.2], [0, 2.86, 0], mats.white);
+  box([0.12, 2.95, 5.2], [-1.58, 1.4, 0], mats.white);
+  box([0.12, 2.95, 5.2], [1.58, 1.4, 0], mats.white);
+  box([0.82, 2.95, 0.12], [-1.17, 1.4, -2.34], mats.white);
+  box([0.82, 2.95, 0.12], [1.17, 1.4, -2.34], mats.white);
+  box([1.5, 0.58, 0.12], [0, 2.66, -2.34], mats.white);
+  box([3.15, 2.95, 0.12], [0, 1.4, 2.55], mats.white);
 
-  ctx.strokeStyle = "rgba(232,226,210,0.5)";
-  ctx.strokeRect(22, 22, canvas.width - 44, canvas.height - 44);
-
-  ctx.fillStyle = "#e8e2d2";
-  ctx.font = "bold 42px system-ui, sans-serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-
-  ctx.fillStyle = "rgba(232,226,210,0.55)";
-  ctx.font = "20px system-ui, sans-serif";
-  ctx.fillText("ENTER", canvas.width / 2, canvas.height / 2 + 58);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-
-  const label = new THREE.Mesh(
-    new THREE.PlaneGeometry(1.65, 0.82),
-    new THREE.MeshBasicMaterial({
-      map: texture,
-      transparent: true,
-    }),
+  box([1.46, 2.38, 0.1], [0, 1.16, -2.22], mats.trim);
+  portalDoor = box(
+    [1.12, 2.0, 0.08],
+    [0, 1.0, -2.03],
+    new THREE.MeshBasicMaterial({ color: 0x050505 }),
   );
+  portalDoor.userData.action = "enter";
 
-  label.position.set(0, 0, 0.16);
-  parent.add(label);
-}
+  const label = textPlane("203", 0.62, 0.28, "#0b0b0b", "#f2eee5");
+  label.position.set(0, 2.03, -1.98);
+  scene.add(label);
 
-function addPortals() {
-  for (const portal of portals) {
-    const group = new THREE.Group();
-    group.position.copy(portal.position);
-
-    const frame = new THREE.Mesh(
-      new THREE.BoxGeometry(1.95, 2.45, 0.16),
-      makeMaterial(0x0d0e10),
-    );
-    group.add(frame);
-
-    const surface = new THREE.Mesh(
-      new THREE.BoxGeometry(1.72, 2.18, 0.12),
-      new THREE.MeshStandardMaterial({
-        color: portal.color,
-        roughness: 0.88,
-        metalness: 0.02,
-        emissive: portal.color,
-        emissiveIntensity: 0.08,
-      }),
-    );
-    surface.position.z = 0.08;
-    surface.userData.portalId = portal.id;
-    group.add(surface);
-
-    const glow = new THREE.Mesh(
-      new THREE.PlaneGeometry(2.18, 2.68),
-      new THREE.MeshBasicMaterial({
-        color: portal.color,
-        transparent: true,
-        opacity: 0.07,
-        depthWrite: false,
-      }),
-    );
-    glow.position.z = 0.02;
-    group.add(glow);
-
-    addPortalLabel(portal.title, group);
-
-    scene.add(group);
-    portalMeshes.push(surface);
-  }
-}
-
-function addDecor() {
-  const pillarMaterial = makeMaterial(0x222326);
-
-  for (const x of [-4.4, 4.4]) {
-    for (const z of [-2.4, 2.4]) {
-      const pillar = new THREE.Mesh(
-        new THREE.BoxGeometry(0.42, 3.7, 0.42),
-        pillarMaterial,
-      );
-      pillar.position.set(x, 1.75, z);
-      scene.add(pillar);
-    }
+  for (let i = 0; i < 7; i++) {
+    box([0.018, 0.012, 4.1], [-0.84 + i * 0.28, 0.015, 0.15], mats.trim);
   }
 
-  for (let i = 0; i < 24; i++) {
-    const strip = new THREE.Mesh(
-      new THREE.BoxGeometry(0.035, 0.01, 7.8),
-      new THREE.MeshBasicMaterial({
-        color: 0xe8e2d2,
-        transparent: true,
-        opacity: i % 2 === 0 ? 0.04 : 0.025,
-      }),
-    );
-
-    strip.position.set(-4.2 + i * 0.365, 0.012, 0.8);
-    scene.add(strip);
-  }
+  resetCamera(0, 1.38, 1.96);
+  hint.textContent = "WASD / DRAG / E";
 }
 
-function addRoom203() {
-  scene.background = new THREE.Color(0x090706);
-  scene.fog = new THREE.FogExp2(0x090706, 0.08);
-  scene.add(new THREE.AmbientLight(0x9a7e64, 0.74));
+function buildRoom203() {
+  clearScene();
+  mode = "room";
+  scene.background = new THREE.Color(0x1e1915);
+  scene.fog = new THREE.Fog(0x1e1915, stage >= 3 ? 4.2 : 5.5, stage >= 3 ? 10.5 : 13.5);
 
-  const hallLight = new THREE.PointLight(0xe8d0a0, 2.1, 7);
-  hallLight.position.set(0, 2.7, 1.6);
+  scene.add(new THREE.HemisphereLight(0xcfc3aa, 0x46382f, 1.16));
+  const hallLight = new THREE.PointLight(0xf0c982, 2.7, 6.2);
+  hallLight.position.set(0, 2.45, 1.2);
   scene.add(hallLight);
-
-  const roomLight = new THREE.PointLight(0xb44d3e, 1.2, 5);
-  roomLight.position.set(3.2, 1.8, -3.4);
+  const roomLight = new THREE.PointLight(stage >= 4 ? 0x8d1414 : 0xe0b877, 1.9, 5.4);
+  roomLight.position.set(-0.7, 2.0, -5.55);
   scene.add(roomLight);
 
-  const floor = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.12, 9.4), makeMaterial(0x211812));
-  floor.position.set(0, -0.06, 0.1);
-  scene.add(floor);
+  const hallDepth = stage >= 3 ? 11.0 : 7.4;
+  const doorZ = stage >= 3 ? -5.48 : -3.7;
+  const roomZ = doorZ - 1.95;
 
-  const ceiling = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.12, 9.4), makeMaterial(0x120f0d));
-  ceiling.position.set(0, 2.8, 0.1);
-  scene.add(ceiling);
+  box([2.7, 0.12, hallDepth], [0, -0.06, 0.35 - (hallDepth - 7.4) / 2], mats.floor);
+  box([2.7, 0.12, hallDepth], [0, 2.62, 0.35 - (hallDepth - 7.4) / 2], mats.wallDark);
+  box([0.12, 2.7, hallDepth], [-1.35, 1.31, 0.35 - (hallDepth - 7.4) / 2], mats.wall);
+  box([0.12, 2.7, hallDepth], [1.35, 1.31, 0.35 - (hallDepth - 7.4) / 2], mats.wall);
 
-  for (const x of [-1.5, 1.5]) {
-    const wall = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.8, 9.4), makeMaterial(0x3a2b22));
-    wall.position.set(x, 1.35, 0.1);
-    scene.add(wall);
+  for (let i = 0; i < (stage >= 3 ? 5 : 3); i++) {
+    const z = 1.75 - i * 1.85;
+    box([0.18, 0.04, 1.1], [0, 2.5, z], mats.sickGreen);
+    const glow = box([0.12, 0.02, 0.9], [0, 2.46, z], mats.white);
+    glow.material = new THREE.MeshBasicMaterial({
+      color: i === 3 && stage >= 3 ? 0x4a1717 : 0xe7d5a7,
+    });
   }
 
-  const leftEndWall = new THREE.Mesh(new THREE.BoxGeometry(0.92, 2.8, 0.12), makeMaterial(0x2b211c));
-  leftEndWall.position.set(-1.04, 1.35, -3.9);
-  scene.add(leftEndWall);
+  for (let i = 0; i < 12; i++) {
+    box([1.28, 0.012, 0.36], [0, 0.012, 2.5 - i * 0.58], i % 2 ? mats.floor : mats.wallDark);
+  }
 
-  const rightEndWall = new THREE.Mesh(new THREE.BoxGeometry(0.92, 2.8, 0.12), makeMaterial(0x2b211c));
-  rightEndWall.position.set(1.04, 1.35, -3.9);
-  scene.add(rightEndWall);
+  addSideDoor(-1.285, -0.9, stage >= 2 ? "203" : "201", Math.PI / 2);
+  addSideDoor(1.285, -1.92, stage >= 2 ? "203" : "202", -Math.PI / 2);
+  if (stage >= 4) addOpenSideDoor(1.285, -3.35);
 
-  const header = new THREE.Mesh(new THREE.BoxGeometry(1.18, 0.55, 0.12), makeMaterial(0x2b211c));
-  header.position.set(0, 2.52, -3.9);
-  scene.add(header);
+  box([0.74, 2.7, 0.12], [-0.98, 1.31, doorZ], mats.wallDark);
+  box([0.74, 2.7, 0.12], [0.98, 1.31, doorZ], mats.wallDark);
+  box([1.1, 0.54, 0.12], [0, 2.42, doorZ], mats.wallDark);
+  activeDoor = box([1.05, 1.95, 0.16], [doorOpen ? 0.62 : 0, 0.96, doorZ + 0.08], mats.wood);
 
-  doorMesh = new THREE.Mesh(new THREE.BoxGeometry(1.05, 2.0, 0.12), makeMaterial(0x080808));
-  doorMesh.position.set(0, 1.0, -3.82);
-  scene.add(doorMesh);
+  const number = textPlane("203", 0.55, 0.23, "#0b0b0b", "#d6c6a0");
+  number.position.set(0, 1.98, doorZ + 0.18);
+  scene.add(number);
 
-  const sign = makeLabel("203", 0.68, 0.26);
-  sign.position.set(0, 2.15, -3.74);
-  scene.add(sign);
+  addRoomInterior(roomZ, stage);
 
-  const carpet = new THREE.Mesh(
-    new THREE.BoxGeometry(0.62, 0.03, 7.2),
-    new THREE.MeshBasicMaterial({ color: 0x4a241e }),
-  );
-  carpet.position.set(0, 0.02, 0.6);
-  scene.add(carpet);
-
-  const bed = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.46, 0.92), makeMaterial(0x5f4032));
-  bed.position.set(0.82, 0.28, -5.0);
-  scene.add(bed);
-
-  const sheet = new THREE.Mesh(new THREE.BoxGeometry(1.44, 0.13, 0.82), makeMaterial(0xc9b98f));
-  sheet.position.set(0.82, 0.62, -5.0);
-  scene.add(sheet);
-
-  const tv = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.52, 0.08), makeMaterial(0x050607));
-  tv.position.set(-1.38, 1.24, -5.1);
-  scene.add(tv);
-
-  const phone = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.12, 0.22), makeMaterial(0x0a0a0a));
-  phone.position.set(-0.85, 0.74, -4.55);
-  scene.add(phone);
-
-  const shape = new THREE.Mesh(new THREE.BoxGeometry(0.34, 1.28, 0.22), new THREE.MeshBasicMaterial({ color: 0x020202 }));
-  shape.position.set(0, 0.64, roomStage < 2 ? -8 : -2.7);
-  shape.visible = roomStage > 0;
-  scene.add(shape);
+  if (stage >= 4) {
+    const figure = box([0.34, 1.58, 0.18], [0, 0.76, doorZ + 1.05], mats.black);
+    figure.name = "hall-figure";
+  }
 }
 
-function startRoom203() {
-  mode = "room203";
-  roomStage = 0;
-  doorOpen = false;
-  clearScene();
-  card.classList.add("hidden");
-  hint.textContent = "WASD / drag / E";
-  addRoom203();
-  camera.position.set(0, 1.55, 3.2);
-  yaw = 0;
-  pitch = -0.03;
+function addSideDoor(x: number, z: number, labelText: string, rotationY: number) {
+  const door = box([0.08, 1.72, 0.82], [x, 0.88, z], mats.wood);
+  door.rotation.y = rotationY;
+  const label = textPlane(labelText, 0.35, 0.16, "#1a120d", "#d8c7a4");
+  label.position.set(x + (x < 0 ? 0.048 : -0.048), 1.58, z);
+  label.rotation.y = rotationY;
+  scene.add(label);
 }
 
-function getPortalById(id: string): PortalData | null {
-  return portals.find((portal) => portal.id === id) ?? null;
+function addOpenSideDoor(x: number, z: number) {
+  const voidPanel = box([0.05, 1.74, 0.74], [x, 0.88, z], mats.black);
+  voidPanel.rotation.y = -Math.PI / 2;
 }
 
-function updateCard(portal: PortalData | null) {
-  selectedPortal = portal;
+function addRoomInterior(roomZ: number, currentStage: number) {
+  box([4.2, 0.12, 3.6], [0, -0.055, roomZ], mats.floor);
+  box([4.2, 0.12, 3.6], [0, 2.62, roomZ], mats.wallDark);
+  box([0.12, 2.7, 3.6], [-2.1, 1.31, roomZ], mats.wallDark);
+  box([0.12, 2.7, 3.6], [2.1, 1.31, roomZ], mats.wallDark);
+  box([4.2, 2.7, 0.12], [0, 1.31, roomZ - 1.8], mats.wall);
 
-  if (!portal) {
-    card.classList.add("hidden");
-    hint.textContent = "Drag to look · Tap a portal";
+  box([1.56, 0.44, 0.94], [1.06, 0.23, roomZ - 0.82], mats.wood);
+  box([1.46, 0.12, 0.86], [1.06, 0.55, roomZ - 0.82], mats.sheet);
+  box([0.44, 0.18, 0.74], [1.57, 0.73, roomZ - 0.82], mats.sickGreen);
+
+  box([0.54, 0.58, 0.42], [-0.78, 0.29, roomZ - 0.92], mats.wood);
+  if (currentStage < 2) box([0.22, 0.1, 0.18], [-0.78, 0.66, roomZ - 0.92], mats.black);
+
+  const mirror = box([0.72, 0.82, 0.035], [-2.03, 1.42, roomZ - 0.2], mats.black);
+  mirror.rotation.y = Math.PI / 2;
+  if (currentStage >= 2) box([0.16, 0.8, 0.04], [-1.98, 1.24, roomZ - 0.2], mats.black);
+
+  box([0.98, 0.64, 0.08], [0, 1.42, roomZ - 1.72], mats.black);
+  const screen = box([0.82, 0.48, 0.04], [0, 1.42, roomZ - 1.66], new THREE.MeshBasicMaterial({ color: 0x101d1a }));
+  if (currentStage >= 3) screen.material = new THREE.MeshBasicMaterial({ color: 0x350909 });
+
+  const bookText = currentStage >= 2 ? "203" : "LOG";
+  const book = textPlane(bookText, 0.4, 0.18, "#17110c", "#b9a27e");
+  book.position.set(-0.8, 0.73, roomZ - 0.54);
+  book.rotation.x = -Math.PI / 2;
+  scene.add(book);
+
+  if (currentStage >= 1) {
+    box([0.28, 1.38, 0.2], [currentStage >= 4 ? 0 : -1.25, 0.68, roomZ - 1.46], mats.black);
+  }
+}
+
+function tryInteract() {
+  if (mode === "portal") {
+    if (camera.position.z < 1.2) startRoom();
     return;
   }
 
-  cardTitle.textContent = portal.title;
-  cardDesc.textContent = portal.desc;
-  card.classList.remove("hidden");
-  hint.textContent = "Tap ENTER to open";
-}
-
-function setPointerFromEvent(event: PointerEvent) {
-  const rect = canvas.getBoundingClientRect();
-
-  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  pointer.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
-}
-
-function pickPortal(event: PointerEvent) {
-  setPointerFromEvent(event);
-  raycaster.setFromCamera(pointer, camera);
-
-  const hits = raycaster.intersectObjects(portalMeshes, false);
-  if (!hits.length) {
-    hoveredPortal = null;
-    updateCard(null);
-    return;
-  }
-
-  const mesh = hits[0].object as THREE.Mesh;
-  const id = mesh.userData.portalId as string | undefined;
-
-  if (!id) return;
-
-  const portal = getPortalById(id);
-  hoveredPortal = portal;
-  updateCard(portal);
-}
-
-let isDragging = false;
-let lastX = 0;
-let lastY = 0;
-let yaw = 0;
-let pitch = -0.06;
-
-canvas.addEventListener("pointerdown", (event) => {
-  isDragging = true;
-  lastX = event.clientX;
-  lastY = event.clientY;
-  canvas.setPointerCapture(event.pointerId);
-});
-
-canvas.addEventListener("pointermove", (event) => {
-  if (!isDragging) return;
-
-  const dx = event.clientX - lastX;
-  const dy = event.clientY - lastY;
-
-  lastX = event.clientX;
-  lastY = event.clientY;
-
-  yaw -= dx * 0.003;
-  pitch -= dy * 0.0025;
-  pitch = THREE.MathUtils.clamp(pitch, -0.45, 0.28);
-});
-
-canvas.addEventListener("pointerup", (event) => {
-  isDragging = false;
-  if (mode !== "portal") return;
-  pickPortal(event);
-});
-
-playButton.addEventListener("click", () => {
-  if (!selectedPortal) return;
-  if (selectedPortal.id === "room-203" && selectedPortal.playable) {
-    startRoom203();
-    return;
-  }
-  hint.textContent = "Locked";
-});
-
-window.addEventListener("keydown", (event) => {
-  keys.add(event.code);
-  if (mode !== "room203" || event.code !== "KeyE") return;
-
-  if (camera.position.z < -2.15 && !doorOpen) {
+  const doorZ = stage >= 3 ? -5.48 : -3.7;
+  if (!doorOpen && camera.position.z < doorZ + 1.22) {
     doorOpen = true;
-    roomStage = 1;
-    if (doorMesh) doorMesh.position.x = 0.68;
+    if (activeDoor) activeDoor.position.x = 0.62;
     hint.textContent = "";
     return;
   }
 
-  if (doorOpen && camera.position.z < -4.1) {
-    roomStage += 1;
-    clearScene();
-    addRoom203();
-    camera.position.set(0, 1.55, 3.2);
-    hint.textContent = roomStage > 2 ? "" : "WASD / drag / E";
+  if (doorOpen && camera.position.z < doorZ - 1.65) {
+    stage += 1;
+    doorOpen = false;
+    if (stage >= 5) {
+      buildEnding();
+      return;
+    }
+    buildRoom203();
+    resetCamera(0, 1.5, 2.95);
+    hint.textContent = "WASD / DRAG / E";
   }
+}
+
+function startRoom() {
+  stage = 0;
+  doorOpen = false;
+  buildRoom203();
+  resetCamera(0, 1.5, 2.95);
+  hint.textContent = "WASD / DRAG / E";
+}
+
+function buildEnding() {
+  buildPortalRoom();
+  const label = textPlane("203", 0.62, 0.28, "#f2eee5", "#090909");
+  label.position.set(0, 1.38, -2.02);
+  scene.add(label);
+  hint.textContent = "";
+}
+
+function updatePointer(event: PointerEvent) {
+  const rect = canvas.getBoundingClientRect();
+  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
+}
+
+function pickPortalDoor(event: PointerEvent) {
+  if (mode !== "portal" || !portalDoor) return;
+  updatePointer(event);
+  raycaster.setFromCamera(pointer, camera);
+  const hits = raycaster.intersectObject(portalDoor, false);
+  if (hits.length) startRoom();
+}
+
+function isMoveTouch(event: PointerEvent) {
+  return event.pointerType === "touch" && event.clientX < window.innerWidth * 0.46;
+}
+
+canvas.addEventListener("pointerdown", (event) => {
+  if (isMoveTouch(event)) {
+    moveTouch.active = true;
+    moveTouch.pointerId = event.pointerId;
+    moveTouch.originX = event.clientX;
+    moveTouch.originY = event.clientY;
+    moveTouch.x = 0;
+    moveTouch.y = 0;
+    touchMove.classList.add("active");
+    touchMove.style.left = `${event.clientX}px`;
+    touchMove.style.top = `${event.clientY}px`;
+    canvas.setPointerCapture(event.pointerId);
+    return;
+  }
+
+  look.active = true;
+  look.pointerId = event.pointerId;
+  look.x = event.clientX;
+  look.y = event.clientY;
+  look.startX = event.clientX;
+  look.startY = event.clientY;
+  canvas.setPointerCapture(event.pointerId);
+});
+
+canvas.addEventListener("pointermove", (event) => {
+  if (moveTouch.active && event.pointerId === moveTouch.pointerId) {
+    moveTouch.x = THREE.MathUtils.clamp((event.clientX - moveTouch.originX) / 54, -1, 1);
+    moveTouch.y = THREE.MathUtils.clamp((event.clientY - moveTouch.originY) / 54, -1, 1);
+    touchStick.style.transform = `translate(${moveTouch.x * 22}px, ${moveTouch.y * 22}px)`;
+    return;
+  }
+
+  if (!look.active || event.pointerId !== look.pointerId) return;
+
+  const dx = event.clientX - look.x;
+  const dy = event.clientY - look.y;
+  look.x = event.clientX;
+  look.y = event.clientY;
+
+  yaw -= dx * 0.0032;
+  pitch -= dy * 0.0027;
+  pitch = THREE.MathUtils.clamp(pitch, -0.52, 0.34);
+});
+
+canvas.addEventListener("pointerup", (event) => {
+  if (moveTouch.active && event.pointerId === moveTouch.pointerId) {
+    moveTouch.active = false;
+    moveTouch.pointerId = -1;
+    moveTouch.x = 0;
+    moveTouch.y = 0;
+    touchMove.classList.remove("active");
+    touchStick.style.transform = "";
+    return;
+  }
+
+  if (look.active && event.pointerId === look.pointerId) {
+    const moved = Math.abs(event.clientX - look.startX) + Math.abs(event.clientY - look.startY);
+    look.active = false;
+    look.pointerId = -1;
+    if (moved < 8) pickPortalDoor(event);
+  }
+});
+
+touchInteract.addEventListener("click", tryInteract);
+
+window.addEventListener("keydown", (event) => {
+  keys.add(event.code);
+  if (event.code === "KeyE" || event.code === "Enter") tryInteract();
+  if (event.code === "Escape" && mode === "room") buildPortalRoom();
 });
 
 window.addEventListener("keyup", (event) => {
@@ -505,73 +444,72 @@ window.addEventListener("keyup", (event) => {
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.35));
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-addRoom();
-addLights();
-addPortals();
-addDecor();
+function updateMovement() {
+  reusableForward.set(Math.sin(yaw), 0, -Math.cos(yaw)).normalize();
+  reusableRight.set(-reusableForward.z, 0, reusableForward.x).normalize();
+  reusableMove.set(0, 0, 0);
 
-function updateRoom203Movement() {
-  const forward = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw)).normalize();
-  const right = new THREE.Vector3(-forward.z, 0, forward.x).normalize();
-  const move = new THREE.Vector3();
+  if (keys.has("KeyW")) reusableMove.add(reusableForward);
+  if (keys.has("KeyS")) reusableMove.sub(reusableForward);
+  if (keys.has("KeyD")) reusableMove.add(reusableRight);
+  if (keys.has("KeyA")) reusableMove.sub(reusableRight);
 
-  if (keys.has("KeyW")) move.add(forward);
-  if (keys.has("KeyS")) move.sub(forward);
-  if (keys.has("KeyD")) move.add(right);
-  if (keys.has("KeyA")) move.sub(right);
-
-  if (move.lengthSq() > 0) {
-    move.normalize().multiplyScalar(0.045);
-    camera.position.add(move);
-    camera.position.x = THREE.MathUtils.clamp(camera.position.x, -1.08, 1.08);
-    camera.position.z = THREE.MathUtils.clamp(camera.position.z, doorOpen ? -5.7 : -2.25, 3.55);
+  if (moveTouch.active) {
+    reusableMove.addScaledVector(reusableForward, -moveTouch.y);
+    reusableMove.addScaledVector(reusableRight, moveTouch.x);
   }
 
-  if (!doorOpen && camera.position.z < -1.95) {
+  if (reusableMove.lengthSq() === 0) return;
+
+  reusableMove.normalize().multiplyScalar(mode === "portal" ? 0.032 : 0.043);
+  camera.position.add(reusableMove);
+
+  if (mode === "portal") {
+    camera.position.x = THREE.MathUtils.clamp(camera.position.x, -0.96, 0.96);
+    camera.position.z = THREE.MathUtils.clamp(camera.position.z, -1.64, 2.06);
+    return;
+  }
+
+  const doorZ = stage >= 3 ? -5.48 : -3.7;
+  const minZ = doorOpen ? doorZ - 3.02 : doorZ + 0.62;
+  camera.position.x = THREE.MathUtils.clamp(camera.position.x, -1.06, 1.06);
+  camera.position.z = THREE.MathUtils.clamp(camera.position.z, minZ, 3.12);
+}
+
+function updateHint() {
+  if (mode === "portal") {
+    hint.textContent = camera.position.z < 1.2 ? "E" : "WASD / DRAG / E";
+    return;
+  }
+
+  const doorZ = stage >= 3 ? -5.48 : -3.7;
+  if (!doorOpen && camera.position.z < doorZ + 1.22) {
     hint.textContent = "E";
-  } else if (doorOpen && camera.position.z < -4.1) {
+  } else if (doorOpen && camera.position.z < doorZ - 1.65) {
     hint.textContent = "E";
   } else {
-    hint.textContent = roomStage > 2 ? "" : "WASD / drag / E";
+    hint.textContent = "WASD / DRAG / E";
   }
 }
 
 function animate() {
   const elapsed = (performance.now() - startedAt) / 1000;
 
+  updateMovement();
+  updateHint();
+
   camera.rotation.order = "YXZ";
-  camera.rotation.y = yaw + Math.sin(elapsed * 0.28) * 0.015;
-  camera.rotation.x = pitch + Math.sin(elapsed * 0.7) * 0.006;
-
-  if (mode === "portal") {
-    camera.position.x = Math.sin(yaw) * 0.35;
-    camera.position.z = 6.8 + Math.cos(elapsed * 0.24) * 0.05;
-    camera.position.y = 1.55 + Math.sin(elapsed * 0.9) * 0.012;
-  } else {
-    updateRoom203Movement();
-    camera.position.y = 1.55 + Math.sin(elapsed * 1.7) * 0.01;
-  }
-
-  for (const mesh of portalMeshes) {
-    const id = mesh.userData.portalId as string;
-    const portal = getPortalById(id);
-    if (!portal) continue;
-
-    const material = mesh.material as THREE.MeshStandardMaterial;
-    const isActive = hoveredPortal?.id === id || selectedPortal?.id === id;
-
-    material.emissiveIntensity = isActive
-      ? 0.24 + Math.sin(elapsed * 5) * 0.04
-      : 0.08 + Math.sin(elapsed * 2 + mesh.position.x) * 0.02;
-  }
+  camera.rotation.y = yaw + Math.sin(elapsed * 0.31) * 0.006;
+  camera.rotation.x = pitch + Math.sin(elapsed * 0.68) * 0.004;
+  camera.position.y = (mode === "portal" ? 1.38 : 1.5) + Math.sin(elapsed * 1.6) * 0.006;
 
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
 
+buildPortalRoom();
 animate();

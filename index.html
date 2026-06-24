@@ -3,22 +3,20 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lo-Fi Horror Portal</title>
+    <title>203</title>
   </head>
   <body>
     <div id="app">
       <canvas id="scene"></canvas>
 
       <div class="hud">
-        <div class="brand">LO-FI HORROR PORTAL</div>
-        <div id="hint">Drag to look · Tap a portal</div>
+        <div id="hint">WASD / DRAG / E</div>
       </div>
 
-      <div id="card" class="card hidden">
-        <div id="card-title" class="card-title"></div>
-        <div id="card-desc" class="card-desc"></div>
-        <button id="play-button">ENTER</button>
+      <div id="touch-move" aria-hidden="true">
+        <div id="touch-stick"></div>
       </div>
+      <button id="touch-interact" aria-label="interact">E</button>
     </div>
 
     <script type="module" src="/src/main.ts"></script>
