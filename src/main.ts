@@ -49,6 +49,11 @@ function renderPortal(root: HTMLElement, save: SaveSystem): void {
               <button class="primary" type="button" data-play>Play</button>
               <button class="secondary" type="button" data-reset>Reset local progress</button>
             </div>
+            <div class="how-to">
+              <h3>How to play</h3>
+              <p>Follow the night-audit tasks. Check records, prepare keys, watch CCTV, and inspect Room 203 when the desk asks.</p>
+              <p>Desktop: WASD move, mouse look, E interact, F flashlight. Mobile: left stick, right drag, USE, LIGHT.</p>
+            </div>
           </div>
         </article>
 
@@ -86,5 +91,4 @@ function startNoVacancy(root: HTMLElement, save: SaveSystem): void {
   const renderer = new Renderer(root);
   const game = new Game({ renderer, input, ui, audio, save });
   game.start();
-  ui.start();
 }
