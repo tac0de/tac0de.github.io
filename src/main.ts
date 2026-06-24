@@ -5,9 +5,9 @@ type PortalData = {
   id: string;
   title: string;
   desc: string;
-  url: string;
   position: THREE.Vector3;
   color: number;
+  playable: boolean;
 };
 
 function qs<T extends Element>(selector: string): T {
@@ -44,40 +44,45 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-const clock = new THREE.Clock();
+const startedAt = performance.now();
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
+const keys = new Set<string>();
 
 const portals: PortalData[] = [
   {
     id: "room-203",
     title: "ROOM 203",
-    desc: "A short lo-fi motel horror game. Check the guest book. Do not wake the room.",
-    url: "/games/room-203/",
+    desc: "A short lo-fi horror loop. Walk the hall. Open the room. Return once.",
     position: new THREE.Vector3(-2.6, 1.35, 0),
     color: 0xd6b574,
+    playable: true,
   },
   {
     id: "night-shift",
     title: "NIGHT SHIFT",
     desc: "A quiet clerk simulator that becomes wrong after 2AM.",
-    url: "/games/night-shift/",
     position: new THREE.Vector3(0, 1.35, -0.65),
     color: 0x89a7b1,
+    playable: false,
   },
   {
     id: "static-door",
     title: "STATIC DOOR",
     desc: "A CCTV-only horror experiment. Some things exist only on the monitor.",
-    url: "/games/static-door/",
     position: new THREE.Vector3(2.6, 1.35, 0),
     color: 0xc06b5c,
+    playable: false,
   },
 ];
 
 const portalMeshes: THREE.Mesh[] = [];
 let hoveredPortal: PortalData | null = null;
 let selectedPortal: PortalData | null = null;
+let mode: "portal" | "room203" = "portal";
+let roomStage = 0;
+let doorOpen = false;
+let doorMesh: THREE.Mesh | null = null;
 
 function makeMaterial(color: number, roughness = 0.92): THREE.MeshStandardMaterial {
   return new THREE.MeshStandardMaterial({
@@ -85,6 +90,34 @@ function makeMaterial(color: number, roughness = 0.92): THREE.MeshStandardMateri
     roughness,
     metalness: 0.04,
   });
+}
+
+function clearScene() {
+  for (const child of [...scene.children]) {
+    scene.remove(child);
+  }
+  portalMeshes.length = 0;
+}
+
+function makeLabel(text: string, width = 1.2, height = 0.42): THREE.Mesh {
+  const labelCanvas = document.createElement("canvas");
+  labelCanvas.width = 256;
+  labelCanvas.height = 96;
+  const ctx = labelCanvas.getContext("2d");
+  if (!ctx) throw new Error("Missing label canvas context");
+  ctx.fillStyle = "#090909";
+  ctx.fillRect(0, 0, labelCanvas.width, labelCanvas.height);
+  ctx.fillStyle = "#d8cfb7";
+  ctx.font = "bold 34px monospace";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(text, labelCanvas.width / 2, labelCanvas.height / 2);
+  const texture = new THREE.CanvasTexture(labelCanvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return new THREE.Mesh(
+    new THREE.PlaneGeometry(width, height),
+    new THREE.MeshBasicMaterial({ map: texture }),
+  );
 }
 
 function addRoom() {
@@ -189,7 +222,7 @@ function addPortalLabel(text: string, parent: THREE.Object3D) {
     }),
   );
 
-  label.position.set(0, 0, 0.055);
+  label.position.set(0, 0, 0.16);
   parent.add(label);
 }
 
@@ -264,6 +297,95 @@ function addDecor() {
     strip.position.set(-4.2 + i * 0.365, 0.012, 0.8);
     scene.add(strip);
   }
+}
+
+function addRoom203() {
+  scene.background = new THREE.Color(0x090706);
+  scene.fog = new THREE.FogExp2(0x090706, 0.08);
+  scene.add(new THREE.AmbientLight(0x9a7e64, 0.74));
+
+  const hallLight = new THREE.PointLight(0xe8d0a0, 2.1, 7);
+  hallLight.position.set(0, 2.7, 1.6);
+  scene.add(hallLight);
+
+  const roomLight = new THREE.PointLight(0xb44d3e, 1.2, 5);
+  roomLight.position.set(3.2, 1.8, -3.4);
+  scene.add(roomLight);
+
+  const floor = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.12, 9.4), makeMaterial(0x211812));
+  floor.position.set(0, -0.06, 0.1);
+  scene.add(floor);
+
+  const ceiling = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.12, 9.4), makeMaterial(0x120f0d));
+  ceiling.position.set(0, 2.8, 0.1);
+  scene.add(ceiling);
+
+  for (const x of [-1.5, 1.5]) {
+    const wall = new THREE.Mesh(new THREE.BoxGeometry(0.12, 2.8, 9.4), makeMaterial(0x3a2b22));
+    wall.position.set(x, 1.35, 0.1);
+    scene.add(wall);
+  }
+
+  const leftEndWall = new THREE.Mesh(new THREE.BoxGeometry(0.92, 2.8, 0.12), makeMaterial(0x2b211c));
+  leftEndWall.position.set(-1.04, 1.35, -3.9);
+  scene.add(leftEndWall);
+
+  const rightEndWall = new THREE.Mesh(new THREE.BoxGeometry(0.92, 2.8, 0.12), makeMaterial(0x2b211c));
+  rightEndWall.position.set(1.04, 1.35, -3.9);
+  scene.add(rightEndWall);
+
+  const header = new THREE.Mesh(new THREE.BoxGeometry(1.18, 0.55, 0.12), makeMaterial(0x2b211c));
+  header.position.set(0, 2.52, -3.9);
+  scene.add(header);
+
+  doorMesh = new THREE.Mesh(new THREE.BoxGeometry(1.05, 2.0, 0.12), makeMaterial(0x080808));
+  doorMesh.position.set(0, 1.0, -3.82);
+  scene.add(doorMesh);
+
+  const sign = makeLabel("203", 0.68, 0.26);
+  sign.position.set(0, 2.15, -3.74);
+  scene.add(sign);
+
+  const carpet = new THREE.Mesh(
+    new THREE.BoxGeometry(0.62, 0.03, 7.2),
+    new THREE.MeshBasicMaterial({ color: 0x4a241e }),
+  );
+  carpet.position.set(0, 0.02, 0.6);
+  scene.add(carpet);
+
+  const bed = new THREE.Mesh(new THREE.BoxGeometry(1.55, 0.46, 0.92), makeMaterial(0x5f4032));
+  bed.position.set(0.82, 0.28, -5.0);
+  scene.add(bed);
+
+  const sheet = new THREE.Mesh(new THREE.BoxGeometry(1.44, 0.13, 0.82), makeMaterial(0xc9b98f));
+  sheet.position.set(0.82, 0.62, -5.0);
+  scene.add(sheet);
+
+  const tv = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.52, 0.08), makeMaterial(0x050607));
+  tv.position.set(-1.38, 1.24, -5.1);
+  scene.add(tv);
+
+  const phone = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.12, 0.22), makeMaterial(0x0a0a0a));
+  phone.position.set(-0.85, 0.74, -4.55);
+  scene.add(phone);
+
+  const shape = new THREE.Mesh(new THREE.BoxGeometry(0.34, 1.28, 0.22), new THREE.MeshBasicMaterial({ color: 0x020202 }));
+  shape.position.set(0, 0.64, roomStage < 2 ? -8 : -2.7);
+  shape.visible = roomStage > 0;
+  scene.add(shape);
+}
+
+function startRoom203() {
+  mode = "room203";
+  roomStage = 0;
+  doorOpen = false;
+  clearScene();
+  card.classList.add("hidden");
+  hint.textContent = "WASD / drag / E";
+  addRoom203();
+  camera.position.set(0, 1.55, 3.2);
+  yaw = 0;
+  pitch = -0.03;
 }
 
 function getPortalById(id: string): PortalData | null {
@@ -342,12 +464,42 @@ canvas.addEventListener("pointermove", (event) => {
 
 canvas.addEventListener("pointerup", (event) => {
   isDragging = false;
+  if (mode !== "portal") return;
   pickPortal(event);
 });
 
 playButton.addEventListener("click", () => {
   if (!selectedPortal) return;
-  window.location.href = selectedPortal.url;
+  if (selectedPortal.id === "room-203" && selectedPortal.playable) {
+    startRoom203();
+    return;
+  }
+  hint.textContent = "Locked";
+});
+
+window.addEventListener("keydown", (event) => {
+  keys.add(event.code);
+  if (mode !== "room203" || event.code !== "KeyE") return;
+
+  if (camera.position.z < -2.15 && !doorOpen) {
+    doorOpen = true;
+    roomStage = 1;
+    if (doorMesh) doorMesh.position.x = 0.68;
+    hint.textContent = "";
+    return;
+  }
+
+  if (doorOpen && camera.position.z < -4.1) {
+    roomStage += 1;
+    clearScene();
+    addRoom203();
+    camera.position.set(0, 1.55, 3.2);
+    hint.textContent = roomStage > 2 ? "" : "WASD / drag / E";
+  }
+});
+
+window.addEventListener("keyup", (event) => {
+  keys.delete(event.code);
 });
 
 window.addEventListener("resize", () => {
@@ -363,16 +515,47 @@ addLights();
 addPortals();
 addDecor();
 
+function updateRoom203Movement() {
+  const forward = new THREE.Vector3(Math.sin(yaw), 0, -Math.cos(yaw)).normalize();
+  const right = new THREE.Vector3(-forward.z, 0, forward.x).normalize();
+  const move = new THREE.Vector3();
+
+  if (keys.has("KeyW")) move.add(forward);
+  if (keys.has("KeyS")) move.sub(forward);
+  if (keys.has("KeyD")) move.add(right);
+  if (keys.has("KeyA")) move.sub(right);
+
+  if (move.lengthSq() > 0) {
+    move.normalize().multiplyScalar(0.045);
+    camera.position.add(move);
+    camera.position.x = THREE.MathUtils.clamp(camera.position.x, -1.08, 1.08);
+    camera.position.z = THREE.MathUtils.clamp(camera.position.z, doorOpen ? -5.7 : -2.25, 3.55);
+  }
+
+  if (!doorOpen && camera.position.z < -1.95) {
+    hint.textContent = "E";
+  } else if (doorOpen && camera.position.z < -4.1) {
+    hint.textContent = "E";
+  } else {
+    hint.textContent = roomStage > 2 ? "" : "WASD / drag / E";
+  }
+}
+
 function animate() {
-  const elapsed = clock.getElapsedTime();
+  const elapsed = (performance.now() - startedAt) / 1000;
 
   camera.rotation.order = "YXZ";
   camera.rotation.y = yaw + Math.sin(elapsed * 0.28) * 0.015;
   camera.rotation.x = pitch + Math.sin(elapsed * 0.7) * 0.006;
 
-  camera.position.x = Math.sin(yaw) * 0.35;
-  camera.position.z = 6.8 + Math.cos(elapsed * 0.24) * 0.05;
-  camera.position.y = 1.55 + Math.sin(elapsed * 0.9) * 0.012;
+  if (mode === "portal") {
+    camera.position.x = Math.sin(yaw) * 0.35;
+    camera.position.z = 6.8 + Math.cos(elapsed * 0.24) * 0.05;
+    camera.position.y = 1.55 + Math.sin(elapsed * 0.9) * 0.012;
+  } else {
+    updateRoom203Movement();
+    camera.position.y = 1.55 + Math.sin(elapsed * 1.7) * 0.01;
+  }
 
   for (const mesh of portalMeshes) {
     const id = mesh.userData.portalId as string;
