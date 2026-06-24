@@ -34,8 +34,8 @@ button {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at center, transparent 48%, rgba(0, 0, 0, 0.18)),
-    linear-gradient(to bottom, rgba(0, 0, 0, 0.16), transparent 26%);
+    radial-gradient(circle at center, transparent 52%, rgba(0, 0, 0, 0.12)),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.1), transparent 26%);
 }
 
 #hint {
@@ -50,6 +50,94 @@ button {
   font-size: 11px;
   letter-spacing: 0.08em;
   white-space: nowrap;
+}
+
+#task-panel {
+  position: fixed;
+  left: 18px;
+  top: 16px;
+  max-width: min(310px, calc(100vw - 36px));
+  padding: 6px 8px;
+  border: 1px solid rgba(239, 231, 216, 0.16);
+  background: rgba(5, 5, 5, 0.24);
+  color: rgba(239, 231, 216, 0.76);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+#cctv-panel {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(215, 230, 205, 0.08) 0,
+      rgba(215, 230, 205, 0.08) 1px,
+      transparent 1px,
+      transparent 4px
+    ),
+    radial-gradient(circle at center, rgba(58, 80, 68, 0.42), rgba(2, 4, 3, 0.94));
+  color: rgba(221, 238, 213, 0.82);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  pointer-events: none;
+}
+
+#cctv-panel.visible {
+  display: grid;
+}
+
+#cctv-panel > div:first-child {
+  position: fixed;
+  left: 18px;
+  top: 18px;
+}
+
+#cctv-panel span {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+}
+
+.cctv-figure {
+  position: fixed;
+  left: 50%;
+  top: 51%;
+  width: 26px;
+  height: 96px;
+  transform: translate(-50%, -50%);
+  background: #020202;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+}
+
+.cctv-figure::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: -18px;
+  width: 14px;
+  height: 18px;
+  background: #020202;
+}
+
+.cctv-figure.stage-1 {
+  transform: translate(-50%, -50%) scale(0.55);
+}
+
+.cctv-figure.stage-2 {
+  transform: translate(-50%, -50%) scale(0.9);
+}
+
+.cctv-figure.stage-3 {
+  transform: translate(-50%, -50%) scale(1.25);
+}
+
+.cctv-figure.stage-4,
+.cctv-figure.stage-5 {
+  transform: translate(-50%, -50%) scale(1.7);
 }
 
 #touch-move {
@@ -114,6 +202,12 @@ button {
 }
 
 @media (max-width: 720px) {
+  #task-panel {
+    left: 12px;
+    top: 12px;
+    font-size: 10px;
+  }
+
   #hint {
     font-size: 10px;
   }
