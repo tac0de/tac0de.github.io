@@ -1,9 +1,9 @@
-# NO VACANCY
+# TAC0DE ARCADE
 
-A short lo-fi first-person motel horror game for `https://tac0de.github.io`.
+A small Three.js browser game portal for `https://tac0de.github.io`.
 
-You are the night clerk at a small motel. Check guests in, watch CCTV, answer
-the phone, and survive the shift as the building starts changing.
+The first playable game is `NO VACANCY`, a lo-fi motel horror prototype about
+night-shift tasks, CCTV contradictions, and Room 203.
 
 ## Run
 
@@ -20,7 +20,7 @@ npm run build
 
 The production output is `dist/`. GitHub Pages deploys it through the Pages workflow.
 
-## Controls
+## Current Game Controls
 
 - Desktop: WASD move, mouse look, E interact, F flashlight.
 - Mobile: left joystick move, right drag look, large interact and flashlight buttons.

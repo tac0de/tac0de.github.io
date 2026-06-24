@@ -18,6 +18,181 @@ button {
   font: inherit;
 }
 
+.portal {
+  min-height: 100%;
+  padding: clamp(20px, 4vw, 48px);
+  color: #f0dfbc;
+  background:
+    linear-gradient(rgba(18, 16, 14, 0.72), rgba(18, 16, 14, 0.86)),
+    repeating-linear-gradient(0deg, rgba(255, 211, 106, 0.04), rgba(255, 211, 106, 0.04) 1px, transparent 2px, transparent 5px),
+    #2d2926;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+.portal-hero {
+  max-width: 920px;
+  margin: 0 auto 28px;
+}
+
+.portal-kicker,
+.game-status,
+.game-meta {
+  color: #ffd36a;
+  font-size: 12px;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.portal h1 {
+  margin: 0;
+  color: #d94d37;
+  font-size: clamp(44px, 9vw, 112px);
+  line-height: 0.9;
+  letter-spacing: 0;
+}
+
+.portal-copy {
+  max-width: 560px;
+  margin: 16px 0 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.game-shelf {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.65fr);
+  gap: 14px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.game-card {
+  min-height: 190px;
+  border: 1px solid rgba(255, 211, 106, 0.36);
+  background: rgba(21, 17, 14, 0.68);
+}
+
+.game-card.featured {
+  display: grid;
+  grid-row: span 2;
+  grid-template-columns: minmax(240px, 0.9fr) minmax(280px, 1fr);
+  min-height: 430px;
+}
+
+.game-card.locked {
+  display: grid;
+  align-items: end;
+  padding: 18px;
+  color: rgba(240, 223, 188, 0.64);
+}
+
+.game-preview {
+  position: relative;
+  min-height: 320px;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, transparent 0 45%, rgba(255, 211, 106, 0.16) 45% 47%, transparent 47%),
+    linear-gradient(0deg, #1a1512 0 22%, #4b3325 22% 45%, #252322 45% 100%);
+}
+
+.game-preview::before {
+  content: "";
+  position: absolute;
+  inset: 20% 12% auto;
+  height: 30%;
+  background:
+    linear-gradient(90deg, #5f473a 0 16%, #292521 16% 84%, #5f473a 84%),
+    #292521;
+  transform: perspective(280px) rotateX(58deg);
+  transform-origin: bottom;
+}
+
+.game-preview .sign {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  padding: 7px 10px;
+  border: 1px solid #d94d37;
+  color: #d94d37;
+  background: #171210;
+  font-size: 15px;
+}
+
+.game-preview .room {
+  position: absolute;
+  right: 30px;
+  top: 42%;
+  color: #f0dfbc;
+  font-size: 38px;
+}
+
+.game-preview .scan {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.18) 1px, transparent 2px, transparent 5px);
+}
+
+.game-info {
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  padding: clamp(20px, 4vw, 34px);
+}
+
+.game-info h2,
+.game-card.locked h2 {
+  margin: 0;
+  color: #f0dfbc;
+  font-size: clamp(28px, 4vw, 52px);
+  letter-spacing: 0;
+}
+
+.game-info p,
+.game-card.locked p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.game-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.game-meta span {
+  padding: 4px 7px;
+  border: 1px solid rgba(255, 211, 106, 0.28);
+  background: rgba(255, 211, 106, 0.08);
+}
+
+.portal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.portal-actions button {
+  min-height: 44px;
+  padding: 11px 14px;
+  border: 1px solid #ffd36a;
+  background: #1a1512;
+  color: #ffd36a;
+  cursor: pointer;
+}
+
+.portal-actions .primary {
+  min-width: 132px;
+  background: #ffd36a;
+  color: #171210;
+}
+
+.portal-actions .secondary {
+  color: rgba(240, 223, 188, 0.78);
+  border-color: rgba(240, 223, 188, 0.32);
+}
+
 .game-canvas {
   display: block;
   width: 100vw;
@@ -227,5 +402,47 @@ button {
     overflow-wrap: anywhere;
     white-space: normal;
     text-align: center;
+  }
+}
+
+@media (max-width: 760px) {
+  .portal {
+    padding: 18px;
+  }
+
+  .portal *,
+  .game-card,
+  .game-info,
+  .game-preview {
+    min-width: 0;
+  }
+
+  .portal h1 {
+    font-size: 34px;
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-copy,
+  .game-info p {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .game-shelf,
+  .game-card.featured {
+    grid-template-columns: 1fr;
+  }
+
+  .game-card.featured {
+    min-height: auto;
+  }
+
+  .game-preview {
+    min-height: 260px;
+  }
+
+  .portal-actions button {
+    width: 100%;
   }
 }
