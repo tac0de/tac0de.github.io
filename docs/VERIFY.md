@@ -17,10 +17,11 @@ There is currently no separate lint script.
 ## Runtime Criteria
 
 - WebGL canvas renders on desktop.
-- First screen is the 3D arcade portal.
-- Selecting the `NO VACANCY` CRT updates the portal details.
-- Clicking or tapping Play starts `NO VACANCY`.
-- Keyboard selection works with left/right arrows and Enter.
+- First screen is the minimal white 3D portal.
+- WASD moves the portal camera.
+- Mouse look works after pointer lock.
+- The tiny overlay explains WASD, mouse, E, and ESC.
+- Approaching the `NO VACANCY` door and pressing E starts the game.
 - Task list appears after game start.
 - No console exceptions during start.
 - Mobile viewport does not have major UI overlap.
