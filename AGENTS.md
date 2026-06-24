@@ -9,7 +9,6 @@ This repo is a static Three.js web project.
 - Follow the global DTP runtime as fallback.
 - Treat this file as the local project instruction source.
 - Keep source-of-truth changes inside the repo.
-- Do not rely on deleted `docs/` files as product truth.
 
 ## TOKEN_SCOPED
 

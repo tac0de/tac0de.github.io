@@ -2,21 +2,21 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>203</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>Lo-Fi Horror</title>
   </head>
   <body>
-    <div id="app">
-      <canvas id="scene"></canvas>
+    <canvas id="game"></canvas>
 
-      <div class="hud">
-        <div id="hint">WASD / DRAG / E</div>
-      </div>
-
-      <div id="touch-move" aria-hidden="true">
-        <div id="touch-stick"></div>
-      </div>
-      <button id="touch-interact" aria-label="interact">E</button>
+    <div id="overlay">
+      <div id="title">LO-FI HORROR TEST</div>
+      <div id="hint">Click to enter · WASD Move · E Interact</div>
+      <div id="fear">FEAR 0</div>
+      <div id="message"></div>
+      <div id="crosshair"></div>
     </div>
 
     <script type="module" src="/src/main.ts"></script>

@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
+    "deploy": "npm run build && gh workflow run deploy.yml --ref main",
+    "deploy:watch": "gh run watch $(gh run list --workflow deploy.yml --limit 1 --json databaseId --jq '.[0].databaseId') --exit-status",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
