@@ -10,14 +10,18 @@
     "deploy:watch": "gh run watch $(gh run list --workflow deploy.yml --limit 1 --json databaseId --jq '.[0].databaseId') --exit-status",
     "preview": "vite preview --host 0.0.0.0"
   },
-  "dependencies": {
-    "three": "^0.184.0",
-    "vite": "^8.0.16"
+   "dependencies": {
+    "@react-three/drei": "latest",
+    "@react-three/fiber": "latest",
+    "three": "latest",
+    "react": "latest",
+    "react-dom": "latest"
   },
   "devDependencies": {
-    "@types/pngjs": "^6.0.5",
-    "@types/three": "^0.184.1",
-    "pngjs": "^7.0.0",
-    "typescript": "^6.0.3"
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@vitejs/plugin-react": "latest",
+    "typescript": "latest",
+    "vite": "latest"
   }
 }

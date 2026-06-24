@@ -2,27 +2,11 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=no"
-    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Motel 204</title>
   </head>
   <body>
-    <canvas id="game"></canvas>
-
-    <div id="overlay">
-      <div id="top-left">
-        <div id="title">MOTEL 204</div>
-        <div id="hint">Click · WASD Move · Shift Run · E Interact</div>
-      </div>
-
-      <div id="status">CASE 00:00 · ANOMALY 0</div>
-      <div id="message"></div>
-      <div id="objective">목표: 프런트를 확인하라.</div>
-      <div id="crosshair"></div>
-    </div>
-
-    <script type="module" src="/src/main.ts"></script>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
