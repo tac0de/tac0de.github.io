@@ -64,6 +64,7 @@ export class Game {
     this.ui.onReset = () => this.reset();
     this.ui.onContinue = () => window.location.reload();
     this.ui.bindInput(this.input);
+    this.ui.start();
     this.renderer.setAnimationLoop(() => this.tick());
   }
 

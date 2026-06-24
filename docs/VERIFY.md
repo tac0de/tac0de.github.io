@@ -22,6 +22,7 @@ There is currently no separate lint script.
 - Mouse look works after pointer lock.
 - The tiny overlay explains WASD, mouse, E, and ESC.
 - Approaching the `NO VACANCY` door and pressing E starts the game.
+- `NO VACANCY` starts without a separate how-to-play panel.
 - Task list appears after game start.
 - No console exceptions during start.
 - Mobile viewport does not have major UI overlap.

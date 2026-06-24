@@ -121,7 +121,7 @@ export class ArcadePortal {
 
   private updateMovement(delta: number): void {
     this.forward.set(Math.sin(this.yaw), 0, Math.cos(this.yaw) * -1).normalize();
-    this.right.set(this.forward.z, 0, -this.forward.x).normalize();
+    this.right.set(-this.forward.z, 0, this.forward.x).normalize();
     this.move.set(0, 0, 0);
 
     if (this.keys.has("KeyW")) this.move.add(this.forward);

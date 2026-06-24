@@ -27,8 +27,8 @@ export class UI {
     this.ending = this.make("div", "ending hidden");
     this.startPanel = this.make(
       "div",
-      "start-panel",
-      "<h1>NO VACANCY</h1><p>Night audit. 11:43 PM.</p><button>Start Shift</button>",
+      "start-panel hidden",
+      "<h1>NO VACANCY</h1><button>Start</button>",
     );
     this.joystick = this.make("div", "joystick");
     this.knob = this.make("div", "knob");
@@ -67,28 +67,16 @@ export class UI {
   setStartLoop(loop: number): void {
     const copy =
       loop === 0
-        ? ["Night audit. 11:43 PM.", "Start Shift"]
+        ? ["Start"]
         : loop === 1
-          ? ["Incident report reopened. 11:43 PM.", "Continue Audit"]
+          ? ["Continue"]
           : loop === 2
-          ? ["Room 203 is ready. 11:43 PM.", "Continue Check-In"]
-          : ["Staff reassigned. 11:43 PM.", "Return to Desk"];
+          ? ["Continue"]
+          : ["Return"];
     this.startPanel.innerHTML = `
       <div class="shift-card">
-        <p class="shift-kicker">Motel night audit</p>
         <h1>NO VACANCY</h1>
-        <p>${copy[0]}</p>
-        <div class="shift-brief">
-          <h2>How to play</h2>
-          <div><span>1</span><p>Read the task list and complete the motel desk work.</p></div>
-          <div><span>2</span><p>Interact with highlighted objects: guest book, key, CCTV, Room 203, breaker.</p></div>
-          <div><span>3</span><p>Compare what records and CCTV show against the physical motel.</p></div>
-        </div>
-        <div class="shift-controls">
-          <p><strong>Desktop</strong> WASD move, mouse look, E interact, F flashlight.</p>
-          <p><strong>Mobile</strong> left stick, right drag, USE, LIGHT.</p>
-        </div>
-        <button>${copy[1]}</button>
+        <button>${copy[0]}</button>
       </div>
     `;
     this.startPanel.querySelector("button")?.addEventListener("click", () => this.start());

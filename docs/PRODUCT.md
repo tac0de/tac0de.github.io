@@ -33,6 +33,9 @@ Working title: `NO VACANCY`
 Pitch: You are an overnight motel clerk. A normal checklist slowly proves that
 the motel records are not documenting reality; they are rewriting it.
 
+Entry rule: entering from the portal starts the shift immediately. Do not show a
+separate how-to-play panel before gameplay.
+
 ## Horror Core
 
 The game should not rely on darkness. Horror comes from:
