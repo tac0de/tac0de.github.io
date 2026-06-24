@@ -1,15 +1,13 @@
 import * as THREE from "three";
 import "./style.css";
 
-type Mode = "portal" | "room";
+type Mode = "room";
 
 type TouchLook = {
   active: boolean;
   pointerId: number;
   x: number;
   y: number;
-  startX: number;
-  startY: number;
 };
 
 type TouchMove = {
@@ -50,16 +48,12 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.35));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
 const keys = new Set<string>();
 const look: TouchLook = {
   active: false,
   pointerId: -1,
   x: 0,
   y: 0,
-  startX: 0,
-  startY: 0,
 };
 const moveTouch: TouchMove = {
   active: false,
@@ -75,13 +69,12 @@ const reusableRight = new THREE.Vector3();
 const reusableMove = new THREE.Vector3();
 const startedAt = performance.now();
 
-let mode: Mode = "portal";
+let mode: Mode = "room";
 let yaw = 0;
 let pitch = -0.03;
 let stage = 0;
 let doorOpen = false;
 let activeDoor: THREE.Mesh | null = null;
-let portalDoor: THREE.Mesh | null = null;
 
 const mats = {
   white: mat(0xe9e6dc, 0.96),
@@ -152,53 +145,12 @@ function textPlane(
 function clearScene() {
   for (const child of [...scene.children]) scene.remove(child);
   activeDoor = null;
-  portalDoor = null;
 }
 
 function resetCamera(x: number, y: number, z: number, nextYaw = 0, nextPitch = -0.03) {
   camera.position.set(x, y, z);
   yaw = nextYaw;
   pitch = nextPitch;
-}
-
-function buildPortalRoom() {
-  clearScene();
-  mode = "portal";
-  scene.background = new THREE.Color(0xf3f0e8);
-  scene.fog = new THREE.Fog(0xf3f0e8, 4.8, 9.5);
-
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xbeb3a7, 1.55));
-  const doorLight = new THREE.PointLight(0xffffff, 1.4, 5.5);
-  doorLight.position.set(0, 2.5, -1.25);
-  scene.add(doorLight);
-
-  box([3.15, 0.14, 5.2], [0, -0.07, 0], mats.whiteDark);
-  box([3.15, 0.12, 5.2], [0, 2.86, 0], mats.white);
-  box([0.12, 2.95, 5.2], [-1.58, 1.4, 0], mats.white);
-  box([0.12, 2.95, 5.2], [1.58, 1.4, 0], mats.white);
-  box([0.82, 2.95, 0.12], [-1.17, 1.4, -2.34], mats.white);
-  box([0.82, 2.95, 0.12], [1.17, 1.4, -2.34], mats.white);
-  box([1.5, 0.58, 0.12], [0, 2.66, -2.34], mats.white);
-  box([3.15, 2.95, 0.12], [0, 1.4, 2.55], mats.white);
-
-  box([1.46, 2.38, 0.1], [0, 1.16, -2.22], mats.trim);
-  portalDoor = box(
-    [1.12, 2.0, 0.08],
-    [0, 1.0, -2.03],
-    new THREE.MeshBasicMaterial({ color: 0x050505 }),
-  );
-  portalDoor.userData.action = "enter";
-
-  const label = textPlane("203", 0.62, 0.28, "#0b0b0b", "#f2eee5");
-  label.position.set(0, 2.03, -1.98);
-  scene.add(label);
-
-  for (let i = 0; i < 7; i++) {
-    box([0.018, 0.012, 4.1], [-0.84 + i * 0.28, 0.015, 0.15], mats.trim);
-  }
-
-  resetCamera(0, 1.38, 1.96);
-  hint.textContent = "WASD / DRAG / E";
 }
 
 function buildRoom203() {
@@ -306,11 +258,6 @@ function addRoomInterior(roomZ: number, currentStage: number) {
 }
 
 function tryInteract() {
-  if (mode === "portal") {
-    if (camera.position.z < 1.2) startRoom();
-    return;
-  }
-
   const doorZ = stage >= 3 ? -5.48 : -3.7;
   if (!doorOpen && camera.position.z < doorZ + 1.22) {
     doorOpen = true;
@@ -341,25 +288,20 @@ function startRoom() {
 }
 
 function buildEnding() {
-  buildPortalRoom();
-  const label = textPlane("203", 0.62, 0.28, "#f2eee5", "#090909");
-  label.position.set(0, 1.38, -2.02);
+  clearScene();
+  mode = "room";
+  scene.background = new THREE.Color(0x050505);
+  scene.fog = new THREE.Fog(0x050505, 2.5, 8);
+  scene.add(new THREE.HemisphereLight(0x6f6455, 0x050505, 0.9));
+  box([2.7, 0.12, 5.4], [0, -0.06, 0.2], mats.floor);
+  box([0.12, 2.7, 5.4], [-1.35, 1.31, 0.2], mats.wallDark);
+  box([0.12, 2.7, 5.4], [1.35, 1.31, 0.2], mats.wallDark);
+  box([2.7, 2.7, 0.12], [0, 1.31, -2.3], mats.wallDark);
+  const label = textPlane("203", 0.72, 0.32, "#050505", "#d8c7a4");
+  label.position.set(0, 1.5, -2.18);
   scene.add(label);
+  resetCamera(0, 1.5, 1.65);
   hint.textContent = "";
-}
-
-function updatePointer(event: PointerEvent) {
-  const rect = canvas.getBoundingClientRect();
-  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-  pointer.y = -(((event.clientY - rect.top) / rect.height) * 2 - 1);
-}
-
-function pickPortalDoor(event: PointerEvent) {
-  if (mode !== "portal" || !portalDoor) return;
-  updatePointer(event);
-  raycaster.setFromCamera(pointer, camera);
-  const hits = raycaster.intersectObject(portalDoor, false);
-  if (hits.length) startRoom();
 }
 
 function isMoveTouch(event: PointerEvent) {
@@ -385,8 +327,6 @@ canvas.addEventListener("pointerdown", (event) => {
   look.pointerId = event.pointerId;
   look.x = event.clientX;
   look.y = event.clientY;
-  look.startX = event.clientX;
-  look.startY = event.clientY;
   canvas.setPointerCapture(event.pointerId);
 });
 
@@ -422,10 +362,8 @@ canvas.addEventListener("pointerup", (event) => {
   }
 
   if (look.active && event.pointerId === look.pointerId) {
-    const moved = Math.abs(event.clientX - look.startX) + Math.abs(event.clientY - look.startY);
     look.active = false;
     look.pointerId = -1;
-    if (moved < 8) pickPortalDoor(event);
   }
 });
 
@@ -434,7 +372,7 @@ touchInteract.addEventListener("click", tryInteract);
 window.addEventListener("keydown", (event) => {
   keys.add(event.code);
   if (event.code === "KeyE" || event.code === "Enter") tryInteract();
-  if (event.code === "Escape" && mode === "room") buildPortalRoom();
+  if (event.code === "Escape") startRoom();
 });
 
 window.addEventListener("keyup", (event) => {
@@ -449,7 +387,7 @@ window.addEventListener("resize", () => {
 });
 
 function updateMovement() {
-  reusableForward.set(Math.sin(yaw), 0, -Math.cos(yaw)).normalize();
+  reusableForward.set(-Math.sin(yaw), 0, -Math.cos(yaw)).normalize();
   reusableRight.set(-reusableForward.z, 0, reusableForward.x).normalize();
   reusableMove.set(0, 0, 0);
 
@@ -465,14 +403,8 @@ function updateMovement() {
 
   if (reusableMove.lengthSq() === 0) return;
 
-  reusableMove.normalize().multiplyScalar(mode === "portal" ? 0.032 : 0.043);
+  reusableMove.normalize().multiplyScalar(0.043);
   camera.position.add(reusableMove);
-
-  if (mode === "portal") {
-    camera.position.x = THREE.MathUtils.clamp(camera.position.x, -0.96, 0.96);
-    camera.position.z = THREE.MathUtils.clamp(camera.position.z, -1.64, 2.06);
-    return;
-  }
 
   const doorZ = stage >= 3 ? -5.48 : -3.7;
   const minZ = doorOpen ? doorZ - 3.02 : doorZ + 0.62;
@@ -481,11 +413,6 @@ function updateMovement() {
 }
 
 function updateHint() {
-  if (mode === "portal") {
-    hint.textContent = camera.position.z < 1.2 ? "E" : "WASD / DRAG / E";
-    return;
-  }
-
   const doorZ = stage >= 3 ? -5.48 : -3.7;
   if (!doorOpen && camera.position.z < doorZ + 1.22) {
     hint.textContent = "E";
@@ -505,11 +432,11 @@ function animate() {
   camera.rotation.order = "YXZ";
   camera.rotation.y = yaw + Math.sin(elapsed * 0.31) * 0.006;
   camera.rotation.x = pitch + Math.sin(elapsed * 0.68) * 0.004;
-  camera.position.y = (mode === "portal" ? 1.38 : 1.5) + Math.sin(elapsed * 1.6) * 0.006;
+  camera.position.y = 1.5 + Math.sin(elapsed * 1.6) * 0.006;
 
   renderer.render(scene, camera);
   requestAnimationFrame(animate);
 }
 
-buildPortalRoom();
+startRoom();
 animate();
