@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { createBox } from './createBox';
 import { createDoor } from './Door';
-import { PropFactory } from './propFactory';
+import { PropFactory } from './PropFactory';
 import type { Materials } from '../world/Materials';
 import type { InteractableMesh } from '../game/types';
 import type { CollisionWorld } from '../world/CollisionWorld';
