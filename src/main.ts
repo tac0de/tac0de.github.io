@@ -55,8 +55,8 @@ const messageEl = getRequiredElement<HTMLDivElement>('#message');
 const crosshairEl = getRequiredElement<HTMLDivElement>('#crosshair');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x101317);
-scene.fog = new THREE.FogExp2(0x101317, 0.045);
+scene.background = new THREE.Color(0x20242a);
+scene.fog = new THREE.FogExp2(0x20242a, 0.018);
 
 const camera = new THREE.PerspectiveCamera(
   68,
@@ -101,37 +101,37 @@ const walls: THREE.Mesh[] = [];
 const interactables: InteractableMesh[] = [];
 
 const wallMaterial = new THREE.MeshStandardMaterial({
-  color: 0x303433,
+  color: 0x6a665f,
   roughness: 1,
   metalness: 0,
 });
 
 const floorMaterial = new THREE.MeshStandardMaterial({
-  color: 0x1c1f1f,
+  color: 0x4a4842,
   roughness: 1,
   metalness: 0,
 });
 
 const carpetMaterial = new THREE.MeshStandardMaterial({
-  color: 0x3c2326,
+  color: 0x7a2d35,
   roughness: 1,
   metalness: 0,
 });
 
 const deskMaterial = new THREE.MeshStandardMaterial({
-  color: 0x4a3326,
+  color: 0x6b432b,
   roughness: 1,
   metalness: 0,
 });
 
 const doorMaterial = new THREE.MeshStandardMaterial({
-  color: 0x4b2d22,
+  color: 0x7a4a2f,
   roughness: 1,
   metalness: 0,
 });
 
 const roomMaterial = new THREE.MeshStandardMaterial({
-  color: 0x2b2e32,
+  color: 0x5c626b,
   roughness: 1,
   metalness: 0,
 });
@@ -216,11 +216,101 @@ function addWall(
   return wall;
 }
 
+function createSignTextLikeBlocks(
+  x: number,
+  y: number,
+  z: number,
+  textLength: number,
+  material: THREE.Material
+): void {
+  for (let i = 0; i < textLength; i++) {
+    createBox(
+      x + i * 0.22,
+      y,
+      z,
+      0.12 + Math.random() * 0.08,
+      0.18,
+      0.04,
+      material
+    );
+  }
+}
+
+function createDoorPlate(x: number, y: number, z: number): void {
+  createBox(x, y, z, 0.55, 0.25, 0.04, paperMaterial);
+  createSignTextLikeBlocks(x - 0.18, y + 0.02, z - 0.03, 3, bloodMaterial);
+}
+
+function createLamp(x: number, y: number, z: number): void {
+  createBox(x, y, z, 0.22, 0.8, 0.22, deskMaterial);
+  createBox(x, y + 0.55, z, 0.8, 0.35, 0.8, paperMaterial);
+
+  const lampLight = new THREE.PointLight(0xffd18a, 0.75, 6, 1.8);
+  lampLight.position.set(x, y + 0.75, z);
+  scene.add(lampLight);
+}
+
+function createTrash(x: number, z: number): void {
+  createBox(x, 0.22, z, 0.45, 0.44, 0.45, wallMaterial);
+  createBox(x + 0.32, 0.08, z - 0.18, 0.42, 0.08, 0.24, paperMaterial);
+  createBox(x - 0.25, 0.07, z + 0.22, 0.32, 0.07, 0.2, paperMaterial);
+}
+
+function createBed(x: number, z: number): void {
+  createBox(x, 0.45, z, 3.2, 0.9, 1.8, deskMaterial);
+  createBox(x - 0.8, 1.0, z - 0.45, 1.0, 0.22, 0.7, paperMaterial);
+  createBox(x + 0.35, 1.02, z + 0.1, 1.8, 0.16, 1.2, carpetMaterial);
+}
+
+function createNeonMotelSign(): void {
+  createBox(0, 3.4, -5.85, 5.2, 1.1, 0.12, tvMaterial);
+  createSignTextLikeBlocks(-1.6, 3.48, -5.94, 16, keyMaterial);
+}
+
 function createMotel(): void {
   // Floor zones
   createBox(0, -0.05, 0, 18, 0.1, 12, floorMaterial); // front desk
   createBox(0, -0.04, 12, 7, 0.1, 28, carpetMaterial); // hallway
   createBox(7, -0.05, 24, 10, 0.1, 10, roomMaterial); // room 204
+
+  // Motel sign
+  createNeonMotelSign();
+
+  // Lobby props
+  createLamp(-3.4, 0.75, -3.5);
+  createLamp(3.4, 0.75, -3.5);
+  createTrash(-7.4, 3.8);
+  createTrash(7.3, 4.2);
+
+  // Wall frames / cheap motel posters
+  createBox(-8.75, 1.7, -2.2, 0.08, 1.0, 1.4, paperMaterial);
+  createBox(8.75, 1.7, -1.2, 0.08, 1.0, 1.4, paperMaterial);
+  createBox(-4.8, 1.8, -5.75, 1.5, 0.8, 0.08, tvMaterial);
+  createBox(4.8, 1.8, -5.75, 1.5, 0.8, 0.08, tvMaterial);
+
+  // Hallway ceiling lights
+  for (let i = 0; i < 6; i++) {
+    const z = 8 + i * 4;
+    createBox(0, 2.92, z, 1.1, 0.08, 0.5, paperMaterial);
+
+    const hallLight = new THREE.PointLight(0xffd9a0, 0.45, 7, 1.6);
+    hallLight.position.set(0, 2.6, z);
+    scene.add(hallLight);
+  }
+
+  // Door plates for fake rooms
+  for (let i = 0; i < 4; i++) {
+    const z = 10 + i * 4.4;
+    createDoorPlate(-3.42, 1.85, z);
+    createDoorPlate(3.42, 1.85, z + 2);
+  }
+
+  // Room 204 more visible props
+  createBed(7.5, 21.1);
+  createLamp(4.3, 0.7, 22.2);
+  createTrash(11.0, 22.2);
+  createBox(6.2, 0.75, 26.2, 1.2, 1.5, 0.6, doorMaterial); // dresser
+  createBox(8.9, 1.2, 28.75, 1.4, 1.0, 0.1, tvMaterial); // bright TV
 
   // Front desk room boundaries
   addWall(0, 1.5, -6, 18, 3, 0.4);
@@ -290,9 +380,6 @@ function createMotel(): void {
     1.8,
     doorMaterial
   );
-
-  // Room 204 props
-  createBox(7.5, 0.45, 21.1, 3.2, 0.9, 1.8, deskMaterial); // bed
   createBox(10.5, 0.55, 26.7, 1.5, 1.1, 2.0, floorMaterial); // bathtub
   createBox(5.4, 1.4, 28.75, 1.9, 1.1, 0.12, tvMaterial); // TV
 
@@ -350,18 +437,18 @@ function createMotel(): void {
 
 createMotel();
 
-const ambientLight = new THREE.AmbientLight(0x9a9fa5, 0.58);
+const ambientLight = new THREE.AmbientLight(0xc8c8c8, 0.95);
 scene.add(ambientLight);
 
-const playerLight = new THREE.PointLight(0xffdfac, 2.15, 14, 1.55);
+const playerLight = new THREE.PointLight(0xffe2b0, 1.4, 18, 1.4);
 scene.add(playerLight);
 
-const motelSignLight = new THREE.PointLight(0xd24747, 1.15, 16, 1.8);
-motelSignLight.position.set(0, 2.7, -4.8);
+const motelSignLight = new THREE.PointLight(0xff3355, 2.4, 24, 1.5);
+motelSignLight.position.set(0, 3.2, -5.2);
 scene.add(motelSignLight);
 
-const room204Light = new THREE.PointLight(0xb0c9d6, 1.1, 10, 1.8);
-room204Light.position.set(7, 2.3, 24);
+const room204Light = new THREE.PointLight(0x9fd1ff, 1.7, 18, 1.5);
+room204Light.position.set(7, 2.4, 24);
 scene.add(room204Light);
 
 const entity = new THREE.Group();

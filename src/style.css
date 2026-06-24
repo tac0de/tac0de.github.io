@@ -13,7 +13,7 @@ body {
   width: 100vw;
   height: 100vh;
   image-rendering: pixelated;
-  filter: contrast(1.14) brightness(1.1) saturate(0.68);
+  filter: contrast(1.05) brightness(1.22) saturate(0.82);
 }
 
 #overlay {
