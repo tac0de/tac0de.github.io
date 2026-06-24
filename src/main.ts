@@ -2,8 +2,16 @@ import './style.css';
 import * as THREE from 'three';
 import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
 
-type GamePhase = 'playing' | 'dead' | 'escaped';
-type InteractableType = 'key' | 'door';
+type GamePhase = 'playing' | 'ending' | 'dead';
+
+type InteractableType =
+  | 'front-desk'
+  | 'room-204-key'
+  | 'door-204'
+  | 'blood'
+  | 'guestbook'
+  | 'tv'
+  | 'bathroom';
 
 interface InputState {
   forward: boolean;
@@ -15,13 +23,19 @@ interface InputState {
 
 interface GameState {
   phase: GamePhase;
-  fear: number;
-  hasKey: boolean;
+  anomaly: number;
+  hasRoom204Key: boolean;
+  entered204: boolean;
+  cluesFound: number;
+  hallwayShifted: boolean;
+  frontChanged: boolean;
 }
 
 type InteractableMesh = THREE.Mesh & {
   userData: THREE.Mesh['userData'] & {
     type: InteractableType;
+    label: string;
+    used?: boolean;
   };
 };
 
@@ -36,19 +50,19 @@ function getRequiredElement<T extends HTMLElement>(selector: string): T {
 }
 
 const canvas = getRequiredElement<HTMLCanvasElement>('#game');
-const fearEl = getRequiredElement<HTMLDivElement>('#fear');
+const statusEl = getRequiredElement<HTMLDivElement>('#status');
 const messageEl = getRequiredElement<HTMLDivElement>('#message');
 const crosshairEl = getRequiredElement<HTMLDivElement>('#crosshair');
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x101317);
-scene.fog = new THREE.FogExp2(0x101317, 0.055);
+scene.fog = new THREE.FogExp2(0x101317, 0.045);
 
 const camera = new THREE.PerspectiveCamera(
   68,
   window.innerWidth / window.innerHeight,
   0.05,
-  90
+  120
 );
 
 const renderer = new THREE.WebGLRenderer({
@@ -61,7 +75,6 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.35));
 
 const controls = new PointerLockControls(camera, document.body);
-
 const clock = new THREE.Clock();
 const raycaster = new THREE.Raycaster();
 const screenCenter = new THREE.Vector2(0, 0);
@@ -76,58 +89,76 @@ const input: InputState = {
 
 const state: GameState = {
   phase: 'playing',
-  fear: 0,
-  hasKey: false,
+  anomaly: 0,
+  hasRoom204Key: false,
+  entered204: false,
+  cluesFound: 0,
+  hallwayShifted: false,
+  frontChanged: false,
 };
 
 const walls: THREE.Mesh[] = [];
 const interactables: InteractableMesh[] = [];
 
 const wallMaterial = new THREE.MeshStandardMaterial({
-  color: 0x2a2d2c,
+  color: 0x303433,
   roughness: 1,
   metalness: 0,
 });
 
 const floorMaterial = new THREE.MeshStandardMaterial({
-  color: 0x171918,
+  color: 0x1c1f1f,
+  roughness: 1,
+  metalness: 0,
+});
+
+const carpetMaterial = new THREE.MeshStandardMaterial({
+  color: 0x3c2326,
+  roughness: 1,
+  metalness: 0,
+});
+
+const deskMaterial = new THREE.MeshStandardMaterial({
+  color: 0x4a3326,
   roughness: 1,
   metalness: 0,
 });
 
 const doorMaterial = new THREE.MeshStandardMaterial({
-  color: 0x3b2118,
+  color: 0x4b2d22,
   roughness: 1,
+  metalness: 0,
+});
+
+const roomMaterial = new THREE.MeshStandardMaterial({
+  color: 0x2b2e32,
+  roughness: 1,
+  metalness: 0,
+});
+
+const bloodMaterial = new THREE.MeshBasicMaterial({
+  color: 0x5b0505,
 });
 
 const keyMaterial = new THREE.MeshBasicMaterial({
-  color: 0xb8ad76,
+  color: 0xd8c072,
+});
+
+const paperMaterial = new THREE.MeshBasicMaterial({
+  color: 0xd8cfaa,
+});
+
+const tvMaterial = new THREE.MeshBasicMaterial({
+  color: 0x9fb6c8,
 });
 
 const entityMaterial = new THREE.MeshBasicMaterial({
-  color: 0x030303,
+  color: 0x040404,
 });
-
-const map = [
-  '############',
-  '#S.........#',
-  '#.####.###.#',
-  '#.#....#...#',
-  '#.#.####.#.#',
-  '#.#......#K#',
-  '#.######.#.#',
-  '#........#.#',
-  '####.#####.#',
-  '#..........#',
-  '#....D.....#',
-  '############',
-];
-
-const cellSize = 3;
 
 let messageTimer = 0;
 
-function showMessage(text: string, ms = 2400): void {
+function showMessage(text: string, ms = 2800): void {
   messageEl.textContent = text;
 
   window.clearTimeout(messageTimer);
@@ -152,104 +183,194 @@ function createBox(
   return mesh;
 }
 
-function gridToWorld(col: number, row: number): THREE.Vector3 {
-  return new THREE.Vector3(col * cellSize, 0, row * cellSize);
+function createInteractable(
+  type: InteractableType,
+  label: string,
+  x: number,
+  y: number,
+  z: number,
+  sx: number,
+  sy: number,
+  sz: number,
+  material: THREE.Material
+): InteractableMesh {
+  const mesh = createBox(x, y, z, sx, sy, sz, material) as InteractableMesh;
+  mesh.userData.type = type;
+  mesh.userData.label = label;
+  mesh.userData.used = false;
+  interactables.push(mesh);
+  return mesh;
 }
 
-function createWorld(): void {
-  for (let row = 0; row < map.length; row++) {
-    const mapRow = map[row];
-    if (!mapRow) continue;
+function addWall(
+  x: number,
+  y: number,
+  z: number,
+  sx: number,
+  sy: number,
+  sz: number,
+  material = wallMaterial
+): THREE.Mesh {
+  const wall = createBox(x, y, z, sx, sy, sz, material);
+  walls.push(wall);
+  return wall;
+}
 
-    for (let col = 0; col < mapRow.length; col++) {
-      const tile = mapRow[col];
-      if (!tile) continue;
+function createMotel(): void {
+  // Floor zones
+  createBox(0, -0.05, 0, 18, 0.1, 12, floorMaterial); // front desk
+  createBox(0, -0.04, 12, 7, 0.1, 28, carpetMaterial); // hallway
+  createBox(7, -0.05, 24, 10, 0.1, 10, roomMaterial); // room 204
 
-      const position = gridToWorld(col, row);
+  // Front desk room boundaries
+  addWall(0, 1.5, -6, 18, 3, 0.4);
+  addWall(-9, 1.5, 0, 0.4, 3, 12);
+  addWall(9, 1.5, 0, 0.4, 3, 12);
+  addWall(-5.5, 1.5, 6, 7, 3, 0.4);
+  addWall(5.5, 1.5, 6, 7, 3, 0.4);
 
-      createBox(
-        position.x,
-        -0.05,
-        position.z,
-        cellSize,
-        0.1,
-        cellSize,
-        floorMaterial
-      );
+  // Hallway boundaries
+  addWall(-3.7, 1.5, 18, 0.4, 3, 24);
+  addWall(3.7, 1.5, 18, 0.4, 3, 24);
 
-      if (tile === '#') {
-        const wall = createBox(
-          position.x,
-          1.55,
-          position.z,
-          cellSize,
-          3.1,
-          cellSize,
-          wallMaterial
-        );
-        walls.push(wall);
-      }
+  // Back wall near room 204
+  addWall(0, 1.5, 32, 7.4, 3, 0.4);
 
-      if (tile === 'S') {
-        camera.position.set(position.x, 1.55, position.z);
-      }
+  // Room 204 boundaries
+  addWall(7, 1.5, 19, 10, 3, 0.4);
+  addWall(7, 1.5, 29, 10, 3, 0.4);
+  addWall(12, 1.5, 24, 0.4, 3, 10);
+  addWall(2, 1.5, 21.5, 0.4, 3, 5);
+  addWall(2, 1.5, 27.5, 0.4, 3, 3);
 
-      if (tile === 'K') {
-        const key = createBox(
-          position.x,
-          0.65,
-          position.z,
-          0.38,
-          0.38,
-          0.38,
-          keyMaterial
-        ) as InteractableMesh;
+  // Front desk furniture
+  createBox(0, 0.55, -2.2, 5.5, 1.1, 1.2, deskMaterial);
+  createBox(-2.1, 1.3, -2.2, 0.8, 0.35, 0.25, paperMaterial);
 
-        key.userData.type = 'key';
-        interactables.push(key);
-      }
+  createInteractable(
+    'front-desk',
+    '프런트 숙박부를 확인한다',
+    -2.1,
+    1.58,
+    -2.2,
+    0.7,
+    0.12,
+    0.35,
+    paperMaterial
+  );
 
-      if (tile === 'D') {
-        const door = createBox(
-          position.x,
-          1.35,
-          position.z,
-          2.4,
-          2.7,
-          0.36,
-          doorMaterial
-        ) as InteractableMesh;
+  createInteractable(
+    'room-204-key',
+    '204호 키를 집는다',
+    1.6,
+    1.25,
+    -2.25,
+    0.42,
+    0.08,
+    0.18,
+    keyMaterial
+  );
 
-        door.userData.type = 'door';
-        interactables.push(door);
-        walls.push(door);
-      }
-    }
+  // Fake room doors in hallway
+  for (let i = 0; i < 4; i++) {
+    const z = 10 + i * 4.4;
+    createBox(-3.48, 1.2, z, 0.12, 2.2, 1.9, doorMaterial);
+    createBox(3.48, 1.2, z + 2, 0.12, 2.2, 1.9, doorMaterial);
   }
+
+  // Room 204 actual door
+  createInteractable(
+    'door-204',
+    '204호 문을 연다',
+    2.08,
+    1.25,
+    24.5,
+    0.14,
+    2.35,
+    1.8,
+    doorMaterial
+  );
+
+  // Room 204 props
+  createBox(7.5, 0.45, 21.1, 3.2, 0.9, 1.8, deskMaterial); // bed
+  createBox(10.5, 0.55, 26.7, 1.5, 1.1, 2.0, floorMaterial); // bathtub
+  createBox(5.4, 1.4, 28.75, 1.9, 1.1, 0.12, tvMaterial); // TV
+
+  createInteractable(
+    'blood',
+    '침대 아래 얼룩을 조사한다',
+    7.2,
+    0.05,
+    22.35,
+    1.7,
+    0.05,
+    0.8,
+    bloodMaterial
+  );
+
+  createInteractable(
+    'bathroom',
+    '욕조 안을 확인한다',
+    10.5,
+    1.18,
+    26.7,
+    1.15,
+    0.12,
+    1.5,
+    bloodMaterial
+  );
+
+  createInteractable(
+    'tv',
+    '꺼진 TV를 본다',
+    5.4,
+    1.4,
+    28.6,
+    1.8,
+    0.9,
+    0.1,
+    tvMaterial
+  );
+
+  createInteractable(
+    'guestbook',
+    '찢어진 숙박부 조각을 읽는다',
+    8.3,
+    0.95,
+    21.1,
+    0.65,
+    0.08,
+    0.42,
+    paperMaterial
+  );
+
+  camera.position.set(0, 1.55, 1.5);
+  camera.lookAt(0, 1.4, 8);
 }
 
-createWorld();
+createMotel();
 
-const ambientLight = new THREE.AmbientLight(0x8a8f94, 0.55);
+const ambientLight = new THREE.AmbientLight(0x9a9fa5, 0.58);
 scene.add(ambientLight);
 
-const playerLight = new THREE.PointLight(0xffe0a3, 2.2, 13, 1.6);
+const playerLight = new THREE.PointLight(0xffdfac, 2.15, 14, 1.55);
 scene.add(playerLight);
 
-const redLight = new THREE.PointLight(0xb23a32, 1.1, 10, 1.8);
-redLight.position.set(27, 1.3, 27);
-scene.add(redLight);
+const motelSignLight = new THREE.PointLight(0xd24747, 1.15, 16, 1.8);
+motelSignLight.position.set(0, 2.7, -4.8);
+scene.add(motelSignLight);
+
+const room204Light = new THREE.PointLight(0xb0c9d6, 1.1, 10, 1.8);
+room204Light.position.set(7, 2.3, 24);
+scene.add(room204Light);
 
 const entity = new THREE.Group();
-
-const entityBody = createBox(0, 0.9, 0, 0.45, 1.8, 0.25, entityMaterial);
-const entityHead = createBox(0, 1.95, 0, 0.58, 0.58, 0.32, entityMaterial);
-
+const entityBody = createBox(0, 0.9, 0, 0.42, 1.8, 0.22, entityMaterial);
+const entityHead = createBox(0, 1.95, 0, 0.55, 0.55, 0.28, entityMaterial);
 entity.add(entityBody);
 entity.add(entityHead);
 scene.add(entity);
-
-entity.position.set(27, 0, 3);
+entity.position.set(0, 0, 30);
 entity.visible = false;
 
 function canMoveTo(nextPosition: THREE.Vector3): boolean {
@@ -257,8 +378,6 @@ function canMoveTo(nextPosition: THREE.Vector3): boolean {
   const playerPoint = new THREE.Vector3(nextPosition.x, 1.2, nextPosition.z);
 
   for (const wall of walls) {
-    if (wall.userData.type === 'door' && state.hasKey) continue;
-
     const box = new THREE.Box3().setFromObject(wall);
     const closestPoint = box.clampPoint(playerPoint, new THREE.Vector3());
 
@@ -277,7 +396,7 @@ const movement = new THREE.Vector3();
 function updatePlayer(delta: number): void {
   if (state.phase !== 'playing') return;
 
-  const speed = input.sprint ? 5.1 : 3.1;
+  const speed = input.sprint ? 5.0 : 3.0;
 
   camera.getWorldDirection(forward);
   forward.y = 0;
@@ -318,97 +437,77 @@ function updatePlayer(delta: number): void {
   }
 }
 
-function isLookingAt(target: THREE.Vector3, threshold = 0.82): boolean {
-  camera.getWorldDirection(forward);
-
-  const toTarget = target.clone().sub(camera.position).normalize();
-  return forward.dot(toTarget) > threshold;
+function isNearRoom204Entrance(): boolean {
+  return camera.position.z > 22 && camera.position.z < 27 && camera.position.x > 1;
 }
 
-function updateEntity(delta: number): void {
-  if (state.phase !== 'playing') return;
+function shiftHallway(): void {
+  if (state.hallwayShifted) return;
 
-  const distance = entity.position.distanceTo(camera.position);
-  const lookingAtEntity = entity.visible && isLookingAt(entity.position, 0.82);
+  state.hallwayShifted = true;
+  state.anomaly += 1;
 
-  if (state.fear > 28 || distance < 10) {
+  addWall(0, 1.5, 11.5, 4.4, 3, 0.35, wallMaterial);
+
+  const falseDoor = createBox(0, 1.2, 11.32, 1.7, 2.2, 0.12, doorMaterial);
+  falseDoor.rotation.y = 0;
+
+  showMessage('방금 지나온 복도에 없던 문이 생겼다.', 4200);
+}
+
+function changeFrontDesk(): void {
+  if (state.frontChanged) return;
+
+  state.frontChanged = true;
+  state.anomaly += 1;
+
+  createBox(0, 1.3, -2.85, 3.0, 0.18, 0.14, bloodMaterial);
+  createBox(2.5, 1.48, -2.2, 0.65, 0.08, 0.42, paperMaterial);
+
+  showMessage('프런트의 숙박부가 젖어 있다. 마지막 서명은 당신 이름이다.', 4800);
+}
+
+function addClue(mesh: InteractableMesh, text: string): void {
+  if (mesh.userData.used) {
+    showMessage('이미 확인했다.');
+    return;
+  }
+
+  mesh.userData.used = true;
+  state.cluesFound += 1;
+  state.anomaly += 1;
+
+  showMessage(text, 4200);
+
+  if (state.cluesFound === 1) {
+    shiftHallway();
+  }
+
+  if (state.cluesFound === 2) {
     entity.visible = true;
+    entity.position.set(0, 0, 17.5);
+    showMessage(`${text}\n복도 끝에 사람이 서 있다.`, 5200);
   }
 
-  if (entity.visible && !lookingAtEntity && distance > 2.0) {
-    const direction = camera.position.clone().sub(entity.position);
-    direction.y = 0;
-    direction.normalize();
-
-    const speed = 0.42 + state.fear / 75;
-    entity.position.addScaledVector(direction, speed * delta);
+  if (state.cluesFound >= 3) {
+    changeFrontDesk();
   }
-
-  if (entity.visible && lookingAtEntity) {
-    state.fear += delta * 12;
-  } else {
-    state.fear += delta * 1.1;
-  }
-
-  if (distance < 1.45) {
-    state.phase = 'dead';
-    document.body.classList.add('dead');
-    showMessage('너는 그것을 너무 오래 인식했다.', 999999);
-  }
-
-  if (!entity.visible && Math.random() < delta * 0.18) {
-    const spawnPoints = [
-      new THREE.Vector3(27, 0, 3),
-      new THREE.Vector3(6, 0, 21),
-      new THREE.Vector3(30, 0, 27),
-      new THREE.Vector3(12, 0, 30),
-    ];
-
-    const spawn = spawnPoints[Math.floor(Math.random() * spawnPoints.length)];
-    if (!spawn) return;
-
-    entity.position.copy(spawn);
-    entity.visible = true;
-
-    window.setTimeout(() => {
-      if (!isLookingAt(entity.position, 0.72)) {
-        entity.visible = false;
-      }
-    }, 1200);
-  }
-
-  entity.lookAt(camera.position.x, 1.15, camera.position.z);
 }
 
-function getFocusedInteractable(): InteractableMesh | null {
-  raycaster.setFromCamera(screenCenter, camera);
-
-  const hits = raycaster.intersectObjects(interactables, false);
-  if (!hits.length) return null;
-
-  const hit = hits[0];
-
-  if (hit.distance > 2.4) return null;
-
-  return hit.object as InteractableMesh;
-}
-
-function updateInteractionPrompt(): void {
-  if (state.phase !== 'playing') return;
-
-  const focused = getFocusedInteractable();
-
-  crosshairEl.classList.toggle('active', Boolean(focused));
-
-  if (!focused) return;
-
-  if (focused.userData.type === 'key') {
-    messageEl.textContent = 'E: 녹슨 열쇠를 집는다';
+function enterRoom204(): void {
+  if (!state.hasRoom204Key) {
+    showMessage('204호는 잠겨 있다. 프런트에 키가 있을 것이다.');
+    return;
   }
 
-  if (focused.userData.type === 'door') {
-    messageEl.textContent = state.hasKey ? 'E: 문을 연다' : '문은 잠겨 있다';
+  if (!state.entered204) {
+    state.entered204 = true;
+    state.anomaly += 1;
+    showMessage('204호. 방 안은 정리되어 있다. 그래서 더 이상하다.', 4200);
+    return;
   }
+
+  showMessage('204호는 방금보다 좁아진 것 같다.');
 }
 
 function interact(): void {
@@ -417,54 +516,151 @@ function interact(): void {
   const focused = getFocusedInteractable();
   if (!focused) return;
 
-  if (focused.userData.type === 'key') {
-    state.hasKey = true;
-    state.fear += 24;
+  switch (focused.userData.type) {
+    case 'front-desk': {
+      if (!state.hasRoom204Key) {
+        showMessage('숙박부에는 204호만 비어 있다. 키가 카운터 위에 놓여 있다.');
+      } else if (state.cluesFound >= 3) {
+        state.phase = 'ending';
+        document.body.classList.add('ending');
+        showMessage('숙박부 마지막 줄: “204호 손님은 이미 체크아웃했다.”', 999999);
+      } else {
+        showMessage('프런트에는 아무도 없다. 오래된 벨만 놓여 있다.');
+      }
+      break;
+    }
 
-    scene.remove(focused);
-    interactables.splice(interactables.indexOf(focused), 1);
+    case 'room-204-key': {
+      if (focused.userData.used) {
+        showMessage('이미 204호 키를 가지고 있다.');
+        return;
+      }
 
-    entity.visible = true;
-    entity.position.set(camera.position.x - 3, 0, camera.position.z - 4);
+      focused.userData.used = true;
+      focused.visible = false;
+      state.hasRoom204Key = true;
+      state.anomaly += 1;
+      showMessage('204호 키를 얻었다. 뒤쪽 복도 조명이 켜졌다.', 3800);
+      break;
+    }
 
-    showMessage('열쇠를 얻었다. 뒤에서 무언가 움직였다.');
+    case 'door-204': {
+      enterRoom204();
+      break;
+    }
+
+    case 'blood': {
+      addClue(
+        focused,
+        '침대 아래 얼룩은 오래된 피가 아니다. 아직 따뜻하다.'
+      );
+      break;
+    }
+
+    case 'bathroom': {
+      addClue(
+        focused,
+        '욕조 물속에 객실 카드가 가라앉아 있다. 카드 번호는 204가 아니다.'
+      );
+      break;
+    }
+
+    case 'tv': {
+      addClue(
+        focused,
+        'TV 화면에는 프런트가 비친다. 화면 속 당신은 움직이지 않는다.'
+      );
+      break;
+    }
+
+    case 'guestbook': {
+      addClue(
+        focused,
+        '찢어진 숙박부 조각에는 같은 이름이 여러 번 반복되어 있다.'
+      );
+      break;
+    }
+  }
+}
+
+function getFocusedInteractable(): InteractableMesh | null {
+  raycaster.setFromCamera(screenCenter, camera);
+
+  const hits = raycaster.intersectObjects(interactables, false);
+  if (!hits.length) {
+    crosshairEl.classList.remove('active');
+    return null;
+  }
+
+  const hit = hits[0];
+  if (!hit || hit.distance > 2.6) {
+    crosshairEl.classList.remove('active');
+    return null;
+  }
+
+  crosshairEl.classList.add('active');
+  return hit.object as InteractableMesh;
+}
+
+function updateInteractionPrompt(): void {
+  if (state.phase !== 'playing') return;
+
+  const focused = getFocusedInteractable();
+
+  if (!focused) return;
+
+  messageEl.textContent = `E: ${focused.userData.label}`;
+}
+
+function updateEntity(delta: number): void {
+  if (state.phase !== 'playing') return;
+  if (!entity.visible) return;
+
+  entity.lookAt(camera.position.x, 1.2, camera.position.z);
+
+  const distance = entity.position.distanceTo(camera.position);
+
+  if (distance < 2.1) {
+    state.phase = 'dead';
+    document.body.classList.add('dead');
+    showMessage('문을 닫았어야 했다.', 999999);
     return;
   }
 
-  if (focused.userData.type === 'door') {
-    if (!state.hasKey) {
-      state.fear += 8;
-      showMessage('잠겨 있다.');
-      return;
-    }
+  if (state.cluesFound >= 2) {
+    const direction = camera.position.clone().sub(entity.position);
+    direction.y = 0;
+    direction.normalize();
 
-    focused.visible = false;
-    const wallIndex = walls.indexOf(focused);
-    if (wallIndex >= 0) {
-      walls.splice(wallIndex, 1);
-    }
-
-    state.phase = 'escaped';
-    document.body.classList.add('escaped');
-
-    showMessage('밖이다. 그런데 복도는 계속된다.', 999999);
+    const speed = 0.28 + state.anomaly * 0.08;
+    entity.position.addScaledVector(direction, speed * delta);
   }
 }
 
 let pulse = 0;
 
 function updateAtmosphere(delta: number): void {
-  pulse += delta * (2.2 + state.fear / 22);
-
-  state.fear = THREE.MathUtils.clamp(state.fear, 0, 100);
+  pulse += delta * (2.1 + state.anomaly * 0.35);
 
   playerLight.position.copy(camera.position);
-  playerLight.intensity = 1.0 + Math.sin(pulse) * 0.17 + state.fear / 145;
+  playerLight.intensity =
+    1.9 + Math.sin(pulse) * 0.16 + state.anomaly * 0.08;
 
-  camera.fov = 68 + Math.sin(pulse * 0.7) * Math.min(state.fear / 20, 4);
+  room204Light.intensity =
+    1.0 + Math.sin(pulse * 0.7) * 0.18 + state.anomaly * 0.04;
+
+  motelSignLight.intensity = 1.0 + Math.sin(pulse * 1.4) * 0.28;
+
+  scene.fog = new THREE.FogExp2(0x101317, 0.045 + state.anomaly * 0.006);
+
+  camera.fov = 68 + Math.sin(pulse * 0.6) * Math.min(state.anomaly, 4) * 0.35;
   camera.updateProjectionMatrix();
 
-  fearEl.textContent = `FEAR ${Math.floor(state.fear)}`;
+  statusEl.textContent = `ANOMALY ${state.anomaly}`;
+
+  if (isNearRoom204Entrance() && state.hasRoom204Key && !state.entered204) {
+    showMessage('문 아래에서 물이 새고 있다.', 1800);
+  }
 }
 
 function animate(): void {
@@ -510,4 +706,9 @@ window.addEventListener('resize', () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-showMessage('클릭해서 들어가라. 열쇠를 찾고 문을 열어라.', 4000);
+showMessage(
+  '야간 근무 첫날. 프런트에는 아무도 없다. 204호 키만 남아 있다.',
+  5200
+);
+
+console.log('MOTEL 204 BUILD 001');
