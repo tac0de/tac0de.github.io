@@ -1,27 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="canonical" href="https://tac0de.github.io/" />
-    <link rel="alternate" hreflang="en" href="https://tac0de.github.io/" />
-    <meta name="robots" content="index, follow" />
-    <meta
-      name="description"
-      content="TAC0DE ARCADE is a small Three.js browser game portal."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://tac0de.github.io/" />
-    <meta property="og:title" content="TAC0DE ARCADE" />
-    <meta
-      property="og:description"
-      content="A small Three.js browser game portal."
-    />
-    <meta name="twitter:card" content="summary" />
-    <title>TAC0DE ARCADE</title>
+    <title>Lo-Fi Horror Portal</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <canvas id="scene"></canvas>
+
+      <div class="hud">
+        <div class="brand">LO-FI HORROR PORTAL</div>
+        <div id="hint">Drag to look · Tap a portal</div>
+      </div>
+
+      <div id="card" class="card hidden">
+        <div id="card-title" class="card-title"></div>
+        <div id="card-desc" class="card-desc"></div>
+        <button id="play-button">ENTER</button>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

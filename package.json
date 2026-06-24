@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
-    "check:screenshot": "node scripts/check-screenshot.mjs",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
