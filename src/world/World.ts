@@ -35,7 +35,7 @@ export class World {
   private readonly bookPage: THREE.Mesh;
   private keyRemoved = false;
 
-  constructor() {
+  constructor(private readonly loop: number) {
     this.group.name = "NoVacancyWorld";
     this.group.add(new THREE.AmbientLight(0xb6a897, 2.45));
     this.group.add(this.makeLight(-1.9, 2.25, 2.2, 0xffd08b, 3.4, 8.5));
@@ -52,6 +52,7 @@ export class World {
     this.threat.visible = false;
     this.threat.position.set(0, 0, -16);
     this.group.add(this.threat);
+    this.applyLoopState();
   }
 
   update(dt: number, player: THREE.Vector3): void {
@@ -107,8 +108,16 @@ export class World {
     this.setParkingGhostVisible(true);
     const ghost = this.parkingGhost;
     if (!ghost) return;
-    ghost.position.set(stage % 2 === 0 ? 0.65 : -0.9, 0, 8.2 + stage * 1.25);
+    ghost.position.set(stage % 2 === 0 ? 0.65 : -0.9, 0, 8.4 + stage * 0.85);
     ghost.scale.setScalar(0.92 + stage * 0.16);
+  }
+
+  setLobbyReflectionVisible(visible: boolean): void {
+    if (!visible) return;
+    const reflection = this.makeGhost(0x0b0d10);
+    reflection.position.set(-2.35, 0, 4.95);
+    reflection.scale.set(0.62, 0.72, 0.62);
+    reflection.traverse((child) => child.layers.set(1));
   }
 
   changeRoomNumbersTo203(): void {
@@ -131,6 +140,13 @@ export class World {
     if (this.keyRemoved) return;
     this.keyRemoved = true;
     this.keyMesh.visible = false;
+  }
+
+  markCheckedIn(): void {
+    const material = this.bookPage.material as THREE.MeshBasicMaterial;
+    material.map?.dispose();
+    material.map = this.makeLabelTexture("203 OCCUPIED\\nSTAFF: YOU\\nCHECKED IN", "#120d0d", "#f0c1a4");
+    material.needsUpdate = true;
   }
 
   occupyRoom203(): void {
@@ -210,6 +226,22 @@ export class World {
     this.group.add(this.box(0x353b3e, [1.8, 0.12, 3.6], [-2.1, 0.02, 10.3]));
     this.group.add(this.box(0x353b3e, [1.8, 0.12, 3.6], [2.1, 0.02, 10.3]));
     this.group.add(this.clockHand);
+  }
+
+  private applyLoopState(): void {
+    if (this.loop >= 1) {
+      this.corruptGuestBook();
+      this.setCctvFigureStage(1);
+    }
+    if (this.loop >= 2) {
+      this.changeRoomNumbersTo203();
+      this.removeDeskKey();
+    }
+    if (this.loop >= 3) {
+      this.markCheckedIn();
+      this.setCctvFigureStage(3);
+      this.setLobbyReflectionVisible(true);
+    }
   }
 
   private makeDoor(

@@ -21,7 +21,7 @@ export class InteractionSystem {
     this.raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
     const hits = this.raycaster.intersectObjects(this.world.group.children, true);
     for (const hit of hits) {
-      if (hit.distance > 2.2) break;
+      if (hit.distance > 3) break;
       const meta = this.findMeta(hit.object);
       if (meta) {
         this.current = meta;

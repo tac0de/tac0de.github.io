@@ -28,6 +28,7 @@ export class Game {
   private readonly world: World;
   private readonly interactions: InteractionSystem;
   private readonly horror: HorrorDirector;
+  private readonly loop: number;
   private readonly velocity = new THREE.Vector3();
   private readonly direction = new THREE.Vector3();
   private lastTime = performance.now();
@@ -41,9 +42,10 @@ export class Game {
     this.ui = ui;
     this.audio = audio;
     this.save = save;
-    this.world = new World();
+    this.loop = this.save.getLoop();
+    this.world = new World(this.loop);
     this.interactions = new InteractionSystem(this.world, this.ui, this.audio);
-    this.horror = new HorrorDirector(this.world, this.ui, this.audio);
+    this.horror = new HorrorDirector(this.world, this.ui, this.audio, this.loop);
   }
 
   start(): void {
@@ -55,13 +57,13 @@ export class Game {
     this.input.onFlashlight = () => this.toggleFlashlight();
     this.input.onStart = () => {
       this.audio.resume();
-      this.ui.showMessage("11:43 PM. Another quiet shift.", 4200);
       this.horror.begin();
       this.isRunning = true;
     };
+    this.ui.setStartLoop(this.loop);
     this.ui.onReset = () => this.reset();
+    this.ui.onContinue = () => window.location.reload();
     this.ui.bindInput(this.input);
-    this.save.clear();
     this.renderer.setAnimationLoop(() => this.tick());
   }
 
@@ -193,12 +195,19 @@ export class Game {
 
   private finish(): void {
     this.ended = true;
-    this.save.setCompleted();
-    this.ui.showEnding("You reach the parking lot. Room 203 is written on your hand.");
+    const nextLoop = this.save.completeLoop();
+    const text =
+      nextLoop === 1
+        ? "No incidents reported. The guest book disagrees."
+        : nextLoop === 2
+          ? "One guest unaccounted for. The desk key is missing."
+          : "Room 203 occupied. Staff reassigned for the next audit.";
+    this.ui.showEnding(text);
     this.audio.endTone();
   }
 
   private reset(): void {
+    this.save.reset();
     window.location.reload();
   }
 }

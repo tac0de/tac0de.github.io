@@ -15,6 +15,7 @@ export class UI {
   private messageTimer = 0;
   private started = false;
   onReset?: () => void;
+  onContinue?: () => void;
 
   constructor(root: HTMLElement) {
     this.overlay = document.createElement("div");
@@ -63,6 +64,19 @@ export class UI {
     this.dispatchStart();
   }
 
+  setStartLoop(loop: number): void {
+    const copy =
+      loop === 0
+        ? ["Night audit. 11:43 PM.", "Start Shift"]
+        : loop === 1
+          ? ["Incident report reopened. 11:43 PM.", "Continue Audit"]
+          : loop === 2
+            ? ["Room 203 is ready. 11:43 PM.", "Continue Check-In"]
+            : ["Staff reassigned. 11:43 PM.", "Return to Desk"];
+    this.startPanel.innerHTML = `<h1>NO VACANCY</h1><p>${copy[0]}</p><button>${copy[1]}</button>`;
+    this.startPanel.querySelector("button")?.addEventListener("click", () => this.start());
+  }
+
   setPrompt(text: string): void {
     this.prompt.textContent = text;
   }
@@ -94,9 +108,10 @@ export class UI {
   }
 
   showEnding(text: string): void {
-    this.ending.innerHTML = `<h2>SHIFT COMPLETE</h2><p>${text}</p><button>Reset</button>`;
+    this.ending.innerHTML = `<h2>SHIFT COMPLETE</h2><p>${text}</p><button>Next Audit</button><button class="quiet">Reset</button>`;
     this.ending.classList.remove("hidden");
-    this.ending.querySelector("button")?.addEventListener("click", () => this.onReset?.());
+    this.ending.querySelector("button")?.addEventListener("click", () => this.onContinue?.());
+    this.ending.querySelector(".quiet")?.addEventListener("click", () => this.onReset?.());
   }
 
   private dispatchStart(): void {

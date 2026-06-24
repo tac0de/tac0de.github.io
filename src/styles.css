@@ -148,6 +148,11 @@ button {
   cursor: pointer;
 }
 
+.ending .quiet {
+  border-color: rgba(240, 223, 188, 0.36);
+  color: rgba(240, 223, 188, 0.72);
+}
+
 .cctv {
   position: absolute;
   inset: 0;
