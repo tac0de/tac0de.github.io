@@ -28,64 +28,72 @@ Portal rules:
 
 ## First Game
 
-Working title: `NO VACANCY`
+Working title: undecided.
 
-Pitch: You are an overnight motel clerk. A normal checklist slowly proves that
-the motel records are not documenting reality; they are rewriting it.
+Do not anchor the game around `NO VACANCY` as a brand or motel-clerk simulator.
+The next version should be a small lo-fi horror game first: a confined place,
+one readable routine, and a reality break that is noticed through space, sound,
+and object behavior.
 
-Entry rule: entering from the portal starts the shift immediately. Do not show a
-separate how-to-play panel before gameplay.
+Current playable shell: entering from the portal starts the game immediately.
+Do not show a separate how-to-play panel before gameplay.
 
-Current UI rule: keep the in-game HUD removed while the motel floor is being
-rebuilt. The first playable version should communicate through space, props,
-lighting, and interaction feedback before adding any task UI back.
+Current UI rule: keep the in-game HUD removed while the horror direction is
+being rebuilt. The first playable version should communicate through space,
+props, lighting, audio, and interaction feedback before adding any task UI back.
 
 ## Horror Core
 
 The game should not rely on darkness. Horror comes from:
 
-- clear tasks that become wrong
-- records changing after the player verifies them
-- CCTV showing things direct sight does not
-- room numbers and objects changing in a known space
-- the motel treating the player as a guest instead of staff
+- confinement: a small place that feels too controlled
+- repetition: the player performs the same small route until it changes
+- low detail: distant shapes and silhouettes leave room for interpretation
+- sound: hums, knocks, room tone, and missing ambience changing first
+- spatial contradiction: a door, hallway, or room does not return the way it should
+- object contradiction: familiar props move, duplicate, vanish, or become mislabeled
 
 ## Core Rule
 
-Records and cameras change first. The physical motel follows later.
+The environment should lie before a monster appears. The player should notice
+that something is wrong because the space is too familiar to be mistaken.
 
 ## Core Loop
 
-1. Enter the motel floor.
-2. Read the space: front desk, hallway, Room 203, storage, parking view.
-3. Interact with clear props.
-4. Receive normal feedback.
-5. Return to a known space.
-6. Notice that a record, camera view, object, or room state changed.
-7. Continue the next audit loop.
+1. Enter a confined location.
+2. Learn the short route.
+3. Interact with one clear object.
+4. Return through the same route.
+5. Notice one impossible change.
+6. Repeat until the route can no longer be trusted.
 
-## Baseline Tasks
+## First Playable Targets
 
-- Check the guest book.
-- Prepare the Room 203 key.
-- Check CCTV.
-- Inspect Room 203.
-- Reset the breaker in storage.
-- Return to the front desk.
+- one small entrance space
+- one main room
+- one short corridor
+- one locked or impossible door
+- one inspectable object
+- one repeated route
+- three escalating spatial changes
+- one ending or hard reset point
 
 ## Progression
 
-Stage 0: Normal shift. Teach the motel and task objects.
+Stage 0: Normal route. Teach the small place.
 
-Stage 1: First contradiction. CCTV shows a figure that direct sight does not.
+Stage 1: First contradiction. One object is not where it was.
 
-Stage 2: Records rewrite. Guest book and Room 203 state change.
+Stage 2: Spatial contradiction. The short route returns to the wrong angle,
+door, or room.
 
-Stage 3: Space lies. Hallway, door state, and room numbers change.
+Stage 3: Audio contradiction. A sound clearly comes from somewhere impossible.
 
-Stage 4: Staff becomes guest. Task UI corrupts and records reference the player.
+Stage 4: Direct threat. A silhouette appears once, clearly, then the route
+changes.
 
-Stage 5: Shift complete / next audit. No hard ending yet; the motel persists.
+Stage 5: Ending. The player either exits into the wrong place or is returned to
+the portal.
 
 ## Non-Goals
 

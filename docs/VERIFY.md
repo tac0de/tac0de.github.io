@@ -18,11 +18,13 @@ There is currently no separate lint script.
 ## Runtime Criteria
 
 - WebGL canvas renders on desktop.
-- First screen is the minimal white 3D portal.
+- First screen is a narrow white 3D portal room with one dark door.
 - WASD moves the portal camera.
 - Mouse look works after pointer lock.
-- The tiny overlay explains WASD, mouse, E, and ESC.
-- Approaching the `NO VACANCY` door and pressing E starts the game.
+- The tiny overlay explains WASD, mouse, E, and ESC on desktop.
+- Mobile shows a left stick, right-side drag look, and an ENTER button.
+- Portal text does not include flavor copy such as "only door."
+- Approaching the door and pressing E or ENTER starts the game.
 - `NO VACANCY` starts without a separate how-to-play panel.
 - In-game HUD elements are hidden while the motel floor blockout is being rebuilt.
 - No console exceptions during start.

@@ -2,17 +2,18 @@
 
 ## Portal Visual Target
 
-The site opens inside a sparse white 3D space. It should feel like the user has
+The site opens inside a narrow white 3D room. It should feel like the user has
 already entered an interactive game layer, not a designed menu page.
 
 Portal composition:
 
 - first-person camera
-- white floor, walls, and fog
-- one dark `NO VACANCY` entrance
-- faint locked future doors
-- tiny low-contrast control overlay
+- white floor, walls, ceiling, and short fog distance
+- one dark door only
+- tiny low-contrast desktop control overlay
+- mobile left stick, right drag, and enter button
 - no large title, card, shelf, or button panel
+- no flavor text such as "only door"
 
 The portal is only a threshold. Do not add missions, collectible systems, or
 large UI to the portal before the first game is playable.
@@ -25,10 +26,39 @@ unsettling, not unfinished.
 
 ## References
 
-- Puppet Combo: VHS/PS1 grime, strong silhouettes, harsh retro mood.
-- Chilla's Art: mundane job spaces that become threatening through routine.
-- Fears to Fathom: short grounded first-person scenarios.
-- No Players Online: empty-space unease and old-game presentation.
+- Puppet Combo: 80s/90s horror, PS1 low-poly aesthetic, harsh silhouettes.
+  Reference: https://www.relyonhorror.com/in-depth/interviews/interview-power-drill-massacre-dev-puppet-combo-talks-past-present-future-of-solo-horror-development/
+- Chilla's Art: mundane work spaces turned threatening through routine.
+  Reference: https://littlegambino.medium.com/chillas-art-horror-in-the-mundane-6e7aca18d164
+- Fears to Fathom: grounded first-person psychological horror with short,
+  survivor-story framing. Reference: https://rayll.itch.io/fears-to-fathom
+- No Players Online: empty low-detail 90s-style space where the player questions
+  whether a distant shape is intentional or a glitch.
+  Reference: https://bloody-disgusting.com/editorials/3594107/no-players-online-impactful-short-form-horror-abandoned-game-server/
+
+## New Horror Direction
+
+The first game should stop presenting itself as a motel task simulator for now.
+Build a smaller horror core first.
+
+Practical rules:
+
+- one location before many rooms
+- one repeated route before many objectives
+- one clear interaction before inventory
+- one impossible change per stage
+- no text UI explaining the fear
+- no constant jumpscares
+- no large open motel until the small version is scary
+
+Lo-fi horror should come from:
+
+- low-poly silhouettes
+- low-resolution labels and textures
+- sharp room tone changes
+- fog that hides distance, not basic navigation
+- hard cuts in spatial layout
+- props that are readable before they become wrong
 
 ## Space Design
 

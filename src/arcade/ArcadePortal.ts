@@ -3,24 +3,30 @@ import type { SaveSystem } from "../save/SaveSystem";
 
 const MOVE_SPEED = 3.2;
 const LOOK_SPEED = 0.0022;
-const INTERACT_DISTANCE = 2.15;
+const INTERACT_DISTANCE = 1.45;
 
 export class ArcadePortal {
   private readonly renderer: THREE.WebGLRenderer;
   private readonly scene = new THREE.Scene();
   private readonly camera = new THREE.PerspectiveCamera(58, 1, 0.1, 70);
   private readonly overlay: HTMLDivElement;
+  private readonly stick: HTMLDivElement;
+  private readonly knob: HTMLDivElement;
+  private readonly enterButton: HTMLButtonElement;
   private readonly keys = new Set<string>();
   private readonly forward = new THREE.Vector3();
   private readonly right = new THREE.Vector3();
   private readonly move = new THREE.Vector3();
-  private readonly entryPosition = new THREE.Vector3(0, 1.05, -7.2);
+  private readonly entryPosition = new THREE.Vector3(0, 1.05, -2.6);
   private previousTime = performance.now();
   private yaw = 0;
   private pitch = 0;
   private dragging = false;
   private lastPointerX = 0;
   private lastPointerY = 0;
+  private stickPointerId: number | null = null;
+  private touchMoveX = 0;
+  private touchMoveY = 0;
 
   constructor(
     private readonly root: HTMLElement,
@@ -35,9 +41,19 @@ export class ArcadePortal {
     this.overlay = document.createElement("div");
     this.overlay.className = "portal-minimal-overlay";
     this.overlay.innerHTML = `
-      <p>WASD move / mouse look / E enter / ESC release</p>
-      <p class="portal-state">Find the only door.</p>
+      <p class="portal-controls desktop">WASD / mouse / E / ESC</p>
+      <p class="portal-controls mobile">left stick / right drag</p>
+      <p class="portal-state"></p>
+      <div class="portal-stick" aria-hidden="true"><div class="portal-knob"></div></div>
+      <button class="portal-enter" type="button">ENTER</button>
     `;
+    const stick = this.overlay.querySelector<HTMLDivElement>(".portal-stick");
+    const knob = this.overlay.querySelector<HTMLDivElement>(".portal-knob");
+    const enterButton = this.overlay.querySelector<HTMLButtonElement>(".portal-enter");
+    if (!stick || !knob || !enterButton) throw new Error("Missing portal mobile controls");
+    this.stick = stick;
+    this.knob = knob;
+    this.enterButton = enterButton;
 
     this.renderer = new THREE.WebGLRenderer({ antialias: false, powerPreference: "high-performance" });
     this.renderer.setClearColor(0xf5f3ee);
@@ -68,6 +84,11 @@ export class ArcadePortal {
     this.renderer.domElement.removeEventListener("pointerdown", this.pointerDown);
     window.removeEventListener("pointermove", this.pointerMove);
     window.removeEventListener("pointerup", this.pointerUp);
+    this.stick.removeEventListener("pointerdown", this.stickDown);
+    this.stick.removeEventListener("pointermove", this.stickMove);
+    this.stick.removeEventListener("pointerup", this.stickUp);
+    this.stick.removeEventListener("pointercancel", this.stickUp);
+    this.enterButton.removeEventListener("click", this.enterIfReady);
     this.scene.traverse((object) => {
       if (object instanceof THREE.Mesh) {
         object.geometry.dispose();
@@ -85,29 +106,21 @@ export class ArcadePortal {
 
   private buildScene(): void {
     this.scene.background = new THREE.Color(0xf5f3ee);
-    this.scene.fog = new THREE.Fog(0xf5f3ee, 10, 36);
-    this.camera.position.set(0, 1.55, 4.6);
+    this.scene.fog = new THREE.Fog(0xf5f3ee, 3.8, 9);
+    this.camera.position.set(0, 1.55, 1.8);
 
     this.scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c7, 2.8));
     const sun = new THREE.DirectionalLight(0xffffff, 1.6);
     sun.position.set(3, 6, 4);
     this.scene.add(sun);
 
-    this.scene.add(this.box(0xf3f0e9, [18, 0.12, 24], [0, -0.06, -4]));
-    this.scene.add(this.box(0xffffff, [18, 7, 0.18], [0, 3.5, -10]));
-    this.scene.add(this.box(0xf8f7f2, [0.18, 7, 24], [-9, 3.5, -4]));
-    this.scene.add(this.box(0xf8f7f2, [0.18, 7, 24], [9, 3.5, -4]));
-    this.scene.add(this.box(0xfaf9f5, [18, 0.18, 24], [0, 7, -4]));
-
-    this.scene.add(this.box(0x0c0c0c, [2.3, 2.9, 0.28], [0, 1.45, -7.5]));
-    this.scene.add(this.box(0xffffff, [1.65, 0.72, 0.06], [0, 1.72, -7.34]));
-    this.scene.add(this.label("NO VACANCY", [0, 1.74, -7.3], [1.46, 0.48], 0x0c0c0c));
-    this.scene.add(this.label("ENTER", [0, 0.82, -7.3], [1.0, 0.28], 0xffffff));
-
-    this.scene.add(this.box(0xe9e5dc, [1.4, 2.1, 0.2], [-4.2, 1.05, -7.65]));
-    this.scene.add(this.label("SOON", [-4.2, 1.55, -7.52], [0.72, 0.24], 0xb8b1a6));
-    this.scene.add(this.box(0xe9e5dc, [1.4, 2.1, 0.2], [4.2, 1.05, -7.65]));
-    this.scene.add(this.label("SOON", [4.2, 1.55, -7.52], [0.72, 0.24], 0xb8b1a6));
+    this.scene.add(this.box(0xf2f0eb, [3.4, 0.12, 5.2], [0, -0.06, 0]));
+    this.scene.add(this.box(0xffffff, [3.4, 2.8, 0.16], [0, 1.4, -2.7]));
+    this.scene.add(this.box(0xf8f7f2, [0.16, 2.8, 5.2], [-1.7, 1.4, 0]));
+    this.scene.add(this.box(0xf8f7f2, [0.16, 2.8, 5.2], [1.7, 1.4, 0]));
+    this.scene.add(this.box(0xfaf9f5, [3.4, 0.16, 5.2], [0, 2.78, 0]));
+    this.scene.add(this.box(0x090909, [1.0, 2.12, 0.16], [0, 1.06, -2.61]));
+    this.scene.add(this.box(0xf5f3ee, [0.08, 0.08, 0.04], [0.32, 1.04, -2.5]));
   }
 
   private render(): void {
@@ -128,12 +141,14 @@ export class ArcadePortal {
     if (this.keys.has("KeyS")) this.move.sub(this.forward);
     if (this.keys.has("KeyD")) this.move.add(this.right);
     if (this.keys.has("KeyA")) this.move.sub(this.right);
+    this.move.addScaledVector(this.right, this.touchMoveX);
+    this.move.addScaledVector(this.forward, this.touchMoveY);
 
     if (this.move.lengthSq() > 0) {
       this.move.normalize().multiplyScalar(MOVE_SPEED * delta);
       this.camera.position.add(this.move);
-      this.camera.position.x = THREE.MathUtils.clamp(this.camera.position.x, -7.4, 7.4);
-      this.camera.position.z = THREE.MathUtils.clamp(this.camera.position.z, -8.8, 5.5);
+      this.camera.position.x = THREE.MathUtils.clamp(this.camera.position.x, -1.18, 1.18);
+      this.camera.position.z = THREE.MathUtils.clamp(this.camera.position.z, -2.18, 2.15);
     }
 
     this.camera.rotation.order = "YXZ";
@@ -144,18 +159,18 @@ export class ArcadePortal {
   private updateOverlay(): void {
     const state = this.overlay.querySelector<HTMLElement>(".portal-state");
     if (!state) return;
-    state.textContent = this.isNearEntry() ? "Press E to enter NO VACANCY." : "Find the only door.";
+    state.textContent = this.isNearEntry() ? "E / ENTER" : "";
   }
 
   private isNearEntry(): boolean {
     return this.camera.position.distanceTo(this.entryPosition) < INTERACT_DISTANCE;
   }
 
-  private enterIfReady(): void {
+  private readonly enterIfReady = (): void => {
     if (this.isNearEntry()) {
       this.onPlayNoVacancy();
     }
-  }
+  };
 
   private bindEvents(): void {
     window.addEventListener("resize", this.resize);
@@ -165,6 +180,11 @@ export class ArcadePortal {
     this.renderer.domElement.addEventListener("pointerdown", this.pointerDown);
     window.addEventListener("pointermove", this.pointerMove);
     window.addEventListener("pointerup", this.pointerUp);
+    this.stick.addEventListener("pointerdown", this.stickDown);
+    this.stick.addEventListener("pointermove", this.stickMove);
+    this.stick.addEventListener("pointerup", this.stickUp);
+    this.stick.addEventListener("pointercancel", this.stickUp);
+    this.enterButton.addEventListener("click", this.enterIfReady);
   }
 
   private readonly keyDown = (event: KeyboardEvent): void => {
@@ -212,9 +232,45 @@ export class ArcadePortal {
     this.camera.updateProjectionMatrix();
   };
 
+  private readonly stickDown = (event: PointerEvent): void => {
+    event.preventDefault();
+    event.stopPropagation();
+    this.stickPointerId = event.pointerId;
+    this.stick.setPointerCapture(event.pointerId);
+    this.updateStick(event.clientX, event.clientY);
+  };
+
+  private readonly stickMove = (event: PointerEvent): void => {
+    if (event.pointerId !== this.stickPointerId) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.updateStick(event.clientX, event.clientY);
+  };
+
+  private readonly stickUp = (event: PointerEvent): void => {
+    if (event.pointerId !== this.stickPointerId) return;
+    this.stickPointerId = null;
+    this.touchMoveX = 0;
+    this.touchMoveY = 0;
+    this.knob.style.transform = "translate(0, 0)";
+  };
+
   private look(deltaX: number, deltaY: number): void {
     this.yaw -= deltaX * LOOK_SPEED;
     this.pitch = THREE.MathUtils.clamp(this.pitch - deltaY * LOOK_SPEED, -1.25, 1.25);
+  }
+
+  private updateStick(clientX: number, clientY: number): void {
+    const rect = this.stick.getBoundingClientRect();
+    const dx = clientX - (rect.left + rect.width / 2);
+    const dy = clientY - (rect.top + rect.height / 2);
+    const distance = Math.min(Math.hypot(dx, dy), 38);
+    const angle = Math.atan2(dy, dx);
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance;
+    this.knob.style.transform = `translate(${x}px, ${y}px)`;
+    this.touchMoveX = x / 38;
+    this.touchMoveY = -y / 38;
   }
 
   private box(color: number, size: [number, number, number], position: [number, number, number]): THREE.Mesh {
