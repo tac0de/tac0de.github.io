@@ -1,3 +1,4 @@
+import { ArcadePortal } from "./arcade/ArcadePortal";
 import { AudioSystem } from "./audio/AudioSystem";
 import { Game } from "./Game";
 import { InputSystem } from "./input/InputSystem";
@@ -14,76 +15,14 @@ if (!root) {
 
 const save = new SaveSystem();
 
-renderPortal(root, save);
+let portal: ArcadePortal | undefined;
 
-function renderPortal(root: HTMLElement, save: SaveSystem): void {
-  const loop = save.getLoop();
-  root.innerHTML = `
-    <main class="portal" aria-label="TAC0DE ARCADE">
-      <section class="portal-hero">
-        <p class="portal-kicker">THREE.JS WEB GAMES</p>
-        <h1>TAC0DE ARCADE</h1>
-        <p class="portal-copy">Small browser games built for quick, strange sessions.</p>
-      </section>
-
-      <section class="game-shelf" aria-label="Game shelf">
-        <article class="game-card featured">
-          <div class="game-preview" aria-hidden="true">
-            <span class="sign">NO VACANCY</span>
-            <span class="room">203</span>
-            <span class="scan"></span>
-          </div>
-          <div class="game-info">
-            <p class="game-status">Featured / First playable</p>
-            <h2>NO VACANCY</h2>
-            <p>
-              A lo-fi motel night shift where the guest book, CCTV, and Room 203
-              begin correcting reality.
-            </p>
-            <div class="game-meta">
-              <span>Horror</span>
-              <span>5-10 min</span>
-              <span>Loop ${loop}</span>
-            </div>
-            <div class="portal-actions">
-              <button class="primary" type="button" data-play>Play</button>
-              <button class="secondary" type="button" data-reset>Reset local progress</button>
-            </div>
-            <div class="how-to">
-              <h3>How to play</h3>
-              <p>Follow the night-audit tasks. Check records, prepare keys, watch CCTV, and inspect Room 203 when the desk asks.</p>
-              <p>Desktop: WASD move, mouse look, E interact, F flashlight. Mobile: left stick, right drag, USE, LIGHT.</p>
-            </div>
-          </div>
-        </article>
-
-        <article class="game-card locked">
-          <div>
-            <p class="game-status">Coming soon</p>
-            <h2>CAM 02</h2>
-            <p>CCTV-only motel horror prototype.</p>
-          </div>
-        </article>
-
-        <article class="game-card locked">
-          <div>
-            <p class="game-status">Coming soon</p>
-            <h2>UNTITLED DRIVE</h2>
-            <p>Low-poly road game experiment.</p>
-          </div>
-        </article>
-      </section>
-    </main>
-  `;
-
-  root.querySelector("[data-play]")?.addEventListener("click", () => startNoVacancy(root, save));
-  root.querySelector("[data-reset]")?.addEventListener("click", () => {
-    save.reset();
-    renderPortal(root, save);
-  });
-}
+portal = new ArcadePortal(root, save, () => startNoVacancy(root, save));
+portal.start();
 
 function startNoVacancy(root: HTMLElement, save: SaveSystem): void {
+  portal?.dispose();
+  portal = undefined;
   root.innerHTML = "";
   const ui = new UI(root);
   const input = new InputSystem(root, ui);

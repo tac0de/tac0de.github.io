@@ -2,19 +2,29 @@
 
 ## Portal Experience
 
-The first screen should feel like a compact web arcade shelf, not a portfolio
-landing page. The user should see the available game immediately and be able to
-start it in one click.
+The first screen should feel like a compact interactive 3D arcade, not a
+portfolio landing page. The user should see the available game immediately,
+select it through an in-scene cabinet, and start it without leaving the site.
 
 Initial portal content:
 
 - site title
-- featured first game card
+- fixed-camera Three.js arcade room
+- selectable CRT cabinets
 - play button
 - short game description
 - play time and tags
 - progress/reset affordance
 - empty future game slots
+
+Portal rules:
+
+- no backend
+- no login
+- no heavy assets
+- one-screen interaction
+- selection must work by pointer, keyboard, and touch
+- future games can be visible but locked
 
 ## First Game
 

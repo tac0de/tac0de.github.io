@@ -1,5 +1,22 @@
 # DESIGN
 
+## Portal Visual Target
+
+The site opens inside a small 3D arcade room with CRT cabinets. It should feel
+like a playable game shell rather than a menu page.
+
+Portal composition:
+
+- fixed screenshot-worthy camera
+- three low-poly CRT cabinets
+- one clearly playable `NO VACANCY` cabinet
+- warm sign light plus cold side fill
+- subtle fog and scanline overlay
+- readable DOM panel for title, status, controls, and reset
+
+The portal is a selector, not its own game. Do not add walking, missions, or
+systems to the portal before the first game is playable.
+
 ## Visual Target
 
 Low-poly motel horror with readable lighting, limited distance, simple geometry,
