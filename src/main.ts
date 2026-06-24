@@ -41,8 +41,8 @@ const messageEl = getRequiredElement<HTMLDivElement>('#message');
 const crosshairEl = getRequiredElement<HTMLDivElement>('#crosshair');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x050607);
-scene.fog = new THREE.FogExp2(0x050607, 0.095);
+scene.background = new THREE.Color(0x101317);
+scene.fog = new THREE.FogExp2(0x101317, 0.055);
 
 const camera = new THREE.PerspectiveCamera(
   68,
@@ -84,19 +84,19 @@ const walls: THREE.Mesh[] = [];
 const interactables: InteractableMesh[] = [];
 
 const wallMaterial = new THREE.MeshStandardMaterial({
-  color: 0x151716,
+  color: 0x2a2d2c,
   roughness: 1,
   metalness: 0,
 });
 
 const floorMaterial = new THREE.MeshStandardMaterial({
-  color: 0x0b0c0b,
+  color: 0x171918,
   roughness: 1,
   metalness: 0,
 });
 
 const doorMaterial = new THREE.MeshStandardMaterial({
-  color: 0x24120e,
+  color: 0x3b2118,
   roughness: 1,
 });
 
@@ -230,13 +230,13 @@ function createWorld(): void {
 
 createWorld();
 
-const ambientLight = new THREE.AmbientLight(0x222222, 0.28);
+const ambientLight = new THREE.AmbientLight(0x8a8f94, 0.55);
 scene.add(ambientLight);
 
-const playerLight = new THREE.PointLight(0xd8c99a, 1.25, 8, 2.2);
+const playerLight = new THREE.PointLight(0xffe0a3, 2.2, 13, 1.6);
 scene.add(playerLight);
 
-const redLight = new THREE.PointLight(0x7a1c1c, 0.8, 7, 2);
+const redLight = new THREE.PointLight(0xb23a32, 1.1, 10, 1.8);
 redLight.position.set(27, 1.3, 27);
 scene.add(redLight);
 
