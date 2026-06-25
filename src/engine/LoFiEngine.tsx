@@ -42,15 +42,51 @@ function CameraController({ engine }: { engine: EngineState }) {
 }
 
 function EntityMesh({ entity }: { entity: Entity }) {
-  if (entity.visible === false) return null;
+  const groupRef = useRef<THREE.Group | null>(null);
+  const meshRef = useRef<THREE.Mesh | null>(null);
+  const lightRef = useRef<THREE.PointLight | null>(null);
+
+  useFrame(() => {
+    if (groupRef.current) {
+      groupRef.current.position.set(
+        entity.position[0],
+        entity.position[1],
+        entity.position[2]
+      );
+      groupRef.current.visible = entity.visible !== false;
+    }
+
+    if (meshRef.current) {
+      meshRef.current.position.set(
+        entity.position[0],
+        entity.position[1],
+        entity.position[2]
+      );
+
+      const rotation = entity.rotation ?? [0, 0, 0];
+      meshRef.current.rotation.set(rotation[0], rotation[1], rotation[2]);
+      meshRef.current.visible = entity.visible !== false;
+    }
+
+    if (lightRef.current) {
+      lightRef.current.intensity = entity.intensity ?? 1.5;
+      lightRef.current.color.set(entity.color ?? "#ffe6b0");
+      lightRef.current.visible = entity.visible !== false;
+    }
+  });
+
+  if (entity.kind === "trigger") {
+    return null;
+  }
 
   const position = entity.position;
   const rotation = entity.rotation ?? [0, 0, 0];
 
   if (entity.kind === "light") {
     return (
-      <group position={position}>
+      <group ref={groupRef} position={position}>
         <pointLight
+          ref={lightRef}
           color={entity.color ?? "#ffe6b0"}
           intensity={entity.intensity ?? 1.5}
           distance={9}
@@ -61,7 +97,7 @@ function EntityMesh({ entity }: { entity: Entity }) {
           <sphereGeometry args={[0.12, 10, 10]} />
           <meshStandardMaterial
             color={entity.color ?? "#ffe6b0"}
-            emissive={entity.emissive ?? "#ffe6b0"}
+            emissive={entity.emissive ?? entity.color ?? "#ffe6b0"}
             emissiveIntensity={1.8}
           />
         </mesh>
@@ -69,12 +105,18 @@ function EntityMesh({ entity }: { entity: Entity }) {
     );
   }
 
-  if (entity.kind === "trigger") {
+  if (entity.visible === false) {
     return null;
   }
 
   return (
-    <mesh position={position} rotation={rotation} receiveShadow castShadow>
+    <mesh
+      ref={meshRef}
+      position={position}
+      rotation={rotation}
+      receiveShadow
+      castShadow
+    >
       <boxGeometry args={entity.size} />
       <meshStandardMaterial
         color={entity.color ?? "#555"}
