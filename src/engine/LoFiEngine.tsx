@@ -222,6 +222,16 @@ function HUD({ engine }: { engine: EngineState }) {
 
   return (
     <div className="hud">
+      <div className="minimalHelp">
+        <span>WASD</span>
+        <span>DRAG</span>
+        <span>E</span>
+      </div>
+
+      {engine.objective && (
+        <div className="minimalObjective">{engine.objective}</div>
+      )}
+
       <div className={nearby ? "crosshair active" : "crosshair"} />
 
       {nearby && (
@@ -229,7 +239,9 @@ function HUD({ engine }: { engine: EngineState }) {
           className="silentInteractButton"
           onClick={() => engine.interact()}
           aria-label="Interact"
-        />
+        >
+          <span className="interactGlyph">E</span>
+        </button>
       )}
 
       <MobileControls />
@@ -237,6 +249,9 @@ function HUD({ engine }: { engine: EngineState }) {
       {engine.ended && (
         <div className={caught ? "ending caught" : "ending escaped"}>
           <div className="silentEndingCard" />
+          <div className="endingText">
+            {caught ? "CAUGHT" : "ESCAPED"}
+          </div>
         </div>
       )}
     </div>
@@ -355,18 +370,17 @@ export function LoFiEngine({ game }: { game: GameDefinition }) {
           powerPreference: "high-performance",
         }}
       >
-        <color attach="background" args={["#050608"]} />
-        <fog attach="fog" args={["#050608", 3.5, 28]} />
+        <color attach="background" args={["#0b0d12"]} />
+        <fog attach="fog" args={["#0d1016", 7, 34]} />
 
-        <ambientLight intensity={0.16} />
+        <ambientLight intensity={0.38} />
         <directionalLight
           position={[4, 8, 4]}
-          intensity={0.24}
+          intensity={0.34}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
         />
-
         <CameraController engine={engine} />
         <WorldRenderer engine={engine} />
 
