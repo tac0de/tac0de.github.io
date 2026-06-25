@@ -18,6 +18,7 @@ export type Entity = {
   size: Vec3;
   rotation?: Vec3;
   color?: string;
+  opacity?: number;
   solid?: boolean;
   visible?: boolean;
   label?: string;

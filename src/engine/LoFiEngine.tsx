@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html, Text } from "@react-three/drei";
+import { Html } from "@react-three/drei";
 import * as THREE from "three";
 
 import type { EngineState, Entity, GameDefinition } from "./types";
@@ -45,15 +45,19 @@ function EntityMesh({ entity }: { entity: Entity }) {
   const groupRef = useRef<THREE.Group | null>(null);
   const meshRef = useRef<THREE.Mesh | null>(null);
   const lightRef = useRef<THREE.PointLight | null>(null);
+  const materialRef = useRef<THREE.MeshStandardMaterial | null>(null);
 
   useFrame(() => {
+    const visible = entity.visible !== false;
+    const opacity = entity.opacity ?? 1;
+
     if (groupRef.current) {
       groupRef.current.position.set(
         entity.position[0],
         entity.position[1],
         entity.position[2]
       );
-      groupRef.current.visible = entity.visible !== false;
+      groupRef.current.visible = visible;
     }
 
     if (meshRef.current) {
@@ -65,13 +69,20 @@ function EntityMesh({ entity }: { entity: Entity }) {
 
       const rotation = entity.rotation ?? [0, 0, 0];
       meshRef.current.rotation.set(rotation[0], rotation[1], rotation[2]);
-      meshRef.current.visible = entity.visible !== false;
+      meshRef.current.visible = visible && opacity > 0.01;
+    }
+
+    if (materialRef.current) {
+      materialRef.current.color.set(entity.color ?? "#555");
+      materialRef.current.opacity = opacity;
+      materialRef.current.transparent = opacity < 1;
+      materialRef.current.needsUpdate = true;
     }
 
     if (lightRef.current) {
-      lightRef.current.intensity = entity.intensity ?? 1.5;
+      lightRef.current.intensity = visible ? entity.intensity ?? 1.5 : 0;
       lightRef.current.color.set(entity.color ?? "#ffe6b0");
-      lightRef.current.visible = entity.visible !== false;
+      lightRef.current.visible = visible && opacity > 0.01;
     }
   });
 
@@ -79,12 +90,9 @@ function EntityMesh({ entity }: { entity: Entity }) {
     return null;
   }
 
-  const position = entity.position;
-  const rotation = entity.rotation ?? [0, 0, 0];
-
   if (entity.kind === "light") {
     return (
-      <group ref={groupRef} position={position}>
+      <group ref={groupRef} position={entity.position}>
         <pointLight
           ref={lightRef}
           color={entity.color ?? "#ffe6b0"}
@@ -96,45 +104,35 @@ function EntityMesh({ entity }: { entity: Entity }) {
         <mesh>
           <sphereGeometry args={[0.12, 10, 10]} />
           <meshStandardMaterial
+            ref={materialRef}
             color={entity.color ?? "#ffe6b0"}
             emissive={entity.emissive ?? entity.color ?? "#ffe6b0"}
             emissiveIntensity={1.8}
+            transparent={(entity.opacity ?? 1) < 1}
+            opacity={entity.opacity ?? 1}
           />
         </mesh>
       </group>
     );
   }
 
-  if (entity.visible === false) {
-    return null;
-  }
-
   return (
     <mesh
       ref={meshRef}
-      position={position}
-      rotation={rotation}
+      position={entity.position}
+      rotation={entity.rotation ?? [0, 0, 0]}
       receiveShadow
       castShadow
     >
       <boxGeometry args={entity.size} />
       <meshStandardMaterial
+        ref={materialRef}
         color={entity.color ?? "#555"}
         roughness={0.95}
         metalness={0.02}
+        transparent={(entity.opacity ?? 1) < 1}
+        opacity={entity.opacity ?? 1}
       />
-
-      {entity.label && entity.kind !== "floor" && (
-        <Text
-          position={[0, entity.size[1] / 2 + 0.18, 0]}
-          fontSize={0.18}
-          color="#d8d8d8"
-          anchorX="center"
-          anchorY="middle"
-        >
-          {entity.label}
-        </Text>
-      )}
     </mesh>
   );
 }
@@ -220,33 +218,25 @@ function HUD({ engine }: { engine: EngineState }) {
   }, []);
 
   const nearby = engine.getNearbyInteraction();
+  const caught = engine.endTitle === "caught";
 
   return (
     <div className="hud">
-      <div className="topPanel">
-        <div className="gameTitle">{engine.game.title}</div>
-        {engine.objective && <div className="objective">{engine.objective}</div>}
-      </div>
-
-      <div className="crosshair" />
+      <div className={nearby ? "crosshair active" : "crosshair"} />
 
       {nearby && (
-        <button className="interactPrompt" onClick={() => engine.interact()}>
-          E / Tap · {nearby.label}
-        </button>
+        <button
+          className="silentInteractButton"
+          onClick={() => engine.interact()}
+          aria-label="Interact"
+        />
       )}
-
-      {engine.message && <div className="messageBox">{engine.message}</div>}
 
       <MobileControls />
 
       {engine.ended && (
-        <div className="ending">
-          <div className="endingCard">
-            <h1>{engine.endTitle}</h1>
-            {engine.endSubtitle && <p>{engine.endSubtitle}</p>}
-            <button onClick={() => engine.scene.restart()}>다시 시작</button>
-          </div>
+        <div className={caught ? "ending caught" : "ending escaped"}>
+          <div className="silentEndingCard" />
         </div>
       )}
     </div>
@@ -365,13 +355,13 @@ export function LoFiEngine({ game }: { game: GameDefinition }) {
           powerPreference: "high-performance",
         }}
       >
-        <color attach="background" args={["#07080a"]} />
-        <fog attach="fog" args={["#08090c", 4, 30]} />
+        <color attach="background" args={["#050608"]} />
+        <fog attach="fog" args={["#050608", 3.5, 28]} />
 
-        <ambientLight intensity={0.22} />
+        <ambientLight intensity={0.16} />
         <directionalLight
           position={[4, 8, 4]}
-          intensity={0.45}
+          intensity={0.24}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
