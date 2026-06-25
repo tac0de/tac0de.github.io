@@ -1,146 +1,201 @@
 html,
-body {
-  margin: 0;
+body,
+#root {
   width: 100%;
   height: 100%;
+  margin: 0;
   overflow: hidden;
-  background: #25232a;
+  background: #050608;
   font-family:
-    ui-monospace,
-    SFMono-Regular,
-    Menlo,
-    Monaco,
-    Consolas,
-    monospace;
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
 }
 
-#game {
-  display: block;
+* {
+  box-sizing: border-box;
+}
+
+.gameRoot {
   width: 100vw;
   height: 100vh;
-  image-rendering: pixelated;
-  filter: contrast(1.06) brightness(1.18) saturate(0.76);
+  background: #050608;
+  touch-action: none;
+  user-select: none;
 }
 
-#overlay {
+.hud {
   position: fixed;
   inset: 0;
-  color: rgba(255, 238, 205, 0.92);
-  text-shadow: 0 0 12px rgba(0, 0, 0, 0.95);
   pointer-events: none;
+  color: #e7e7e7;
 }
 
-#top-left {
+.topPanel {
   position: absolute;
   top: 18px;
   left: 18px;
+  width: min(420px, calc(100vw - 36px));
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(5, 6, 8, 0.58);
+  backdrop-filter: blur(10px);
 }
 
-#title {
+.gameTitle {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #f1f1f1;
+}
+
+.objective {
+  margin-top: 6px;
   font-size: 13px;
-  letter-spacing: 0.22em;
+  line-height: 1.45;
+  color: rgba(230, 230, 230, 0.78);
 }
 
-#hint {
-  margin-top: 8px;
-  font-size: 12px;
-  opacity: 0.72;
-}
-
-#status {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  font-size: 13px;
-  letter-spacing: 0.12em;
-}
-
-#objective {
-  position: absolute;
-  left: 18px;
-  bottom: 22px;
-  max-width: min(72vw, 620px);
-  padding: 9px 12px;
-  border: 1px solid rgba(255, 228, 170, 0.18);
-  background: rgba(24, 18, 18, 0.48);
-  color: rgba(255, 238, 205, 0.92);
-  font-size: 13px;
-  line-height: 1.55;
-}
-
-#message {
-  position: absolute;
-  left: 50%;
-  bottom: 13%;
-  transform: translateX(-50%);
-  width: min(86vw, 680px);
-  min-height: 22px;
-  text-align: center;
-  font-size: 14px;
-  line-height: 1.65;
-  white-space: pre-line;
-  padding: 10px 14px;
-  border-radius: 8px;
-  color: rgba(255, 242, 212, 0.98);
-  background: rgba(8, 7, 8, 0.54);
-  border: 1px solid rgba(255, 228, 170, 0.13);
-  backdrop-filter: blur(2px);
-}
-
-#crosshair {
+.crosshair {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 5px;
-  height: 5px;
+  width: 10px;
+  height: 10px;
   transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 999px;
-  background: rgba(255, 238, 205, 0.55);
+  opacity: 0.7;
 }
 
-#crosshair.active {
-  width: 12px;
-  height: 12px;
-  background: rgba(255, 220, 130, 0.98);
-  box-shadow: 0 0 12px rgba(255, 220, 130, 0.45);
+.interactPrompt {
+  position: absolute;
+  left: 50%;
+  bottom: 132px;
+  transform: translateX(-50%);
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(230, 230, 230, 0.1);
+  color: #f0f0f0;
+  font-size: 14px;
+  font-weight: 700;
+  pointer-events: auto;
+  backdrop-filter: blur(10px);
 }
 
-body.ending #game {
-  filter: contrast(0.9) brightness(1.55) saturate(0.35);
+.messageBox {
+  position: absolute;
+  left: 50%;
+  bottom: 76px;
+  width: min(520px, calc(100vw - 36px));
+  transform: translateX(-50%);
+  padding: 14px 18px;
+  border-left: 3px solid rgba(255, 80, 80, 0.8);
+  border-radius: 12px;
+  background: rgba(8, 8, 10, 0.74);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  backdrop-filter: blur(12px);
 }
 
-body.dead #game {
-  filter: contrast(2.1) brightness(0.32) grayscale(1);
+.mobileStick {
+  position: absolute;
+  left: 24px;
+  bottom: 28px;
+  width: 112px;
+  height: 112px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.055);
+  pointer-events: auto;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
 }
 
-body.ending::after,
-body.dead::after {
-  content: "";
-  position: fixed;
+.mobileKnob {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.lookArea {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 58vw;
+  height: 70vh;
+  pointer-events: auto;
+  touch-action: none;
+}
+
+.ending {
+  position: absolute;
   inset: 0;
-  pointer-events: none;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.68);
+  pointer-events: auto;
 }
 
-body.ending::after {
-  background:
-    radial-gradient(circle, transparent 18%, rgba(0, 0, 0, 0.54) 86%),
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.03) 0,
-      rgba(255, 255, 255, 0.03) 1px,
-      transparent 1px,
-      transparent 5px
-    );
+.endingCard {
+  width: min(420px, calc(100vw - 40px));
+  padding: 28px;
+  border-radius: 18px;
+  background: rgba(12, 12, 16, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
 }
 
-body.dead::after {
-  background:
-    radial-gradient(circle, transparent 4%, rgba(0, 0, 0, 0.96) 74%),
-    repeating-linear-gradient(
-      0deg,
-      rgba(255, 255, 255, 0.04) 0,
-      rgba(255, 255, 255, 0.04) 1px,
-      transparent 1px,
-      transparent 4px
-    );
+.endingCard h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #fff;
+}
+
+.endingCard p {
+  margin: 12px 0 24px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.5;
+}
+
+.endingCard button {
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #eeeeee;
+  color: #111;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .mobileStick {
+    display: flex;
+  }
+
+  .topPanel {
+    top: 12px;
+    left: 12px;
+    width: calc(100vw - 24px);
+  }
+
+  .interactPrompt {
+    bottom: 160px;
+  }
+
+  .messageBox {
+    bottom: 100px;
+  }
+
+  .crosshair {
+    opacity: 0.45;
+  }
 }
