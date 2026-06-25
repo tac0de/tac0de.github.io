@@ -321,16 +321,27 @@ function updatePlayer(engine: EngineState, dt: number) {
     (keyState.left ? -1 : 0) +
     mobileState.moveX;
 
+  /**
+   * Three.js 기준:
+   * - 카메라 기본 전방은 -Z
+   * - 현재 엔진에서는 yaw = Math.PI 일 때 -Z를 보도록 설계
+   * - 따라서 yaw 기준 전방 벡터는 아래와 같음
+   */
   const forward = new THREE.Vector3(
     Math.sin(player.yaw),
     0,
     Math.cos(player.yaw)
   );
 
+  /**
+   * 중요:
+   * 기존 코드의 yaw + PI/2는 좌우가 반대로 느껴질 수 있음.
+   * yaw = PI, 즉 -Z를 볼 때 오른쪽은 +X여야 하므로 yaw - PI/2가 맞음.
+   */
   const right = new THREE.Vector3(
-    Math.sin(player.yaw + Math.PI / 2),
+    Math.sin(player.yaw - Math.PI / 2),
     0,
-    Math.cos(player.yaw + Math.PI / 2)
+    Math.cos(player.yaw - Math.PI / 2)
   );
 
   const move = new THREE.Vector3();
