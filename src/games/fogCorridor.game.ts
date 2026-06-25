@@ -19,6 +19,7 @@ type RunState = {
   monsterVisible: boolean;
   chaseStartedAt: number;
   lastScareAt: number;
+  stalkerSeen: boolean;
 };
 
 const state: RunState = {
@@ -30,6 +31,7 @@ const state: RunState = {
   monsterVisible: false,
   chaseStartedAt: 0,
   lastScareAt: 0,
+  stalkerSeen: false,
 };
 
 function resetState() {
@@ -41,6 +43,7 @@ function resetState() {
   state.monsterVisible = false;
   state.chaseStartedAt = 0;
   state.lastScareAt = 0;
+  state.stalkerSeen = false;
 }
 
 function addBloodStain(ctx: GameContext, id: string, position: Vec3, size: Vec3) {
@@ -65,7 +68,7 @@ function addCeilingLight(
     id: `${id}_fixture`,
     position: [0, 2.72, z],
     size: [1.35, 0.08, 0.34],
-    color: "#23242a",
+    color: "#343843",
     solid: false,
   });
 
@@ -85,7 +88,7 @@ function addSideDoor(
   id: string,
   x: number,
   z: number,
-  color = "#2b2729"
+  color = "#3a3438"
 ) {
   ctx.world.addDoor({
     id,
@@ -99,7 +102,7 @@ function addSideDoor(
     id: `${id}_gap`,
     position: [x * 0.998, 1.08, z + 0.52],
     size: [0.05, 1.72, 0.22],
-    color: "#000000",
+    color: "#020202",
     opacity: 0.9,
     solid: false,
   });
@@ -110,7 +113,7 @@ function addPipe(ctx: GameContext, id: string, x: number, z: number, length: num
     id,
     position: [x, 2.35, z],
     size: [0.12, 0.12, length],
-    color: "#16171b",
+    color: "#242731",
     solid: false,
   });
 
@@ -118,7 +121,7 @@ function addPipe(ctx: GameContext, id: string, x: number, z: number, length: num
     id: `${id}_joint_a`,
     position: [x, 2.35, z - length / 2],
     size: [0.22, 0.22, 0.18],
-    color: "#0e0f12",
+    color: "#151821",
     solid: false,
   });
 
@@ -126,7 +129,7 @@ function addPipe(ctx: GameContext, id: string, x: number, z: number, length: num
     id: `${id}_joint_b`,
     position: [x, 2.35, z + length / 2],
     size: [0.22, 0.22, 0.18],
-    color: "#0e0f12",
+    color: "#151821",
     solid: false,
   });
 }
@@ -221,28 +224,38 @@ function addSilentInteraction(
   });
 }
 
+function setStalkerOpacity(ctx: GameContext, opacity: number) {
+  const ids = ["stalker_body", "stalker_head", "stalker_blade"];
+
+  for (const id of ids) {
+    const entity = ctx.world.getEntity(id);
+    if (entity) entity.opacity = opacity;
+  }
+}
+
 export const fogCorridorGame: GameDefinition = {
   id: "fog-corridor",
   title: "Fog Corridor",
-  description: "No-text lo-fi horror corridor.",
+  description: "Minimal-text lo-fi horror corridor.",
   preset: "horror",
   spawn: [0, 1.6, 8.2],
 
   setup(ctx) {
     resetState();
+    ctx.ui.setObjective("Find the yellow light.");
 
     ctx.world.addFloor({
       id: "main_floor",
       position: [0, -0.1, -13],
       size: [9.2, 0.2, 48],
-      color: "#1e1f25",
+      color: "#383c45",
     });
 
     ctx.world.addBox({
       id: "ceiling",
       position: [0, 2.82, -13],
       size: [9.2, 0.16, 48],
-      color: "#111217",
+      color: "#2a2e38",
       solid: false,
     });
 
@@ -250,28 +263,28 @@ export const fogCorridorGame: GameDefinition = {
       id: "left_wall",
       position: [-4.6, 1.35, -13],
       size: [0.45, 2.7, 48],
-      color: "#2a2b33",
+      color: "#454956",
     });
 
     ctx.world.addWall({
       id: "right_wall",
       position: [4.6, 1.35, -13],
       size: [0.45, 2.7, 48],
-      color: "#272830",
+      color: "#3f4350",
     });
 
     ctx.world.addWall({
       id: "back_wall",
       position: [0, 1.35, 10.9],
       size: [9.2, 2.7, 0.45],
-      color: "#24252b",
+      color: "#3d414b",
     });
 
     ctx.world.addWall({
       id: "end_wall",
       position: [0, 1.35, -37.2],
       size: [9.2, 2.7, 0.45],
-      color: "#121318",
+      color: "#2d313b",
     });
 
     for (const z of [4, -3, -10, -17, -24, -31]) {
@@ -279,64 +292,64 @@ export const fogCorridorGame: GameDefinition = {
         id: `left_pillar_${z}`,
         position: [-4.15, 1.2, z],
         size: [0.55, 2.4, 0.55],
-        color: "#1d1e24",
+        color: "#30343f",
       });
 
       ctx.world.addBox({
         id: `right_pillar_${z}`,
         position: [4.15, 1.2, z - 2],
         size: [0.55, 2.4, 0.55],
-        color: "#1b1c22",
+        color: "#2d313b",
       });
     }
 
-    addCeilingLight(ctx, "light_spawn", 6, "#b9c9ff", 1.4);
-    addCeilingLight(ctx, "light_1", 0, "#ffe0a0", 1.05);
-    addCeilingLight(ctx, "light_2", -8, "#ffd0a0", 0.85);
-    addCeilingLight(ctx, "light_3", -17, "#ffe0a0", 0.42);
-    addCeilingLight(ctx, "light_red", -32, "#ff2525", 1.35);
+    addCeilingLight(ctx, "light_spawn", 6, "#d8e2ff", 2.4);
+    addCeilingLight(ctx, "light_1", 0, "#ffe7b8", 2.05);
+    addCeilingLight(ctx, "light_2", -8, "#ffd9ad", 1.85);
+    addCeilingLight(ctx, "light_3", -17, "#ffe0a0", 1.65);
+    addCeilingLight(ctx, "light_red", -32, "#ff3838", 2.25);
 
     addPipe(ctx, "pipe_left_long", -3.95, -8, 30);
     addPipe(ctx, "pipe_right_long", 3.95, -15, 25);
 
     addSideDoor(ctx, "side_door_a", -4.35, 1.5);
-    addSideDoor(ctx, "side_door_b", 4.35, -6.5, "#252328");
-    addSideDoor(ctx, "side_door_c", -4.35, -15.5, "#2e2021");
-    addSideDoor(ctx, "side_door_d", 4.35, -23.5, "#1c1d22");
+    addSideDoor(ctx, "side_door_b", 4.35, -6.5, "#35343b");
+    addSideDoor(ctx, "side_door_c", -4.35, -15.5, "#3c2c2d");
+    addSideDoor(ctx, "side_door_d", 4.35, -23.5, "#30333d");
 
     ctx.world.addBox({
       id: "crate_1",
       position: [-2.2, 0.45, 2],
       size: [1.4, 0.9, 1.2],
-      color: "#473d35",
+      color: "#5a5047",
     });
 
     ctx.world.addBox({
       id: "fallen_cabinet",
       position: [2.15, 0.45, -4.2],
       size: [1.8, 0.9, 0.8],
-      color: "#343138",
+      color: "#45424a",
     });
 
     ctx.world.addBox({
       id: "wet_barrier",
       position: [-1.2, 0.5, -11.5],
       size: [2.4, 1, 0.55],
-      color: "#28292f",
+      color: "#3a3c44",
     });
 
     ctx.world.addBox({
       id: "chair_1",
       position: [2.1, 0.35, -16.5],
       size: [0.8, 0.7, 0.8],
-      color: "#3a302c",
+      color: "#51443e",
     });
 
     ctx.world.addBox({
       id: "chair_back_1",
       position: [2.1, 0.95, -16.85],
       size: [0.85, 0.8, 0.12],
-      color: "#3a302c",
+      color: "#51443e",
       solid: false,
     });
 
@@ -348,7 +361,7 @@ export const fogCorridorGame: GameDefinition = {
       id: "breaker_panel",
       position: [4.25, 1.2, -18.7],
       size: [0.28, 1.2, 0.85],
-      color: "#202328",
+      color: "#333841",
       solid: false,
     });
 
@@ -384,7 +397,7 @@ export const fogCorridorGame: GameDefinition = {
       size: [0.12, 0.12, 0.12],
       color: "#ffd85d",
       emissive: "#ffd85d",
-      intensity: 1.6,
+      intensity: 2.2,
       solid: false,
     });
 
@@ -392,7 +405,7 @@ export const fogCorridorGame: GameDefinition = {
       id: "red_door",
       position: [0, 1.15, -34.8],
       size: [3.1, 2.3, 0.35],
-      color: "#4e1414",
+      color: "#6a1c1c",
       solid: true,
     });
 
@@ -400,7 +413,7 @@ export const fogCorridorGame: GameDefinition = {
       id: "red_door_frame_top",
       position: [0, 2.4, -34.72],
       size: [3.5, 0.22, 0.5],
-      color: "#111116",
+      color: "#20222a",
       solid: false,
     });
 
@@ -408,7 +421,7 @@ export const fogCorridorGame: GameDefinition = {
       id: "exit_glow_panel",
       position: [0, 2.62, -34.4],
       size: [1.25, 0.24, 0.12],
-      color: "#390b0b",
+      color: "#5a0d0d",
       solid: false,
     });
 
@@ -418,7 +431,7 @@ export const fogCorridorGame: GameDefinition = {
       size: [0.2, 0.2, 0.2],
       color: "#ff2020",
       emissive: "#ff2020",
-      intensity: 1.4,
+      intensity: 2.0,
       solid: false,
     });
 
@@ -455,6 +468,44 @@ export const fogCorridorGame: GameDefinition = {
       size: [0.65, 1.75, 0.38],
       color: "#000000",
       opacity: 0,
+      solid: false,
+    });
+
+    ctx.world.addBox({
+      id: "stalker_body",
+      position: [0, 1.0, -30.5],
+      size: [0.74, 1.72, 0.36],
+      color: "#030303",
+      opacity: 0.22,
+      solid: false,
+    });
+
+    ctx.world.addBox({
+      id: "stalker_head",
+      position: [0, 2.05, -30.5],
+      size: [0.46, 0.42, 0.42],
+      color: "#030303",
+      opacity: 0.22,
+      solid: false,
+    });
+
+    ctx.world.addBox({
+      id: "stalker_blade",
+      position: [0.55, 1.05, -30.56],
+      size: [0.08, 1.1, 0.12],
+      color: "#c8c8c8",
+      opacity: 0.28,
+      solid: false,
+      rotation: [0, 0, -0.25],
+    });
+
+    ctx.world.addLight({
+      id: "stalker_backlight",
+      position: [0, 2.1, -31.25],
+      size: [0.16, 0.16, 0.16],
+      color: "#ff1d1d",
+      emissive: "#ff1d1d",
+      intensity: 0.45,
       solid: false,
     });
 
@@ -498,8 +549,9 @@ export const fogCorridorGame: GameDefinition = {
 
       setLight(ctx, "fuse_glow", 0);
       setLight(ctx, "breaker_hint_light", 2.2, "#ffd65a");
-      setLight(ctx, "light_spawn", 0.78, "#b9c9ff");
-      setLight(ctx, "light_1", 0.55, "#ffd9a0");
+      setLight(ctx, "light_spawn", 1.55, "#d8e2ff");
+      setLight(ctx, "light_1", 1.25, "#ffe7b8");
+      ctx.ui.setObjective("Use the power box.");
     });
 
     addSilentInteraction(
@@ -520,9 +572,9 @@ export const fogCorridorGame: GameDefinition = {
         }
 
         setLight(ctx, "breaker_hint_light", 0);
-        setLight(ctx, "light_1", 1.4, "#ffe0a0");
-        setLight(ctx, "light_2", 1.35, "#ffd0a0");
-        setLight(ctx, "light_3", 1.7, "#ffe0a0");
+        setLight(ctx, "light_1", 2.15, "#ffe7b8");
+        setLight(ctx, "light_2", 2.0, "#ffd9ad");
+        setLight(ctx, "light_3", 2.2, "#ffe0a0");
         setLight(ctx, "exit_hint_light", 3.2, "#ff2020");
 
         const exitPanel = ctx.world.getEntity("exit_glow_panel");
@@ -531,6 +583,19 @@ export const fogCorridorGame: GameDefinition = {
         }
 
         flashEntity(ctx, "far_silhouette", 500);
+
+        const stalkerBody = ctx.world.getEntity("stalker_body");
+        const stalkerHead = ctx.world.getEntity("stalker_head");
+        const stalkerBlade = ctx.world.getEntity("stalker_blade");
+        const stalkerBacklight = ctx.world.getEntity("stalker_backlight");
+
+        if (stalkerBody) stalkerBody.opacity = 0.62;
+        if (stalkerHead) stalkerHead.opacity = 0.62;
+        if (stalkerBlade) stalkerBlade.opacity = 0.65;
+        if (stalkerBacklight) stalkerBacklight.intensity = 1.8;
+
+        state.stalkerSeen = true;
+        ctx.ui.setObjective("Open the red door.");
       },
       false
     );
@@ -549,6 +614,16 @@ export const fogCorridorGame: GameDefinition = {
         state.monsterVisible = true;
         state.monsterPosition.set(0, 1.1, -25.2);
 
+        const stalkerBody = ctx.world.getEntity("stalker_body");
+        const stalkerHead = ctx.world.getEntity("stalker_head");
+        const stalkerBlade = ctx.world.getEntity("stalker_blade");
+        const stalkerBacklight = ctx.world.getEntity("stalker_backlight");
+
+        if (stalkerBody) stalkerBody.opacity = 0;
+        if (stalkerHead) stalkerHead.opacity = 0;
+        if (stalkerBlade) stalkerBlade.opacity = 0;
+        if (stalkerBacklight) stalkerBacklight.intensity = 0;
+
         const door = ctx.world.getEntity("red_door");
         if (door) {
           door.opacity = 0;
@@ -559,6 +634,7 @@ export const fogCorridorGame: GameDefinition = {
         setLight(ctx, "exit_hint_light", 5.2, "#ffffff");
         setMonsterOpacity(ctx, 0.95);
         syncMonster(ctx, state.monsterPosition);
+        ctx.ui.setObjective("Run.");
       },
       false
     );
@@ -574,19 +650,19 @@ export const fogCorridorGame: GameDefinition = {
     if (triggerDoor?.userData?.done && !triggerDoor.userData.played) {
       triggerDoor.userData.played = true;
       flashEntity(ctx, "door_shadow_1", 280);
-      setLight(ctx, "light_2", 0.25);
+      setLight(ctx, "light_2", 0.85);
     }
 
     if (triggerCeiling?.userData?.done && !triggerCeiling.userData.played) {
       triggerCeiling.userData.played = true;
       flashEntity(ctx, "ceiling_shadow_1", 420);
-      setLight(ctx, "light_1", 0.18);
+      setLight(ctx, "light_1", 0.9);
     }
 
     if (triggerFar?.userData?.done && !triggerFar.userData.played) {
       triggerFar.userData.played = true;
       flashEntity(ctx, "far_silhouette", 460);
-      setLight(ctx, "light_3", 0.2);
+      setLight(ctx, "light_3", 0.8);
     }
 
     const light1 = ctx.world.getEntity("light_1");
@@ -598,35 +674,35 @@ export const fogCorridorGame: GameDefinition = {
     const fuseGlow = ctx.world.getEntity("fuse_glow");
 
     if (fuseGlow && !state.hasFuse) {
-      fuseGlow.intensity = 1.3 + Math.sin(t * 7) * 0.35;
+      fuseGlow.intensity = 1.8 + Math.sin(t * 7) * 0.45;
     }
 
     if (light1) {
       light1.intensity =
-        (state.breakerOn ? 1.15 : 0.72) +
-        Math.sin(t * 8) * 0.18 +
-        Math.random() * 0.08;
+        (state.breakerOn ? 1.85 : 1.25) +
+        Math.sin(t * 8) * 0.15 +
+        Math.random() * 0.07;
     }
 
     if (light2) {
       light2.intensity =
-        (state.breakerOn ? 1.05 : 0.58) +
-        Math.sin(t * 11) * 0.28 +
-        Math.random() * 0.12;
+        (state.breakerOn ? 1.7 : 1.05) +
+        Math.sin(t * 11) * 0.18 +
+        Math.random() * 0.08;
     }
 
     if (light3) {
       light3.intensity =
-        (state.breakerOn ? 1.25 : 0.28) +
-        Math.sin(t * 13) * 0.25 +
-        Math.random() * 0.14;
+        (state.breakerOn ? 1.9 : 0.95) +
+        Math.sin(t * 13) * 0.16 +
+        Math.random() * 0.08;
     }
 
     if (redLight) {
       redLight.intensity =
-        (state.breakerOn ? 2.6 : 1.1) +
-        Math.sin(t * 16) * 0.55 +
-        Math.random() * 0.22;
+        (state.breakerOn ? 3.4 : 1.8) +
+        Math.sin(t * 16) * 0.45 +
+        Math.random() * 0.18;
     }
 
     if (exitLight) {
@@ -634,12 +710,41 @@ export const fogCorridorGame: GameDefinition = {
         state.doorOpen
           ? 4.2 + Math.sin(t * 9) * 0.6
           : state.breakerOn
-            ? 2.6 + Math.sin(t * 6) * 0.4
-            : 1.2 + Math.sin(t * 5) * 0.22;
+            ? 2.9 + Math.sin(t * 6) * 0.4
+            : 1.8 + Math.sin(t * 5) * 0.22;
     }
 
     if (spawnLight && state.phase === "chase") {
-      spawnLight.intensity = 0.1 + Math.random() * 0.18;
+      spawnLight.intensity = 0.45 + Math.random() * 0.22;
+    }
+
+    if (state.stalkerSeen && state.phase !== "chase") {
+      const stalkerBody = ctx.world.getEntity("stalker_body");
+      const stalkerHead = ctx.world.getEntity("stalker_head");
+      const stalkerBlade = ctx.world.getEntity("stalker_blade");
+      const stalkerBacklight = ctx.world.getEntity("stalker_backlight");
+
+      const pulse = 0.52 + Math.sin(t * 3.5) * 0.12;
+      const sway = Math.sin(t * 1.4) * 0.18;
+
+      if (stalkerBody) {
+        stalkerBody.opacity = pulse;
+        stalkerBody.position = [sway, 1.0, -30.5];
+      }
+
+      if (stalkerHead) {
+        stalkerHead.opacity = pulse;
+        stalkerHead.position = [sway, 2.05, -30.5];
+      }
+
+      if (stalkerBlade) {
+        stalkerBlade.opacity = 0.62 + Math.sin(t * 8) * 0.12;
+        stalkerBlade.position = [0.55 + sway, 1.05, -30.56];
+      }
+
+      if (stalkerBacklight) {
+        stalkerBacklight.intensity = 1.4 + Math.sin(t * 5) * 0.35;
+      }
     }
 
     if (state.breakerOn && !state.doorOpen) {
@@ -648,7 +753,7 @@ export const fogCorridorGame: GameDefinition = {
       if (nearExit && t - state.lastScareAt > 4.5) {
         state.lastScareAt = t;
         flashEntity(ctx, "far_silhouette", 360);
-        setLight(ctx, "light_3", 0.05);
+        setLight(ctx, "light_3", 0.75);
       }
     }
 
@@ -657,19 +762,19 @@ export const fogCorridorGame: GameDefinition = {
       const player = ctx.player.position;
 
       const target = new THREE.Vector3(player.x * 0.7, 1.1, player.z + 1.05);
-      const speed = Math.min(7.6, 2.9 + chaseDuration * 0.55);
+      const speed = Math.min(9.4, 3.9 + chaseDuration * 0.72);
 
-      state.monsterPosition.lerp(target, Math.min(1, dt * speed * 0.22));
-      state.monsterPosition.x += Math.sin(t * 24) * 0.03;
+      state.monsterPosition.lerp(target, Math.min(1, dt * speed * 0.28));
+      state.monsterPosition.x += Math.sin(t * 24) * 0.05;
 
       syncMonster(ctx, state.monsterPosition);
 
       const danger = playerDistance(ctx, state.monsterPosition);
 
       if (danger < 4.5) {
-        setLight(ctx, "light_1", 0.04);
-        setLight(ctx, "light_2", 0.04);
-        setLight(ctx, "light_3", 0.04);
+        setLight(ctx, "light_1", 0.72);
+        setLight(ctx, "light_2", 0.62);
+        setLight(ctx, "light_3", 0.52);
       }
 
       if (danger < 1.18) {

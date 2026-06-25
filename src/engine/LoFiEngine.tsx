@@ -370,13 +370,13 @@ export function LoFiEngine({ game }: { game: GameDefinition }) {
           powerPreference: "high-performance",
         }}
       >
-        <color attach="background" args={["#0b0d12"]} />
-        <fog attach="fog" args={["#0d1016", 7, 34]} />
+        <color attach="background" args={["#11141b"]} />
+        <fog attach="fog" args={["#151923", 18, 56]} />
 
-        <ambientLight intensity={0.38} />
+        <ambientLight intensity={0.62} />
         <directionalLight
           position={[4, 8, 4]}
-          intensity={0.34}
+          intensity={0.52}
           castShadow
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
