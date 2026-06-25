@@ -9,13 +9,16 @@ export type EntityKind =
   | "door"
   | "light"
   | "trigger"
+  | "model"
   | "custom";
 
 export type Entity = {
   id: string;
   kind: EntityKind;
+  modelUrl?: string;
   position: Vec3;
   size: Vec3;
+  scale?: Vec3;
   rotation?: Vec3;
   color?: string;
   opacity?: number;
@@ -60,6 +63,7 @@ export type WorldAPI = {
   addDoor: (options: Partial<Entity>) => Entity;
   addLight: (options: Partial<Entity>) => Entity;
   addTrigger: (options: Partial<Entity>) => Entity;
+  addModel: (options: Partial<Entity> & { modelUrl: string }) => Entity;
 
   addInteraction: (interaction: Interaction) => Interaction;
   removeEntity: (id: string) => void;

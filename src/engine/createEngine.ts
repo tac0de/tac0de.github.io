@@ -170,6 +170,24 @@ export function createEngine(
       return entity;
     },
 
+    addModel(options) {
+      const entity: Entity = {
+        id: options.id ?? uid("model"),
+        kind: "model",
+        position: options.position ?? [0, 0, 0],
+        size: options.size ?? [1, 1, 1],
+        scale: options.scale ?? [1, 1, 1],
+        rotation: options.rotation ?? [0, 0, 0],
+        solid: options.solid ?? false,
+        visible: options.visible ?? true,
+        opacity: options.opacity ?? 1,
+        ...options,
+      };
+
+      entities.push(entity);
+      return entity;
+    },
+
     addInteraction(interaction) {
       interactions.push(interaction);
       return interaction;

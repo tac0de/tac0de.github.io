@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Html } from "@react-three/drei";
+import { Html, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
 import type { EngineState, Entity, GameDefinition } from "./types";
@@ -10,6 +10,75 @@ import {
   mobileState,
   pointerState,
 } from "./createEngine";
+
+function ModelEntity({ entity }: { entity: Entity }) {
+  const groupRef = useRef<THREE.Group | null>(null);
+  const { scene } = useGLTF(entity.modelUrl ?? "");
+
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone(true);
+
+    clone.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+
+      child.castShadow = true;
+      child.receiveShadow = true;
+
+      const opacity = entity.opacity ?? 1;
+      const materials = Array.isArray(child.material)
+        ? child.material
+        : [child.material];
+
+      child.material = materials.map((material) => {
+        const clonedMaterial = material.clone();
+        clonedMaterial.transparent = opacity < 1;
+        clonedMaterial.opacity = opacity;
+        clonedMaterial.needsUpdate = true;
+        return clonedMaterial;
+      }) as THREE.Material | THREE.Material[];
+    });
+
+    return clone;
+  }, [scene, entity.opacity]);
+
+  useFrame(() => {
+    if (!groupRef.current) return;
+
+    const visible = entity.visible !== false;
+    const opacity = entity.opacity ?? 1;
+    const rotation = entity.rotation ?? [0, 0, 0];
+    const scale = entity.scale ?? [1, 1, 1];
+
+    groupRef.current.position.set(
+      entity.position[0],
+      entity.position[1],
+      entity.position[2]
+    );
+    groupRef.current.rotation.set(rotation[0], rotation[1], rotation[2]);
+    groupRef.current.scale.set(scale[0], scale[1], scale[2]);
+    groupRef.current.visible = visible && opacity > 0.01;
+
+    groupRef.current.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+
+      const materials = Array.isArray(child.material)
+        ? child.material
+        : [child.material];
+
+      for (const material of materials) {
+        material.transparent = opacity < 1;
+        material.opacity = opacity;
+        material.needsUpdate = true;
+      }
+    });
+  });
+
+  return (
+    <group ref={groupRef}>
+      <primitive object={clonedScene} />
+    </group>
+  );
+}
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
@@ -88,6 +157,11 @@ function EntityMesh({ entity }: { entity: Entity }) {
 
   if (entity.kind === "trigger") {
     return null;
+  }
+
+  if (entity.kind === "model") {
+    if (!entity.modelUrl) return null;
+    return <ModelEntity entity={entity} />;
   }
 
   if (entity.kind === "light") {

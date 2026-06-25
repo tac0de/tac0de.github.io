@@ -64,11 +64,21 @@ function addCeilingLight(
   color = "#ffe0a0",
   intensity = 1.25
 ) {
+  ctx.world.addModel({
+    id: `${id}_model`,
+    modelUrl: "/assets/models/ceiling_light.glb",
+    position: [0, 2.72, z],
+    scale: [1, 1, 1],
+    rotation: [0, 0, 0],
+    solid: false,
+  });
+
   ctx.world.addBox({
     id: `${id}_fixture`,
     position: [0, 2.72, z],
     size: [1.35, 0.08, 0.34],
     color: "#343843",
+    opacity: 0,
     solid: false,
   });
 
@@ -225,7 +235,12 @@ function addSilentInteraction(
 }
 
 function setStalkerOpacity(ctx: GameContext, opacity: number) {
-  const ids = ["stalker_body", "stalker_head", "stalker_blade"];
+  const ids = [
+    "stalker_body",
+    "stalker_head",
+    "stalker_blade",
+    "stalker_static_model",
+  ];
 
   for (const id of ids) {
     const entity = ctx.world.getEntity(id);
@@ -357,11 +372,21 @@ export const fogCorridorGame: GameDefinition = {
     addBloodStain(ctx, "stain_2", [-1.1, 0.02, -19.5], [1.9, 0.03, 0.75]);
     addBloodStain(ctx, "stain_3", [1.5, 0.02, -29.5], [2.4, 0.03, 0.55]);
 
+    ctx.world.addModel({
+      id: "breaker_box_model",
+      modelUrl: "/assets/models/breaker_box.glb",
+      position: [4.18, 0.15, -18.7],
+      scale: [1.05, 1.05, 1.05],
+      rotation: [0, Math.PI / 2, 0],
+      solid: false,
+    });
+
     ctx.world.addBox({
       id: "breaker_panel",
       position: [4.25, 1.2, -18.7],
       size: [0.28, 1.2, 0.85],
       color: "#333841",
+      opacity: 0,
       solid: false,
     });
 
@@ -383,11 +408,21 @@ export const fogCorridorGame: GameDefinition = {
       solid: false,
     });
 
+    ctx.world.addModel({
+      id: "fuse_model",
+      modelUrl: "/assets/models/fuse.glb",
+      position: [-2.2, 0.9, 2],
+      scale: [1.35, 1.35, 1.35],
+      rotation: [0, 0, 0],
+      solid: false,
+    });
+
     ctx.world.addBox({
       id: "fuse",
       position: [-2.2, 1.05, 2],
       size: [0.35, 0.18, 0.18],
       color: "#d5bd5f",
+      opacity: 0,
       solid: false,
     });
 
@@ -401,11 +436,21 @@ export const fogCorridorGame: GameDefinition = {
       solid: false,
     });
 
+    ctx.world.addModel({
+      id: "red_door_model",
+      modelUrl: "/assets/models/rusty_door.glb",
+      position: [0, 0, -34.72],
+      scale: [1.7, 1.7, 1.7],
+      rotation: [0, 0, 0],
+      solid: false,
+    });
+
     ctx.world.addDoor({
       id: "red_door",
       position: [0, 1.15, -34.8],
       size: [3.1, 2.3, 0.35],
       color: "#6a1c1c",
+      opacity: 0,
       solid: true,
     });
 
@@ -471,6 +516,16 @@ export const fogCorridorGame: GameDefinition = {
       solid: false,
     });
 
+    ctx.world.addModel({
+      id: "stalker_static_model",
+      modelUrl: "/assets/models/stalker.glb",
+      position: [0, 0, -30.5],
+      scale: [1.05, 1.05, 1.05],
+      rotation: [0, 0, 0],
+      opacity: 0.24,
+      solid: false,
+    });
+
     ctx.world.addBox({
       id: "stalker_body",
       position: [0, 1.0, -30.5],
@@ -509,12 +564,16 @@ export const fogCorridorGame: GameDefinition = {
       solid: false,
     });
 
-    addMonsterPart(ctx, "monster_body", [0, 0.35, 0], [0.75, 1.45, 0.42]);
-    addMonsterPart(ctx, "monster_head", [0, 1.25, -0.02], [0.48, 0.42, 0.42]);
-    addMonsterPart(ctx, "monster_arm_l", [-0.58, 0.35, 0], [0.22, 1.25, 0.22]);
-    addMonsterPart(ctx, "monster_arm_r", [0.58, 0.35, 0], [0.22, 1.25, 0.22]);
-    addMonsterPart(ctx, "monster_leg_l", [-0.22, -0.65, 0], [0.25, 0.9, 0.25]);
-    addMonsterPart(ctx, "monster_leg_r", [0.22, -0.65, 0], [0.25, 0.9, 0.25]);
+    ctx.world.addModel({
+      id: "monster_model",
+      modelUrl: "/assets/models/stalker.glb",
+      position: [0, -100, 0],
+      scale: [1.08, 1.08, 1.08],
+      rotation: [0, 0, 0],
+      opacity: 0,
+      solid: false,
+      userData: { monsterOffset: [0, 0, 0] },
+    });
 
     ctx.world.addTrigger({
       id: "trigger_shadow_door",
@@ -545,6 +604,12 @@ export const fogCorridorGame: GameDefinition = {
       if (fuse) {
         fuse.opacity = 0;
         fuse.solid = false;
+      }
+
+      const fuseModel = ctx.world.getEntity("fuse_model");
+      if (fuseModel) {
+        fuseModel.opacity = 0;
+        fuseModel.solid = false;
       }
 
       setLight(ctx, "fuse_glow", 0);
@@ -593,6 +658,8 @@ export const fogCorridorGame: GameDefinition = {
         if (stalkerHead) stalkerHead.opacity = 0.62;
         if (stalkerBlade) stalkerBlade.opacity = 0.65;
         if (stalkerBacklight) stalkerBacklight.intensity = 1.8;
+        const stalkerStaticModel = ctx.world.getEntity("stalker_static_model");
+        if (stalkerStaticModel) stalkerStaticModel.opacity = 0.72;
 
         state.stalkerSeen = true;
         ctx.ui.setObjective("Open the red door.");
@@ -623,11 +690,19 @@ export const fogCorridorGame: GameDefinition = {
         if (stalkerHead) stalkerHead.opacity = 0;
         if (stalkerBlade) stalkerBlade.opacity = 0;
         if (stalkerBacklight) stalkerBacklight.intensity = 0;
+        const stalkerStaticModel = ctx.world.getEntity("stalker_static_model");
+        if (stalkerStaticModel) stalkerStaticModel.opacity = 0;
 
         const door = ctx.world.getEntity("red_door");
         if (door) {
           door.opacity = 0;
           door.solid = false;
+        }
+
+        const doorModel = ctx.world.getEntity("red_door_model");
+        if (doorModel) {
+          doorModel.opacity = 0;
+          doorModel.solid = false;
         }
 
         setOpacity(ctx, "exit_white_gap", 0.9);
@@ -723,6 +798,7 @@ export const fogCorridorGame: GameDefinition = {
       const stalkerHead = ctx.world.getEntity("stalker_head");
       const stalkerBlade = ctx.world.getEntity("stalker_blade");
       const stalkerBacklight = ctx.world.getEntity("stalker_backlight");
+      const stalkerStaticModel = ctx.world.getEntity("stalker_static_model");
 
       const pulse = 0.52 + Math.sin(t * 3.5) * 0.12;
       const sway = Math.sin(t * 1.4) * 0.18;
@@ -744,6 +820,11 @@ export const fogCorridorGame: GameDefinition = {
 
       if (stalkerBacklight) {
         stalkerBacklight.intensity = 1.4 + Math.sin(t * 5) * 0.35;
+      }
+
+      if (stalkerStaticModel) {
+        stalkerStaticModel.opacity = pulse + 0.12;
+        stalkerStaticModel.position = [sway, 0, -30.5];
       }
     }
 
