@@ -1,0 +1,64 @@
+{
+  "run_id": "2026-06-26T08-45-24-059Z",
+  "repo": "serialized-novel",
+  "input": "Replace hero border with clipped edge waves and simplify CTA motion",
+  "normalized_task": {
+    "type": "refactor",
+    "risk": "low",
+    "input": "Replace hero border with clipped edge waves and simplify CTA motion",
+    "allowed_files": [
+      "src/**",
+      "tests/**",
+      "public/**",
+      "scripts/**",
+      "docs/**",
+      "README.md",
+      "astro.config.*",
+      "tailwind.config.*",
+      "tsconfig.json",
+      "package.json",
+      "package-lock.json",
+      "AGENTS.md",
+      ".gitignore",
+      "index.html",
+      "vite.config.ts",
+      "dtp.config.json",
+      "evals/**",
+      "traces/**"
+    ],
+    "blocked_files": [
+      ".env",
+      ".env.*",
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      ".next/**"
+    ],
+    "done_when": [
+      "npm run verify"
+    ],
+    "human_gate": [
+      ".github/**",
+      "firebase/**",
+      "next.config.*"
+    ]
+  },
+  "changed_files": [
+    "src/layouts/BaseLayout.astro",
+    "src/pages/[lang]/episodes/[slug].astro",
+    "src/pages/[lang]/index.astro",
+    "src/scripts/siteMotion.ts",
+    "src/styles/global.css"
+  ],
+  "commands": [
+    {
+      "command": "npm run verify",
+      "exit_code": 0,
+      "stdout_tail": "\n> serialized-novel@0.1.0 verify\n> node scripts/verify.mjs\n\n\n> serialized-novel@0.1.0 build\n> astro build\n\n17:45:23 [content] Syncing content\n17:45:23 [content] Synced content\n17:45:23 [types] Generated 167ms\n17:45:23 [build] output: \"static\"\n17:45:23 [build] mode: \"static\"\n17:45:23 [build] directory: /Users/wonyoung_choi/projects/gh-portfolio/dist/\n17:45:23 [build] Collecting build info...\n17:45:23 [build] ✓ Completed in 174ms.\n17:45:23 [build] Building static entrypoints...\n17:45:23 [vite] ✓ built in 121ms\n17:45:24 [vite] ✓ built in 24ms\n17:45:24 [build] Rearranging server assets...\n\n generating static routes \n17:45:24   ├─ /ko/about/index.html (+4ms) \n17:45:24   ├─ /en/about/index.html (+1ms) \n17:45:24   ├─ /ko/episodes/001/index.html (+1ms) \n17:45:24   ├─ /ko/episodes/002/index.html (+1ms) \n17:45:24   ├─ /ko/episodes/003/index.html (+1ms) \n17:45:24   ├─ /en/episodes/001/index.html (+1ms) \n17:45:24   ├─ /en/episodes/002/index.html (+1ms) \n17:45:24   ├─ /en/episodes/003/index.html (+1ms) \n17:45:24   ├─ /ko/episodes/index.html (+1ms) \n17:45:24   ├─ /en/episodes/index.html (+1ms) \n17:45:24   ├─ /ko/index.html (+1ms) \n17:45:24   ├─ /en/index.html (+0ms) \n17:45:24   ├─ /index.html (+1ms) \n17:45:24 ✓ Completed in 21ms.\n\n17:45:24 [build] ✓ Completed in 177ms.\n17:45:24 [build] 13 page(s) built in 354ms\n17:45:24 [build] Complete!\n",
+      "stderr_tail": ""
+    }
+  ],
+  "status": "pass",
+  "remaining_risks": [],
+  "violations": []
+}

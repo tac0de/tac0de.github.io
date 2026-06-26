@@ -17,6 +17,7 @@ const {
 const basePath = `/${lang}`;
 const alternateLang = lang === "ko" ? "en" : "ko";
 const alternateLabel = lang === "ko" ? "EN" : "KO";
+const isEpisodeDetail = /^\/(ko|en)\/episodes\/[^/]+\/?$/.test(Astro.url.pathname);
 ---
 
 <!doctype html>
@@ -27,10 +28,11 @@ const alternateLabel = lang === "ko" ? "EN" : "KO";
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
   </head>
-  <body class="bg-night text-bone antialiased">
+  <body class={`bg-night text-bone antialiased ${isEpisodeDetail ? "is-reading-page" : "is-flow-page"}`}>
     <div class="fixed left-0 top-0 z-50 h-0.5 w-full origin-left scale-x-0 bg-ember" data-reading-progress></div>
     <div class="scroll-aura fixed inset-0 z-0 pointer-events-none opacity-0" data-scroll-aura></div>
     <div class="anomaly-field fixed inset-0 z-0 pointer-events-none opacity-0" data-anomaly-field></div>
+    {!isEpisodeDetail && <div class="infinite-drift-field fixed inset-0 z-0 pointer-events-none" aria-hidden="true"></div>}
     <div class="min-h-screen">
       <header class="sticky top-0 z-40 border-b border-bone/10 bg-night/78 backdrop-blur-xl">
         <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">

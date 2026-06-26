@@ -101,6 +101,18 @@ body {
   transform: translate3d(0, 0, 0);
 }
 
+.infinite-drift-field {
+  opacity: 0.28;
+  background:
+    repeating-linear-gradient(115deg, transparent 0 34px, rgba(197, 155, 85, 0.055) 34px 35px, transparent 35px 92px),
+    repeating-linear-gradient(180deg, rgba(159, 185, 198, 0.035) 0 1px, transparent 1px 160px);
+  background-size:
+    280px 280px,
+    100% 320px;
+  animation: infinite-field-drift 28s linear infinite;
+  mask-image: linear-gradient(180deg, transparent 0%, black 16%, black 82%, transparent 100%);
+}
+
 .hero-visual {
   filter:
     contrast(var(--hero-contrast))
@@ -143,108 +155,70 @@ body {
   clip-path: polygon(2% 26%, 100% 4%, 98% 48%, 0 88%);
 }
 
-.hero-edge-frame {
+.hero-edge-waves {
   --edge-x: 50%;
   --edge-y: 50%;
   position: absolute;
-  inset: clamp(0.75rem, 1.6vw, 1.5rem);
+  inset: 0;
   z-index: 4;
   pointer-events: none;
-  opacity: 0.86;
+  opacity: 0.68;
   background:
-    radial-gradient(circle at var(--edge-x) var(--edge-y), rgba(197, 155, 85, 0.14), transparent 22rem),
-    linear-gradient(135deg, rgba(197, 155, 85, 0.07), transparent 34%, rgba(159, 185, 198, 0.06));
-  clip-path: polygon(0 0, 96% 0, 100% 4%, 100% 100%, 4% 100%, 0 96%);
+    radial-gradient(circle at var(--edge-x) var(--edge-y), rgba(197, 155, 85, 0.16), transparent 20rem),
+    linear-gradient(135deg, rgba(197, 155, 85, 0.055), transparent 38%, rgba(159, 185, 198, 0.05));
 }
 
-.hero-edge {
+.hero-wave {
   position: absolute;
-  opacity: 0.74;
-  background-size: 220% 100%;
-  background-image: linear-gradient(90deg, transparent, rgba(197, 155, 85, 0.72), rgba(159, 185, 198, 0.42), transparent);
-  filter: drop-shadow(0 0 12px rgba(197, 155, 85, 0.28));
-  animation: edge-wave 7.5s ease-in-out infinite;
+  opacity: 0.68;
+  filter: blur(0.1px) drop-shadow(0 0 18px rgba(197, 155, 85, 0.18));
+  background:
+    radial-gradient(circle at 12% 50%, rgba(197, 155, 85, 0.35), transparent 0.7rem),
+    linear-gradient(90deg, transparent, rgba(197, 155, 85, 0.28), rgba(159, 185, 198, 0.22), transparent);
+  background-size: 260% 100%;
+  animation: clipped-edge-wave 8.5s ease-in-out infinite;
 }
 
-.hero-edge-top,
-.hero-edge-bottom {
-  left: 0;
-  right: 0;
-  height: 1px;
+.hero-wave-top,
+.hero-wave-bottom {
+  left: -3%;
+  right: -3%;
+  height: clamp(3rem, 8vw, 6.5rem);
 }
 
-.hero-edge-top {
-  top: 0;
+.hero-wave-top {
+  top: -1px;
+  clip-path: polygon(0 0, 100% 0, 100% 34%, 86% 48%, 68% 29%, 49% 43%, 31% 30%, 12% 45%, 0 31%);
 }
 
-.hero-edge-bottom {
-  bottom: 0;
-  animation-delay: -3.2s;
+.hero-wave-bottom {
+  bottom: -1px;
+  clip-path: polygon(0 69%, 13% 52%, 32% 71%, 52% 57%, 69% 73%, 88% 54%, 100% 67%, 100% 100%, 0 100%);
+  animation-delay: -3.4s;
 }
 
-.hero-edge-left,
-.hero-edge-right {
-  top: 0;
-  bottom: 0;
-  width: 1px;
-  background-size: 100% 220%;
-  background-image: linear-gradient(180deg, transparent, rgba(197, 155, 85, 0.7), rgba(159, 185, 198, 0.36), transparent);
-  animation-name: edge-wave-vertical;
+.hero-wave-left,
+.hero-wave-right {
+  top: -3%;
+  bottom: -3%;
+  width: clamp(3rem, 7vw, 6rem);
+  background:
+    radial-gradient(circle at 50% 12%, rgba(197, 155, 85, 0.32), transparent 0.7rem),
+    linear-gradient(180deg, transparent, rgba(197, 155, 85, 0.22), rgba(159, 185, 198, 0.18), transparent);
+  background-size: 100% 260%;
+  animation-name: clipped-edge-wave-vertical;
 }
 
-.hero-edge-left {
-  left: 0;
-  animation-delay: -1.6s;
-}
-
-.hero-edge-right {
-  right: 0;
-  animation-delay: -4.4s;
-}
-
-.hero-corner {
-  position: absolute;
-  width: clamp(2.6rem, 7vw, 6rem);
-  height: clamp(2.6rem, 7vw, 6rem);
-  opacity: 0.88;
-  border-color: rgba(197, 155, 85, 0.64);
-  filter: drop-shadow(0 0 16px rgba(197, 155, 85, 0.24));
-  animation: corner-breathe 5.8s ease-in-out infinite;
-}
-
-.hero-corner-tl {
-  top: 0;
-  left: 0;
-  border-top: 1px solid;
-  border-left: 1px solid;
-  border-top-left-radius: 22px 34px;
-}
-
-.hero-corner-tr {
-  top: 0;
-  right: 0;
-  border-top: 1px solid;
-  border-right: 1px solid;
-  border-top-right-radius: 34px 22px;
+.hero-wave-left {
+  left: -1px;
+  clip-path: polygon(0 0, 35% 0, 51% 14%, 33% 31%, 48% 50%, 31% 68%, 45% 86%, 32% 100%, 0 100%);
   animation-delay: -1.8s;
 }
 
-.hero-corner-br {
-  right: 0;
-  bottom: 0;
-  border-right: 1px solid;
-  border-bottom: 1px solid;
-  border-bottom-right-radius: 22px 34px;
-  animation-delay: -3s;
-}
-
-.hero-corner-bl {
-  bottom: 0;
-  left: 0;
-  border-bottom: 1px solid;
-  border-left: 1px solid;
-  border-bottom-left-radius: 34px 22px;
-  animation-delay: -4.2s;
+.hero-wave-right {
+  right: -1px;
+  clip-path: polygon(67% 0, 100% 0, 100% 100%, 69% 100%, 52% 84%, 70% 68%, 54% 50%, 72% 32%, 55% 13%);
+  animation-delay: -5.1s;
 }
 
 .hero-scanline {
@@ -328,74 +302,12 @@ body {
 
 .chapter-cta-primary {
   position: relative;
+  isolation: isolate;
   background:
     radial-gradient(circle at 85% 20%, rgba(197, 155, 85, 0.18), transparent 18rem),
     linear-gradient(135deg, rgba(197, 155, 85, 0.12), rgba(233, 223, 205, 0.025) 46%, rgba(182, 59, 49, 0.08)),
     linear-gradient(180deg, rgba(16, 18, 22, 0.98), rgba(7, 9, 13, 0.98));
-}
-
-.chapter-gate-panel {
-  position: absolute;
-  inset-block: 0;
-  z-index: 1;
-  width: 51%;
-  pointer-events: none;
-  opacity: 0.72;
-  background:
-    linear-gradient(90deg, rgba(233, 223, 205, 0.08), transparent 34%),
-    repeating-linear-gradient(90deg, rgba(197, 155, 85, 0.09) 0 1px, transparent 1px 18px),
-    linear-gradient(180deg, rgba(7, 9, 13, 0.82), rgba(15, 18, 22, 0.48));
-  transition:
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 280ms ease;
-}
-
-.chapter-gate-left {
-  left: 0;
-  border-right: 1px solid rgba(197, 155, 85, 0.28);
-}
-
-.chapter-gate-right {
-  right: 0;
-  border-left: 1px solid rgba(197, 155, 85, 0.28);
-  transform: scaleX(-1);
-}
-
-.chapter-gate-crack {
-  position: absolute;
-  inset-block: 10%;
-  left: 50%;
-  z-index: 2;
-  width: 1px;
-  pointer-events: none;
-  background: linear-gradient(180deg, transparent, rgba(197, 155, 85, 0.92), rgba(182, 59, 49, 0.62), transparent);
-  box-shadow:
-    0 0 22px rgba(197, 155, 85, 0.48),
-    0 0 44px rgba(182, 59, 49, 0.22);
-  transform: translateX(-50%) scaleY(0.72);
-  transition:
-    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 260ms ease;
-}
-
-.chapter-cta-primary:hover .chapter-gate-left,
-.chapter-cta-primary:focus-visible .chapter-gate-left {
-  transform: translateX(-7%);
-  opacity: 0.5;
-}
-
-.chapter-cta-primary:hover .chapter-gate-right,
-.chapter-cta-primary:focus-visible .chapter-gate-right {
-  transform: translateX(7%) scaleX(-1);
-  opacity: 0.5;
-}
-
-.chapter-cta-primary:hover .chapter-gate-crack,
-.chapter-cta-primary:focus-visible .chapter-gate-crack {
-  transform: translateX(-50%) scaleY(1);
-  box-shadow:
-    0 0 32px rgba(197, 155, 85, 0.68),
-    0 0 70px rgba(182, 59, 49, 0.34);
+  animation: cta-breathe 5.8s ease-in-out infinite;
 }
 
 .chapter-cta-primary::after {
@@ -404,37 +316,14 @@ body {
   inset: 0;
   pointer-events: none;
   opacity: 0.55;
-  background: linear-gradient(120deg, transparent 0%, rgba(233, 223, 205, 0.11) 48%, transparent 58%);
+  z-index: 1;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(197, 155, 85, 0.18), transparent 14rem),
+    linear-gradient(120deg, transparent 0%, rgba(233, 223, 205, 0.13) 48%, transparent 58%);
   transform: translateX(-45%);
-  transition: transform 420ms ease;
+  animation: cta-sheen-loop 6.6s ease-in-out infinite;
 }
 
-.chapter-cta-primary:hover::after {
-  transform: translateX(45%);
-}
-
-.chapter-cta-primary:hover {
-  animation: chapter-gate 520ms steps(2, end);
-}
-
-@keyframes chapter-gate {
-  0% {
-    filter: none;
-    transform: translateY(0);
-  }
-  18% {
-    filter: contrast(1.18) saturate(1.22);
-    transform: translateY(-1px) skewX(-0.35deg);
-  }
-  36% {
-    filter: brightness(0.88) contrast(1.28);
-    transform: translateY(0) skewX(0.28deg);
-  }
-  100% {
-    filter: none;
-    transform: translateY(0);
-  }
-}
 
 @keyframes scanline-drift {
   0% {
@@ -465,43 +354,76 @@ body {
   }
 }
 
-@keyframes edge-wave {
+@keyframes clipped-edge-wave {
   0%,
   100% {
     background-position: 0% 50%;
-    opacity: 0.48;
-    transform: scaleX(0.98);
+    opacity: 0.34;
+    transform: translateY(0) scaleX(0.98);
   }
   50% {
     background-position: 100% 50%;
-    opacity: 0.9;
-    transform: scaleX(1);
+    opacity: 0.78;
+    transform: translateY(0.35rem) scaleX(1.02);
   }
 }
 
-@keyframes edge-wave-vertical {
+@keyframes clipped-edge-wave-vertical {
   0%,
   100% {
     background-position: 50% 0%;
-    opacity: 0.46;
-    transform: scaleY(0.98);
+    opacity: 0.3;
+    transform: translateX(0) scaleY(0.98);
   }
   50% {
     background-position: 50% 100%;
-    opacity: 0.88;
-    transform: scaleY(1);
+    opacity: 0.72;
+    transform: translateX(0.32rem) scaleY(1.02);
   }
 }
 
-@keyframes corner-breathe {
+@keyframes cta-breathe {
   0%,
   100% {
-    opacity: 0.42;
-    transform: scale(0.98);
+    box-shadow:
+      0 24px 90px rgba(0, 0, 0, 0.28),
+      0 0 0 rgba(197, 155, 85, 0);
+    filter: brightness(1);
   }
   50% {
-    opacity: 0.9;
-    transform: scale(1.02);
+    box-shadow:
+      0 28px 105px rgba(0, 0, 0, 0.32),
+      0 0 34px rgba(197, 155, 85, 0.12);
+    filter: brightness(1.05);
+  }
+}
+
+@keyframes cta-sheen-loop {
+  0%,
+  58% {
+    transform: translateX(-55%);
+    opacity: 0.2;
+  }
+  74% {
+    opacity: 0.62;
+  }
+  92%,
+  100% {
+    transform: translateX(55%);
+    opacity: 0.18;
+  }
+}
+
+@keyframes infinite-field-drift {
+  0% {
+    background-position:
+      0 0,
+      0 0;
+  }
+  100% {
+    background-position:
+      0 560px,
+      0 640px;
   }
 }
 

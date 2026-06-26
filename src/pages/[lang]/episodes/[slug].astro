@@ -47,18 +47,12 @@ const next = currentIndex >= 0 ? episodes[currentIndex + 1] : undefined;
     <nav data-reveal class="chapter-cta mt-16 border-t border-bone/12 pt-8">
       {next ? (
         <a class="chapter-cta-primary group block overflow-hidden rounded-md border border-brass/35 p-6 shadow-[0_24px_90px_rgba(0,0,0,0.28)] transition hover:border-brass/80 md:p-8" href={`/${lang}/episodes/${next.id}/`}>
-          <span class="chapter-gate-panel chapter-gate-left" aria-hidden="true"></span>
-          <span class="chapter-gate-panel chapter-gate-right" aria-hidden="true"></span>
-          <span class="chapter-gate-crack" aria-hidden="true"></span>
           <span class="relative z-10 block text-sm font-semibold uppercase tracking-[0.2em] text-brass">{t.continueReading}</span>
           <span class="relative z-10 mt-3 block font-serif text-3xl leading-tight text-bone md:text-4xl">{next.data.title}</span>
           <span class="relative z-10 mt-4 block text-sm text-bone/52">{t.continueHint}</span>
         </a>
       ) : (
         <a class="chapter-cta-primary group block overflow-hidden rounded-md border border-brass/30 p-6 shadow-[0_24px_90px_rgba(0,0,0,0.22)] transition hover:border-brass/70 md:p-8" href={`/${lang}/episodes/`}>
-          <span class="chapter-gate-panel chapter-gate-left" aria-hidden="true"></span>
-          <span class="chapter-gate-panel chapter-gate-right" aria-hidden="true"></span>
-          <span class="chapter-gate-crack" aria-hidden="true"></span>
           <span class="relative z-10 block text-sm font-semibold uppercase tracking-[0.2em] text-brass">{t.noNextEpisode}</span>
           <span class="relative z-10 mt-3 block font-serif text-3xl leading-tight text-bone md:text-4xl">{t.returnToArchive}</span>
         </a>

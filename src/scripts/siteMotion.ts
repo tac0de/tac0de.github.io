@@ -152,17 +152,9 @@ if (!reduceMotion) {
     once: true,
     onEnter: (elements) => {
       elements.forEach((element) => {
-        const left = element.querySelector(".chapter-gate-left");
-        const right = element.querySelector(".chapter-gate-right");
-        const crack = element.querySelector(".chapter-gate-crack");
-
         gsap.timeline()
           .fromTo(element, { y: 22, autoAlpha: 0.82 }, { y: 0, autoAlpha: 1, duration: 0.52, ease: "power3.out" })
-          .to(left, { xPercent: -5, duration: 0.22, ease: "power2.out" }, "-=0.18")
-          .to(right, { xPercent: 5, duration: 0.22, ease: "power2.out" }, "<")
-          .to(crack, { scaleY: 1.08, duration: 0.18, ease: "power2.out" }, "<")
-          .to([left, right], { xPercent: 0, duration: 0.5, ease: "power3.out" })
-          .to(crack, { scaleY: 0.72, duration: 0.46, ease: "power3.out" }, "<");
+          .fromTo(element, { filter: "brightness(1.18) saturate(1.12)" }, { filter: "brightness(1) saturate(1)", duration: 0.9, ease: "power3.out" }, "-=0.18");
       });
     }
   });
