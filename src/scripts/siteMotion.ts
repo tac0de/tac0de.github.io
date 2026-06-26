@@ -69,15 +69,30 @@ if (!reduceMotion) {
     }
   });
 
-  ScrollTrigger.batch(".reader-copy p", {
-    start: "top 88%",
-    once: true,
-    onEnter: (elements) => {
-      gsap.fromTo(
-        elements,
-        { autoAlpha: 0.18, y: 22 },
-        { autoAlpha: 1, y: 0, duration: 0.72, ease: "power2.out", stagger: 0.04 }
-      );
+  const aura = document.querySelector<HTMLElement>("[data-scroll-aura]");
+
+  if (aura) {
+    gsap.to(aura, {
+      autoAlpha: 0.85,
+      yPercent: -8,
+      ease: "none",
+      scrollTrigger: {
+        trigger: document.body,
+        start: "top top",
+        end: "bottom bottom",
+        scrub: 0.8
+      }
+    });
+  }
+
+  gsap.to(document.body, {
+    "--memory-glow": 1,
+    ease: "none",
+    scrollTrigger: {
+      trigger: document.body,
+      start: "top top",
+      end: "bottom bottom",
+      scrub: 0.8
     }
   });
 }

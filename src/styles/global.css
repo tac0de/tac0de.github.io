@@ -26,6 +26,7 @@
 body {
   margin: 0;
   min-width: 320px;
+  --memory-glow: 0;
   background:
     linear-gradient(90deg, rgba(233, 223, 205, 0.045) 1px, transparent 1px),
     linear-gradient(180deg, #07090d 0%, #101216 48%, #08090c 100%);
@@ -46,6 +47,20 @@ body {
   font-size: 1.1rem;
 }
 
+.reader-surface {
+  position: relative;
+}
+
+.reader-surface::before {
+  content: "";
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 2px;
+  pointer-events: none;
+  opacity: calc(0.18 + var(--memory-glow) * 0.26);
+  background: linear-gradient(180deg, transparent, rgba(197, 155, 85, 0.75), transparent);
+}
+
 .reader-copy-ko {
   font-family: var(--font-serif-ko);
   letter-spacing: 0;
@@ -64,6 +79,13 @@ body {
 .reader-copy-en :where(p) {
   margin-block: 1.48rem;
   line-height: 1.78;
+}
+
+.scroll-aura {
+  background:
+    radial-gradient(circle at 18% 24%, rgba(197, 155, 85, 0.16), transparent 24rem),
+    radial-gradient(circle at 84% 70%, rgba(159, 185, 198, 0.12), transparent 28rem);
+  mix-blend-mode: screen;
 }
 
 .surface-grain {
@@ -97,6 +119,29 @@ body {
     linear-gradient(180deg, rgba(11, 14, 18, 0.74), rgba(7, 9, 13, 0.9));
 }
 
+.chapter-cta-primary {
+  position: relative;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(197, 155, 85, 0.18), transparent 18rem),
+    linear-gradient(135deg, rgba(197, 155, 85, 0.12), rgba(233, 223, 205, 0.025) 46%, rgba(182, 59, 49, 0.08)),
+    linear-gradient(180deg, rgba(16, 18, 22, 0.98), rgba(7, 9, 13, 0.98));
+}
+
+.chapter-cta-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background: linear-gradient(120deg, transparent 0%, rgba(233, 223, 205, 0.11) 48%, transparent 58%);
+  transform: translateX(-45%);
+  transition: transform 420ms ease;
+}
+
+.chapter-cta-primary:hover::after {
+  transform: translateX(45%);
+}
+
 .fracture-mask {
   clip-path: polygon(0 0, 94% 0, 100% 14%, 96% 100%, 6% 100%, 0 88%);
 }
@@ -104,8 +149,7 @@ body {
 [data-reveal],
 [data-episode-card],
 [data-memory-shard],
-[data-scroll-reveal],
-.reader-copy :where(p) {
+[data-scroll-reveal] {
   will-change: transform, opacity;
 }
 

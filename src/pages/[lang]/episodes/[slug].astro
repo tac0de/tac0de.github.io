@@ -44,23 +44,27 @@ const next = currentIndex >= 0 ? episodes[currentIndex + 1] : undefined;
     <div data-reveal class={`reading-flow reader-copy prose prose-invert mt-10 max-w-none font-serif ${lang === "ko" ? "reader-copy-ko" : "reader-copy-en"}`}>
       <Content />
     </div>
-    <nav data-reveal class="mt-16 grid gap-3 border-t border-bone/12 pt-8 md:grid-cols-2">
-      {previous ? (
-        <a class="metal-panel rounded-md border border-bone/12 p-5 transition hover:border-brass/60" href={`/${lang}/episodes/${previous.id}/`}>
-          <p class="text-sm font-semibold text-cold">{t.previousEpisode}</p>
-          <p class="mt-2 font-serif text-xl text-bone">{previous.data.title}</p>
-        </a>
-      ) : (
-        <div class="rounded-md border border-bone/8 p-5 text-bone/36">{t.noPreviousEpisode}</div>
-      )}
+    <nav data-reveal class="chapter-cta mt-16 border-t border-bone/12 pt-8">
       {next ? (
-        <a class="metal-panel rounded-md border border-bone/12 p-5 text-right transition hover:border-brass/60" href={`/${lang}/episodes/${next.id}/`}>
-          <p class="text-sm font-semibold text-cold">{t.nextEpisode}</p>
-          <p class="mt-2 font-serif text-xl text-bone">{next.data.title}</p>
+        <a class="chapter-cta-primary group block overflow-hidden rounded-md border border-brass/35 p-6 shadow-[0_24px_90px_rgba(0,0,0,0.28)] transition hover:border-brass/80 md:p-8" href={`/${lang}/episodes/${next.id}/`}>
+          <span class="text-sm font-semibold uppercase tracking-[0.2em] text-brass">{t.continueReading}</span>
+          <span class="mt-3 block font-serif text-3xl leading-tight text-bone md:text-4xl">{next.data.title}</span>
+          <span class="mt-4 block text-sm text-bone/52">{t.continueHint}</span>
         </a>
       ) : (
-        <div class="rounded-md border border-bone/8 p-5 text-right text-bone/36">{t.noNextEpisode}</div>
+        <a class="chapter-cta-primary group block overflow-hidden rounded-md border border-brass/30 p-6 shadow-[0_24px_90px_rgba(0,0,0,0.22)] transition hover:border-brass/70 md:p-8" href={`/${lang}/episodes/`}>
+          <span class="text-sm font-semibold uppercase tracking-[0.2em] text-brass">{t.noNextEpisode}</span>
+          <span class="mt-3 block font-serif text-3xl leading-tight text-bone md:text-4xl">{t.returnToArchive}</span>
+        </a>
       )}
+      <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm">
+        {previous ? (
+          <a class="text-bone/48 transition hover:text-bone" href={`/${lang}/episodes/${previous.id}/`}>{t.previousEpisode}: {previous.data.title}</a>
+        ) : (
+          <span class="text-bone/32">{t.noPreviousEpisode}</span>
+        )}
+        <a class="font-semibold text-brass transition hover:text-bone" href={`/${lang}/episodes/`}>{t.returnToArchive}</a>
+      </div>
     </nav>
   </article>
 </BaseLayout>

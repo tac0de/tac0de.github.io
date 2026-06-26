@@ -16,6 +16,7 @@ This repo is a static Astro web project for serialized long-form fiction.
 - Prefer direct implementation over broad planning.
 - Avoid recreating large docs or frameworks unless requested.
 - Verify with the smallest useful command first, usually `npm run build` or `npm run verify`.
+- In final chat outputs, include a concise "다음 추천 3가지" section.
 
 ## Constraints
 
