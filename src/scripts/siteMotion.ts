@@ -159,18 +159,6 @@ if (!reduceMotion) {
     }
   });
 
-  ScrollTrigger.batch("[data-archive-record]", {
-    start: "top 88%",
-    once: true,
-    onEnter: (elements) => {
-      gsap.fromTo(
-        elements,
-        { autoAlpha: 0, x: 28, filter: "brightness(0.78)" },
-        { autoAlpha: 1, x: 0, filter: "brightness(1)", duration: 0.78, ease: "power3.out", stagger: 0.06 }
-      );
-    }
-  });
-
   gsap.utils.toArray<HTMLElement>(".memory-interference").forEach((sentence) => {
     gsap.fromTo(
       sentence,
@@ -269,6 +257,22 @@ if (!reduceMotion) {
     };
 
     window.setTimeout(pulseHero, gsap.utils.random(14000, 34000));
+  }
+
+  if (heroRift) {
+    const pulseRift = () => {
+      gsap.timeline({
+        onComplete: () => {
+          window.setTimeout(pulseRift, gsap.utils.random(9000, 21000));
+        }
+      })
+        .to(document.body, { "--rift-burst": 1, "--rift-shear": "16px", duration: 0.045, ease: "none" })
+        .to(document.body, { "--rift-shear": "-10px", duration: 0.05, ease: "none" })
+        .to(document.body, { "--rift-burst": 0.18, "--rift-shear": "5px", duration: 0.08, ease: "none" })
+        .to(document.body, { "--rift-burst": 0, "--rift-shear": "0px", duration: 0.18, ease: "power3.out" });
+    };
+
+    window.setTimeout(pulseRift, 1800);
   }
 }
 
