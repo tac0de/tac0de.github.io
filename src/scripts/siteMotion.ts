@@ -39,6 +39,7 @@ if (!reduceMotion) {
 
   const heroVisual = document.querySelector<HTMLElement>("[data-hero-visual]");
   const heroCopy = document.querySelector<HTMLElement>("[data-hero-copy]");
+  const heroStage = document.querySelector<HTMLElement>("[data-hero-stage]");
   const heroSlices = gsap.utils.toArray<HTMLElement>("[data-hero-slice]");
   const heroLiquids = gsap.utils.toArray<HTMLElement>("[data-hero-liquid]");
 
@@ -91,17 +92,55 @@ if (!reduceMotion) {
   if (heroLiquids.length > 0) {
     heroLiquids.forEach((liquid, index) => {
       gsap.to(liquid, {
-        x: index % 2 === 0 ? 22 : -18,
-        y: index % 2 === 0 ? -16 : 14,
-        scaleX: index % 2 === 0 ? 1.1 : 0.94,
-        scaleY: index % 2 === 0 ? 0.93 : 1.12,
-        rotation: index % 2 === 0 ? 4 : -5,
+        borderRadius: index % 2 === 0 ? "58% 42% 54% 46% / 42% 58% 44% 56%" : "42% 58% 45% 55% / 56% 44% 58% 42%",
+        opacity: index === 0 ? 0.68 : 0.46,
         duration: 7 + index * 1.4,
         ease: "sine.inOut",
         repeat: -1,
         yoyo: true
       });
     });
+
+    if (heroStage) {
+      const liquidSetters = heroLiquids.map((liquid, index) => ({
+        x: gsap.quickTo(liquid, "x", { duration: 0.55 + index * 0.08, ease: "power3.out" }),
+        y: gsap.quickTo(liquid, "y", { duration: 0.55 + index * 0.08, ease: "power3.out" }),
+        scaleX: gsap.quickTo(liquid, "scaleX", { duration: 0.42, ease: "power2.out" }),
+        scaleY: gsap.quickTo(liquid, "scaleY", { duration: 0.42, ease: "power2.out" }),
+        rotate: gsap.quickTo(liquid, "rotation", { duration: 0.6, ease: "power2.out" })
+      }));
+
+      const moveLiquids = (event: PointerEvent) => {
+        const rect = heroStage.getBoundingClientRect();
+        const xRatio = (event.clientX - rect.left) / rect.width - 0.5;
+        const yRatio = (event.clientY - rect.top) / rect.height - 0.5;
+        const strength = event.pointerType === "touch" ? 0.72 : 1;
+
+        liquidSetters.forEach((setter, index) => {
+          const depth = (index + 1) / heroLiquids.length;
+          const direction = index % 2 === 0 ? 1 : -1;
+          setter.x(xRatio * (72 + index * 28) * strength * direction);
+          setter.y(yRatio * (46 + index * 18) * strength);
+          setter.scaleX(1 + Math.abs(xRatio) * 0.34 * depth);
+          setter.scaleY(1 + Math.abs(yRatio) * 0.28 * depth);
+          setter.rotate(xRatio * 8 * direction);
+        });
+      };
+
+      const resetLiquids = () => {
+        liquidSetters.forEach((setter) => {
+          setter.x(0);
+          setter.y(0);
+          setter.scaleX(1);
+          setter.scaleY(1);
+          setter.rotate(0);
+        });
+      };
+
+      heroStage.addEventListener("pointermove", moveLiquids, { passive: true });
+      heroStage.addEventListener("pointerleave", resetLiquids, { passive: true });
+      heroStage.addEventListener("pointercancel", resetLiquids, { passive: true });
+    }
   }
 
   const titleGlow = document.querySelector<HTMLElement>("[data-title-glow]");

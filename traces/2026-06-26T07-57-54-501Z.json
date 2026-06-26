@@ -1,0 +1,62 @@
+{
+  "run_id": "2026-06-26T07-57-54-501Z",
+  "repo": "serialized-novel",
+  "input": "Make hero liquid blobs visible and pointer responsive",
+  "normalized_task": {
+    "type": "unknown",
+    "risk": "low",
+    "input": "Make hero liquid blobs visible and pointer responsive",
+    "allowed_files": [
+      "src/**",
+      "tests/**",
+      "public/**",
+      "scripts/**",
+      "docs/**",
+      "README.md",
+      "astro.config.*",
+      "tailwind.config.*",
+      "tsconfig.json",
+      "package.json",
+      "package-lock.json",
+      "AGENTS.md",
+      ".gitignore",
+      "index.html",
+      "vite.config.ts",
+      "dtp.config.json",
+      "evals/**",
+      "traces/**"
+    ],
+    "blocked_files": [
+      ".env",
+      ".env.*",
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      ".next/**"
+    ],
+    "done_when": [
+      "npm run verify"
+    ],
+    "human_gate": [
+      ".github/**",
+      "firebase/**",
+      "next.config.*"
+    ]
+  },
+  "changed_files": [
+    "src/pages/[lang]/index.astro",
+    "src/scripts/siteMotion.ts",
+    "src/styles/global.css"
+  ],
+  "commands": [
+    {
+      "command": "npm run verify",
+      "exit_code": 0,
+      "stdout_tail": "\n> serialized-novel@0.1.0 verify\n> node scripts/verify.mjs\n\n\n> serialized-novel@0.1.0 build\n> astro build\n\n16:57:54 [content] Syncing content\n16:57:54 [content] Synced content\n16:57:54 [types] Generated 247ms\n16:57:54 [build] output: \"static\"\n16:57:54 [build] mode: \"static\"\n16:57:54 [build] directory: /Users/wonyoung_choi/projects/gh-portfolio/dist/\n16:57:54 [build] Collecting build info...\n16:57:54 [build] ✓ Completed in 256ms.\n16:57:54 [build] Building static entrypoints...\n16:57:54 [vite] ✓ built in 158ms\n16:57:54 [vite] ✓ built in 30ms\n16:57:54 [build] Rearranging server assets...\n\n generating static routes \n16:57:54   ├─ /ko/about/index.html (+5ms) \n16:57:54   ├─ /en/about/index.html (+1ms) \n16:57:54   ├─ /ko/episodes/001/index.html (+1ms) \n16:57:54   ├─ /ko/episodes/002/index.html (+1ms) \n16:57:54   ├─ /ko/episodes/003/index.html (+1ms) \n16:57:54   ├─ /en/episodes/001/index.html (+1ms) \n16:57:54   ├─ /en/episodes/002/index.html (+1ms) \n16:57:54   ├─ /en/episodes/003/index.html (+1ms) \n16:57:54   ├─ /ko/episodes/index.html (+1ms) \n16:57:54   ├─ /en/episodes/index.html (+1ms) \n16:57:54   ├─ /ko/index.html (+1ms) \n16:57:54   ├─ /en/index.html (+0ms) \n16:57:54   ├─ /index.html (+1ms) \n16:57:54 ✓ Completed in 25ms.\n\n16:57:54 [build] ✓ Completed in 234ms.\n16:57:54 [build] 13 page(s) built in 494ms\n16:57:54 [build] Complete!\n",
+      "stderr_tail": ""
+    }
+  ],
+  "status": "pass",
+  "remaining_risks": [],
+  "violations": []
+}
