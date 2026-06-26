@@ -111,6 +111,47 @@ body {
   opacity: calc(0.7 - var(--hero-dropout) * 0.22);
 }
 
+.hero-slice {
+  position: absolute;
+  inset-inline: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  background-image: image-set(
+    url("/assets/krontium-hero-1600.webp") type("image/webp"),
+    url("/assets/krontium-hero.png") type("image/png")
+  );
+  background-size: cover;
+  background-position: center;
+  mix-blend-mode: screen;
+  filter: contrast(1.34) saturate(1.22) brightness(1.08);
+}
+
+.hero-slice-a {
+  top: 28%;
+  height: 9%;
+  clip-path: polygon(0 18%, 100% 0, 100% 54%, 0 88%);
+}
+
+.hero-slice-b {
+  top: 48%;
+  height: 12%;
+  clip-path: polygon(0 0, 96% 22%, 100% 70%, 4% 54%);
+}
+
+.hero-slice-c {
+  top: 69%;
+  height: 7%;
+  clip-path: polygon(2% 26%, 100% 4%, 98% 48%, 0 88%);
+}
+
+.hero-scanline {
+  z-index: 2;
+  background: linear-gradient(90deg, transparent, rgba(159, 185, 198, 0.8), rgba(182, 59, 49, 0.54), transparent);
+  box-shadow: 0 0 30px rgba(159, 185, 198, 0.32);
+  animation: scanline-drift 9s linear infinite;
+}
+
 .surface-grain {
   position: relative;
 }
@@ -132,6 +173,10 @@ body {
     0 0 96px rgba(159, 185, 198, 0.18);
 }
 
+.krontium-title::selection {
+  color: #07090d;
+}
+
 .memory-rule {
   background-image: linear-gradient(90deg, rgba(233, 223, 205, 0), rgba(197, 155, 85, 0.72), rgba(233, 223, 205, 0));
 }
@@ -142,12 +187,113 @@ body {
     linear-gradient(180deg, rgba(11, 14, 18, 0.74), rgba(7, 9, 13, 0.9));
 }
 
+.hero-primary-cta {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-primary-cta::after {
+  content: "";
+  position: absolute;
+  inset: -40% -80%;
+  opacity: 0.42;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 255, 255, 0.72) 50%, transparent 62%);
+  transform: translateX(-42%);
+  animation: cta-sweep 5.8s ease-in-out infinite;
+}
+
+.episode-fragment {
+  position: relative;
+}
+
+.episode-fragment::before {
+  content: "";
+  position: absolute;
+  inset: 14% auto 14% -1px;
+  width: 2px;
+  opacity: 0.42;
+  background: linear-gradient(180deg, transparent, rgba(197, 155, 85, 0.8), transparent);
+  transform: scaleY(0.6);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.episode-fragment:hover::before {
+  opacity: 0.9;
+  transform: scaleY(1);
+}
+
 .chapter-cta-primary {
   position: relative;
   background:
     radial-gradient(circle at 85% 20%, rgba(197, 155, 85, 0.18), transparent 18rem),
     linear-gradient(135deg, rgba(197, 155, 85, 0.12), rgba(233, 223, 205, 0.025) 46%, rgba(182, 59, 49, 0.08)),
     linear-gradient(180deg, rgba(16, 18, 22, 0.98), rgba(7, 9, 13, 0.98));
+}
+
+.chapter-gate-panel {
+  position: absolute;
+  inset-block: 0;
+  z-index: 1;
+  width: 51%;
+  pointer-events: none;
+  opacity: 0.72;
+  background:
+    linear-gradient(90deg, rgba(233, 223, 205, 0.08), transparent 34%),
+    repeating-linear-gradient(90deg, rgba(197, 155, 85, 0.09) 0 1px, transparent 1px 18px),
+    linear-gradient(180deg, rgba(7, 9, 13, 0.82), rgba(15, 18, 22, 0.48));
+  transition:
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 280ms ease;
+}
+
+.chapter-gate-left {
+  left: 0;
+  border-right: 1px solid rgba(197, 155, 85, 0.28);
+}
+
+.chapter-gate-right {
+  right: 0;
+  border-left: 1px solid rgba(197, 155, 85, 0.28);
+  transform: scaleX(-1);
+}
+
+.chapter-gate-crack {
+  position: absolute;
+  inset-block: 10%;
+  left: 50%;
+  z-index: 2;
+  width: 1px;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(197, 155, 85, 0.92), rgba(182, 59, 49, 0.62), transparent);
+  box-shadow:
+    0 0 22px rgba(197, 155, 85, 0.48),
+    0 0 44px rgba(182, 59, 49, 0.22);
+  transform: translateX(-50%) scaleY(0.72);
+  transition:
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms ease;
+}
+
+.chapter-cta-primary:hover .chapter-gate-left,
+.chapter-cta-primary:focus-visible .chapter-gate-left {
+  transform: translateX(-7%);
+  opacity: 0.5;
+}
+
+.chapter-cta-primary:hover .chapter-gate-right,
+.chapter-cta-primary:focus-visible .chapter-gate-right {
+  transform: translateX(7%) scaleX(-1);
+  opacity: 0.5;
+}
+
+.chapter-cta-primary:hover .chapter-gate-crack,
+.chapter-cta-primary:focus-visible .chapter-gate-crack {
+  transform: translateX(-50%) scaleY(1);
+  box-shadow:
+    0 0 32px rgba(197, 155, 85, 0.68),
+    0 0 70px rgba(182, 59, 49, 0.34);
 }
 
 .chapter-cta-primary::after {
@@ -188,6 +334,35 @@ body {
   }
 }
 
+@keyframes scanline-drift {
+  0% {
+    transform: translateY(-14vh);
+    opacity: 0;
+  }
+  10%,
+  46% {
+    opacity: 0.82;
+  }
+  64% {
+    opacity: 0.18;
+  }
+  100% {
+    transform: translateY(78vh);
+    opacity: 0;
+  }
+}
+
+@keyframes cta-sweep {
+  0%,
+  68% {
+    transform: translateX(-42%);
+  }
+  86%,
+  100% {
+    transform: translateX(42%);
+  }
+}
+
 .fracture-mask {
   clip-path: polygon(0 0, 94% 0, 100% 14%, 96% 100%, 6% 100%, 0 88%);
 }
@@ -195,7 +370,8 @@ body {
 [data-reveal],
 [data-episode-card],
 [data-memory-shard],
-[data-scroll-reveal] {
+[data-scroll-reveal],
+[data-hero-slice] {
   will-change: transform, opacity;
 }
 

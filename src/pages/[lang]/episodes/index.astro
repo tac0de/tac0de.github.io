@@ -25,7 +25,7 @@ const locale = lang === "ko" ? "ko-KR" : "en-US";
     <p data-reveal class="mt-4 text-sm font-medium text-brass/85">{t.cadence}</p>
     <div data-reveal class="mt-10 divide-y divide-bone/10 border-y border-bone/14">
       {episodes.map((episode) => (
-        <a data-episode-card data-scroll-reveal class="grid gap-3 px-1 py-7 md:grid-cols-[8rem_1fr_auto] md:gap-8" href={`${basePath}/episodes/${episode.id}/`}>
+        <a data-episode-card data-scroll-reveal class="episode-fragment grid gap-3 px-1 py-7 md:grid-cols-[8rem_1fr_auto] md:gap-8" href={`${basePath}/episodes/${episode.id}/`}>
           <p class="text-sm font-semibold text-cold">CHAPTER {String(episode.data.episode).padStart(2, "0")}</p>
           <div>
             <h2 class="font-serif text-2xl font-semibold text-bone">{episode.data.title}</h2>

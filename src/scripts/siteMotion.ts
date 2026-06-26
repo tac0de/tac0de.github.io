@@ -39,6 +39,7 @@ if (!reduceMotion) {
 
   const heroVisual = document.querySelector<HTMLElement>("[data-hero-visual]");
   const heroCopy = document.querySelector<HTMLElement>("[data-hero-copy]");
+  const heroSlices = gsap.utils.toArray<HTMLElement>("[data-hero-slice]");
 
   if (heroVisual && heroCopy) {
     const moveVisualX = gsap.quickTo(heroVisual, "x", { duration: 0.7, ease: "power3.out" });
@@ -59,6 +60,45 @@ if (!reduceMotion) {
     );
   }
 
+  if (heroSlices.length > 0) {
+    const slicePulse = (strong = false) => {
+      const distance = strong ? 34 : 18;
+      const alpha = strong ? 0.5 : 0.28;
+
+      gsap.timeline()
+        .set(heroSlices, { x: 0, autoAlpha: 0 })
+        .to(heroSlices, {
+          autoAlpha: alpha,
+          x: (index) => (index % 2 === 0 ? distance : -distance),
+          duration: 0.08,
+          ease: "none",
+          stagger: 0.025
+        })
+        .to(heroSlices, {
+          autoAlpha: 0,
+          x: 0,
+          duration: strong ? 0.22 : 0.16,
+          ease: "power3.out",
+          stagger: 0.02
+        });
+    };
+
+    window.setTimeout(() => slicePulse(true), 650);
+    window.setInterval(() => slicePulse(false), 9400);
+  }
+
+  const titleGlow = document.querySelector<HTMLElement>("[data-title-glow]");
+
+  if (titleGlow) {
+    gsap.to(titleGlow, {
+      textShadow: "0 0 42px rgba(197,155,85,0.48), 0 0 130px rgba(159,185,198,0.28)",
+      duration: 2.8,
+      ease: "sine.inOut",
+      repeat: -1,
+      yoyo: true
+    });
+  }
+
   ScrollTrigger.batch("[data-scroll-reveal]", {
     start: "top 84%",
     once: true,
@@ -68,6 +108,38 @@ if (!reduceMotion) {
         { autoAlpha: 0, y: 34 },
         { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.08 }
       );
+    }
+  });
+
+  ScrollTrigger.batch(".episode-fragment", {
+    start: "top 86%",
+    once: true,
+    onEnter: (elements) => {
+      gsap.fromTo(
+        elements,
+        { clipPath: "inset(0 0 0 14%)", filter: "brightness(0.84)" },
+        { clipPath: "inset(0 0 0 0%)", filter: "brightness(1)", duration: 0.72, ease: "power3.out", stagger: 0.08 }
+      );
+    }
+  });
+
+  ScrollTrigger.batch(".chapter-cta-primary", {
+    start: "top 82%",
+    once: true,
+    onEnter: (elements) => {
+      elements.forEach((element) => {
+        const left = element.querySelector(".chapter-gate-left");
+        const right = element.querySelector(".chapter-gate-right");
+        const crack = element.querySelector(".chapter-gate-crack");
+
+        gsap.timeline()
+          .fromTo(element, { y: 22, autoAlpha: 0.82 }, { y: 0, autoAlpha: 1, duration: 0.52, ease: "power3.out" })
+          .to(left, { xPercent: -5, duration: 0.22, ease: "power2.out" }, "-=0.18")
+          .to(right, { xPercent: 5, duration: 0.22, ease: "power2.out" }, "<")
+          .to(crack, { scaleY: 1.08, duration: 0.18, ease: "power2.out" }, "<")
+          .to([left, right], { xPercent: 0, duration: 0.5, ease: "power3.out" })
+          .to(crack, { scaleY: 0.72, duration: 0.46, ease: "power3.out" }, "<");
+      });
     }
   });
 

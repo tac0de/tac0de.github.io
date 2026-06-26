@@ -36,16 +36,20 @@ const locale = lang === "ko" ? "ko-KR" : "en-US";
         fetchpriority="high"
       />
     </picture>
+    <div class="hero-slice hero-slice-a" data-hero-slice></div>
+    <div class="hero-slice hero-slice-b" data-hero-slice></div>
+    <div class="hero-slice hero-slice-c" data-hero-slice></div>
     <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,9,13,0.92)_0%,rgba(7,9,13,0.62)_42%,rgba(7,9,13,0.10)_100%),linear-gradient(180deg,rgba(7,9,13,0.05)_0%,rgba(7,9,13,0.82)_100%)]"></div>
+    <div class="hero-scanline absolute inset-x-0 top-[18%] h-px opacity-80"></div>
     <div class="relative z-10 mx-auto grid max-w-7xl gap-12 px-5 pb-12 pt-14 md:grid-cols-[0.94fr_1.06fr] md:pb-16 md:pt-20 lg:pt-24">
       <div data-hero-copy class="flex min-h-[68svh] flex-col justify-center">
         <p data-reveal class="mb-5 text-sm font-semibold uppercase tracking-[0.22em] text-brass">{t.eyebrow}</p>
-        <h1 data-reveal class="krontium-title max-w-4xl font-serif text-6xl font-semibold leading-[0.9] text-bone md:text-8xl lg:text-9xl">Krontium</h1>
+        <h1 data-reveal class="krontium-title max-w-4xl font-serif text-6xl font-semibold leading-[0.9] text-bone md:text-8xl lg:text-9xl" data-title-glow>Krontium</h1>
         <div data-reveal class="memory-rule mt-7 h-px w-48"></div>
         <p data-reveal class="mt-7 max-w-2xl text-xl leading-9 text-bone/82 md:text-2xl md:leading-10">{t.heroLine1}</p>
         <p data-reveal class="mt-5 max-w-xl text-lg leading-8 text-cold/86">{t.heroLine2}</p>
         <div data-reveal class="mt-9 flex flex-wrap gap-3">
-          <a class="rounded-md bg-bone px-5 py-3 text-sm font-semibold text-ink shadow-[0_0_34px_rgba(197,155,85,0.22)] transition hover:bg-brass" href={`${basePath}/episodes/${latest.id}/`}>
+          <a class="hero-primary-cta rounded-md bg-bone px-5 py-3 text-sm font-semibold text-ink shadow-[0_0_34px_rgba(197,155,85,0.22)] transition hover:bg-brass" href={`${basePath}/episodes/${latest.id}/`}>
             {t.readLatest}
           </a>
           <a class="rounded-md border border-bone/24 bg-night/40 px-5 py-3 text-sm font-semibold text-bone transition hover:border-brass/70" href={`${basePath}/episodes/`}>
