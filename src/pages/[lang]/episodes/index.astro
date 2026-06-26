@@ -1,0 +1,37 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { collectionsByLanguage, copy, formatReadingTime, isLanguage, languages } from "../../../i18n";
+import "../../../styles/global.css";
+
+export function getStaticPaths() {
+  return languages.map((lang) => ({ params: { lang } }));
+}
+
+const lang = isLanguage(Astro.params.lang) ? Astro.params.lang : "ko";
+const t = copy[lang];
+const collection = collectionsByLanguage[lang];
+const episodes = (await getCollection(collection, ({ data }) => data.status === "published"))
+  .sort((a, b) => a.data.episode - b.data.episode);
+const basePath = `/${lang}`;
+---
+
+<BaseLayout title={t.episodesTitle} description={t.description} lang={lang} navEpisodes={t.navEpisodes} navAbout={t.navAbout}>
+  <section class="mx-auto max-w-5xl px-5 py-14 md:py-20">
+    <p data-reveal class="text-sm font-semibold uppercase tracking-[0.2em] text-brass">{t.archiveEyebrow}</p>
+    <h1 data-reveal class="mt-3 font-serif text-5xl font-semibold text-bone">{t.archiveTitle}</h1>
+    <p data-reveal class="mt-5 max-w-2xl leading-8 text-bone/62">{t.episodesIntro}</p>
+    <div data-reveal class="mt-10 divide-y divide-bone/10 border-y border-bone/14">
+      {episodes.map((episode) => (
+        <a data-episode-card class="grid gap-3 px-1 py-7 md:grid-cols-[7rem_1fr_auto] md:gap-8" href={`${basePath}/episodes/${episode.id}/`}>
+          <p class="text-sm font-semibold text-cold">LEVY {String(episode.data.episode).padStart(2, "0")}</p>
+          <div>
+            <h2 class="font-serif text-2xl font-semibold text-bone">{episode.data.title}</h2>
+            <p class="mt-2 leading-7 text-bone/62">{episode.data.description}</p>
+          </div>
+          <p class="text-sm text-bone/45 md:pt-2">{formatReadingTime(lang, episode.data.readingMinutes)}</p>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

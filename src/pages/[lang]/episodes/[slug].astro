@@ -1,0 +1,42 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import { collectionsByLanguage, copy, formatReadingTime, isLanguage, languages } from "../../../i18n";
+import "../../../styles/global.css";
+
+export async function getStaticPaths() {
+  const paths = [];
+
+  for (const lang of languages) {
+    const episodes = await getCollection(collectionsByLanguage[lang], ({ data }) => data.status === "published");
+    paths.push(
+      ...episodes.map((episode) => ({
+        params: { lang, slug: episode.id },
+        props: { episode, lang }
+      }))
+    );
+  }
+
+  return paths;
+}
+
+const lang = isLanguage(Astro.props.lang) ? Astro.props.lang : "ko";
+const { episode } = Astro.props;
+const t = copy[lang];
+const { Content } = await render(episode);
+---
+
+<BaseLayout title={`${episode.data.title} | Krontium`} description={episode.data.description} lang={lang} navEpisodes={t.navEpisodes} navAbout={t.navAbout}>
+  <article class="mx-auto max-w-3xl px-5 py-12 md:py-20">
+    <a data-reveal class="text-sm font-semibold text-brass hover:text-bone" href={`/${lang}/episodes/`}>{t.backEpisodes}</a>
+    <header data-reveal class="mt-8 border-b border-bone/12 pb-8">
+      <p class="text-sm font-semibold text-cold">LEVY {String(episode.data.episode).padStart(2, "0")}</p>
+      <h1 class="mt-3 font-serif text-4xl font-semibold leading-tight text-bone md:text-6xl">{episode.data.title}</h1>
+      <p class="mt-5 leading-7 text-bone/62">{episode.data.description}</p>
+      <p class="mt-5 text-sm text-bone/45">{formatReadingTime(lang, episode.data.readingMinutes)}</p>
+    </header>
+    <div data-reveal class="reading-flow prose prose-invert prose-lg mt-10 max-w-none font-serif prose-p:my-7 prose-p:leading-9 prose-p:text-bone/84">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

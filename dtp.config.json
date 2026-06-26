@@ -1,0 +1,42 @@
+{
+  "$schema": "./schemas/dtp.config.schema.json",
+  "project": "serialized-novel",
+  "verify": "npm run verify",
+  "allowed_paths": [
+    "src/**",
+    "tests/**",
+    "public/**",
+    "scripts/**",
+    "docs/**",
+    "README.md",
+    "astro.config.*",
+    "tailwind.config.*",
+    "tsconfig.json",
+    "package.json",
+    "package-lock.json",
+    "AGENTS.md",
+    ".gitignore",
+    "index.html",
+    "vite.config.ts",
+    "dtp.config.json",
+    "evals/**",
+    "traces/**"
+  ],
+  "blocked_paths": [
+    ".env",
+    ".env.*",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".next/**"
+  ],
+  "approval_required": [
+    ".github/**",
+    "firebase/**",
+    "next.config.*"
+  ],
+  "trace_dir": "traces",
+  "eval_cases": "evals/cases.json",
+  "max_files_changed_without_review": 60,
+  "max_repair_attempts": 2
+}

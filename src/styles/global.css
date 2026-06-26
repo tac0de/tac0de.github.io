@@ -1,0 +1,93 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: Inter, Pretendard, system-ui, sans-serif;
+  --font-serif: Literata, "Noto Serif KR", Georgia, serif;
+  --color-ink: #0b0e12;
+  --color-paper: #f4efe4;
+  --color-line: #3b4248;
+  --color-moss: #7f988a;
+  --color-wine: #7f2534;
+  --color-brass: #c59b55;
+  --color-night: #07090d;
+  --color-bone: #e9dfcd;
+  --color-ember: #b63b31;
+  --color-cold: #9fb9c6;
+}
+
+:root {
+  color-scheme: dark;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    linear-gradient(90deg, rgba(233, 223, 205, 0.045) 1px, transparent 1px),
+    linear-gradient(180deg, #07090d 0%, #101216 48%, #08090c 100%);
+  background-size: 72px 72px, auto;
+}
+
+::selection {
+  background: color-mix(in srgb, #b63b31 42%, transparent);
+}
+
+.reading-flow {
+  font-kerning: normal;
+  line-break: strict;
+  word-break: keep-all;
+}
+
+.surface-grain {
+  position: relative;
+}
+
+.surface-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.42;
+  background-image:
+    radial-gradient(circle at 25% 20%, rgba(197, 155, 85, 0.16), transparent 18rem),
+    radial-gradient(circle at 80% 10%, rgba(159, 185, 198, 0.14), transparent 22rem);
+}
+
+.krontium-title {
+  text-shadow:
+    0 0 34px rgba(197, 155, 85, 0.26),
+    0 0 96px rgba(159, 185, 198, 0.18);
+}
+
+.memory-rule {
+  background-image: linear-gradient(90deg, rgba(233, 223, 205, 0), rgba(197, 155, 85, 0.72), rgba(233, 223, 205, 0));
+}
+
+.metal-panel {
+  background:
+    linear-gradient(135deg, rgba(233, 223, 205, 0.08), rgba(233, 223, 205, 0.02)),
+    linear-gradient(180deg, rgba(11, 14, 18, 0.74), rgba(7, 9, 13, 0.9));
+}
+
+.fracture-mask {
+  clip-path: polygon(0 0, 94% 0, 100% 14%, 96% 100%, 6% 100%, 0 88%);
+}
+
+[data-reveal],
+[data-episode-card],
+[data-memory-shard] {
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

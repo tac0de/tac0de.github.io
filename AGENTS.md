@@ -2,7 +2,7 @@
 
 ## Scope
 
-This repo is a static Three.js web project.
+This repo is a static Astro web project for serialized long-form fiction.
 
 ## Runtime
 
@@ -15,7 +15,7 @@ This repo is a static Three.js web project.
 - Keep changes narrowly scoped to the active request.
 - Prefer direct implementation over broad planning.
 - Avoid recreating large docs or frameworks unless requested.
-- Verify with the smallest useful command first, usually `npm run build`.
+- Verify with the smallest useful command first, usually `npm run build` or `npm run verify`.
 
 ## Constraints
 

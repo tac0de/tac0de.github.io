@@ -1,0 +1,51 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  lang?: "ko" | "en";
+  navEpisodes?: string;
+  navAbout?: string;
+}
+
+const {
+  title,
+  description = "Krontium: 신의 뼈에서 나온 금속과 기억을 세금으로 거두는 도시의 장편 연재",
+  lang = "ko",
+  navEpisodes = "연재 목록",
+  navAbout = "작품 소개"
+} = Astro.props;
+const basePath = `/${lang}`;
+const alternateLang = lang === "ko" ? "en" : "ko";
+const alternateLabel = lang === "ko" ? "EN" : "KO";
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-night text-bone antialiased">
+    <div class="fixed left-0 top-0 z-50 h-0.5 w-full origin-left scale-x-0 bg-ember" data-reading-progress></div>
+    <div class="min-h-screen">
+      <header class="sticky top-0 z-40 border-b border-bone/10 bg-night/78 backdrop-blur-xl">
+        <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
+          <a href={`${basePath}/`} class="font-serif text-xl font-semibold tracking-normal text-bone">Krontium</a>
+          <div class="flex items-center gap-5 text-sm font-medium text-bone/62">
+            <a class="hover:text-bone" href={`${basePath}/episodes/`}>{navEpisodes}</a>
+            <a class="hover:text-bone" href={`${basePath}/about/`}>{navAbout}</a>
+            <a class="rounded-full border border-bone/15 px-3 py-1 text-xs font-semibold text-bone/72 hover:border-brass/60 hover:text-bone" href={`/${alternateLang}/`}>{alternateLabel}</a>
+          </div>
+        </nav>
+      </header>
+      <main>
+        <slot />
+      </main>
+    </div>
+    <script>
+      import "../scripts/siteMotion.ts";
+    </script>
+  </body>
+</html>
