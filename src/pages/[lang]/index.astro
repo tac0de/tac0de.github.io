@@ -16,6 +16,7 @@ const episodes = (await getCollection(collection, ({ data }) => data.status === 
 const latest = episodes[0];
 const basePath = `/${lang}`;
 const locale = lang === "ko" ? "ko-KR" : "en-US";
+const taxStream = [...t.taxStream, ...t.taxStream];
 ---
 
 <BaseLayout title={t.title} description={t.description} lang={lang} navEpisodes={t.navEpisodes} navAbout={t.navAbout}>
@@ -39,11 +40,17 @@ const locale = lang === "ko" ? "ko-KR" : "en-US";
     <div class="hero-slice hero-slice-a" data-hero-slice></div>
     <div class="hero-slice hero-slice-b" data-hero-slice></div>
     <div class="hero-slice hero-slice-c" data-hero-slice></div>
+    <div class="hero-memory-rift" data-hero-rift aria-hidden="true"></div>
     <div class="hero-edge-waves" data-hero-edge-frame aria-hidden="true">
       <span class="hero-wave hero-wave-top"></span>
       <span class="hero-wave hero-wave-right"></span>
       <span class="hero-wave hero-wave-bottom"></span>
       <span class="hero-wave hero-wave-left"></span>
+    </div>
+    <div class="memory-tax-stream" aria-hidden="true">
+      <div class="tax-stream-track">
+        {taxStream.map((item) => <span>{item}</span>)}
+      </div>
     </div>
     <div class="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,9,13,0.92)_0%,rgba(7,9,13,0.62)_42%,rgba(7,9,13,0.10)_100%),linear-gradient(180deg,rgba(7,9,13,0.05)_0%,rgba(7,9,13,0.82)_100%)]"></div>
     <div class="hero-scanline absolute inset-x-0 top-[18%] h-px opacity-80"></div>
@@ -86,10 +93,10 @@ const locale = lang === "ko" ? "ko-KR" : "en-US";
         <h2 class="mt-6 font-serif text-3xl font-semibold leading-tight text-bone">{latest.data.title}</h2>
         <p class="mt-4 leading-7 text-bone/68">{latest.data.description}</p>
         <p class="mt-7 text-sm text-cold/60">{latest.data.publishedAt.toLocaleDateString(locale)}</p>
-        <div class="mt-8 grid grid-cols-3 gap-2 text-xs uppercase tracking-[0.16em] text-bone/46">
-          <span data-memory-shard class="border border-bone/10 px-3 py-2">birth</span>
-          <span data-memory-shard class="border border-bone/10 px-3 py-2">name</span>
-          <span data-memory-shard class="border border-ember/30 px-3 py-2 text-ember">oath</span>
+        <div class="memory-shard-grid mt-8 grid grid-cols-3 gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-bone/54">
+          {t.memoryShards.map((item, index) => (
+            <span data-memory-shard class={`memory-shard-chip ${index === 2 ? "memory-shard-danger" : ""}`}>{item}</span>
+          ))}
         </div>
       </aside>
     </div>

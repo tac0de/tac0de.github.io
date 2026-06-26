@@ -29,6 +29,18 @@ const isEpisodeDetail = /^\/(ko|en)\/episodes\/[^/]+\/?$/.test(Astro.url.pathnam
     <title>{title}</title>
   </head>
   <body class={`bg-night text-bone antialiased ${isEpisodeDetail ? "is-reading-page" : "is-flow-page"}`}>
+    <svg class="pointer-events-none fixed h-0 w-0" aria-hidden="true" focusable="false">
+      <filter id="krontium-goo">
+        <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+        <feColorMatrix
+          in="blur"
+          mode="matrix"
+          values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -8"
+          result="goo"
+        />
+        <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+      </filter>
+    </svg>
     <div class="fixed left-0 top-0 z-50 h-0.5 w-full origin-left scale-x-0 bg-ember" data-reading-progress></div>
     <div class="scroll-aura fixed inset-0 z-0 pointer-events-none opacity-0" data-scroll-aura></div>
     <div class="anomaly-field fixed inset-0 z-0 pointer-events-none opacity-0" data-anomaly-field></div>

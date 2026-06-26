@@ -42,6 +42,7 @@ if (!reduceMotion) {
   const heroStage = document.querySelector<HTMLElement>("[data-hero-stage]");
   const heroSlices = gsap.utils.toArray<HTMLElement>("[data-hero-slice]");
   const heroEdgeFrame = document.querySelector<HTMLElement>("[data-hero-edge-frame]");
+  const heroRift = document.querySelector<HTMLElement>("[data-hero-rift]");
 
   if (heroVisual && heroCopy && !isMobile) {
     const moveVisualX = gsap.quickTo(heroVisual, "x", { duration: 0.7, ease: "power3.out" });
@@ -92,6 +93,8 @@ if (!reduceMotion) {
   if (heroStage && heroEdgeFrame) {
     const setEdgeX = gsap.quickTo(heroEdgeFrame, "--edge-x", { duration: 0.45, ease: "power3.out" });
     const setEdgeY = gsap.quickTo(heroEdgeFrame, "--edge-y", { duration: 0.45, ease: "power3.out" });
+    const setRiftX = heroRift ? gsap.quickTo(heroRift, "--rift-x", { duration: 0.7, ease: "power3.out" }) : undefined;
+    const setRiftY = heroRift ? gsap.quickTo(heroRift, "--rift-y", { duration: 0.7, ease: "power3.out" }) : undefined;
 
     const moveEdgeLight = (event: PointerEvent) => {
       const rect = heroStage.getBoundingClientRect();
@@ -99,11 +102,15 @@ if (!reduceMotion) {
       const y = Math.min(Math.max(((event.clientY - rect.top) / rect.height) * 100, 0), 100);
       setEdgeX(`${x}%`);
       setEdgeY(`${y}%`);
+      setRiftX?.(`${x}%`);
+      setRiftY?.(`${y}%`);
     };
 
     const resetEdgeLight = () => {
       setEdgeX("50%");
       setEdgeY("50%");
+      setRiftX?.("52%");
+      setRiftY?.("42%");
     };
 
     heroStage.addEventListener("pointermove", moveEdgeLight, { passive: true });
