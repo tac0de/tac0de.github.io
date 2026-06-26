@@ -27,10 +27,17 @@ body {
   margin: 0;
   min-width: 320px;
   --memory-glow: 0;
+  --anomaly: 0;
+  --hero-dropout: 0;
+  --hero-contrast: 1;
   background:
     linear-gradient(90deg, rgba(233, 223, 205, 0.045) 1px, transparent 1px),
     linear-gradient(180deg, #07090d 0%, #101216 48%, #08090c 100%);
   background-size: 72px 72px, auto;
+  filter:
+    contrast(calc(1 + var(--anomaly) * 0.09))
+    saturate(calc(1 + var(--anomaly) * 0.12))
+    brightness(calc(1 - var(--anomaly) * 0.035));
 }
 
 ::selection {
@@ -88,6 +95,22 @@ body {
   mix-blend-mode: screen;
 }
 
+.anomaly-field {
+  background:
+    linear-gradient(180deg, transparent 0 18%, rgba(182, 59, 49, 0.14) 18.4%, transparent 18.8% 54%, rgba(159, 185, 198, 0.12) 54.3%, transparent 54.7%),
+    repeating-linear-gradient(0deg, rgba(233, 223, 205, 0.035) 0 1px, transparent 1px 7px);
+  mix-blend-mode: screen;
+  transform: translate3d(0, 0, 0);
+}
+
+.hero-visual {
+  filter:
+    contrast(var(--hero-contrast))
+    saturate(calc(0.92 + var(--anomaly) * 0.3))
+    brightness(calc(1 - var(--hero-dropout) * 0.22));
+  opacity: calc(0.7 - var(--hero-dropout) * 0.22);
+}
+
 .surface-grain {
   position: relative;
 }
@@ -140,6 +163,29 @@ body {
 
 .chapter-cta-primary:hover::after {
   transform: translateX(45%);
+}
+
+.chapter-cta-primary:hover {
+  animation: chapter-gate 520ms steps(2, end);
+}
+
+@keyframes chapter-gate {
+  0% {
+    filter: none;
+    transform: translateY(0);
+  }
+  18% {
+    filter: contrast(1.18) saturate(1.22);
+    transform: translateY(-1px) skewX(-0.35deg);
+  }
+  36% {
+    filter: brightness(0.88) contrast(1.28);
+    transform: translateY(0) skewX(0.28deg);
+  }
+  100% {
+    filter: none;
+    transform: translateY(0);
+  }
 }
 
 .fracture-mask {

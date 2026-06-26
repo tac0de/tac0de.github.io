@@ -2,6 +2,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isMobile = window.matchMedia("(max-width: 720px)").matches;
+const anomalyStrength = isMobile ? 0.42 : 1;
 
 if (!reduceMotion) {
   gsap.registerPlugin(ScrollTrigger);
@@ -95,6 +97,60 @@ if (!reduceMotion) {
       scrub: 0.8
     }
   });
+
+  [0.33, 0.66, 0.9].forEach((threshold) => {
+    ScrollTrigger.create({
+      trigger: document.body,
+      start: `${threshold * 100}% bottom`,
+      once: true,
+      onEnter: () => {
+        gsap.timeline()
+          .to(document.body, { "--anomaly": 0.75 * anomalyStrength, duration: 0.08, ease: "none" })
+          .to("[data-anomaly-field]", { autoAlpha: 0.56 * anomalyStrength, x: 8, duration: 0.08, ease: "none" }, "<")
+          .to(document.body, { "--anomaly": 0.18 * anomalyStrength, duration: 0.16, ease: "power2.out" })
+          .to("[data-anomaly-field]", { autoAlpha: 0, x: 0, duration: 0.18, ease: "power2.out" }, "<")
+          .to(document.body, { "--anomaly": 0, duration: 0.18, ease: "power2.out" });
+      }
+    });
+  });
+
+  const pulseAnomaly = () => {
+    gsap.timeline({
+      onComplete: () => {
+        window.setTimeout(pulseAnomaly, gsap.utils.random(18000, 42000));
+      }
+    })
+      .to(document.body, { "--anomaly": 0.55 * anomalyStrength, duration: 0.05, ease: "none" })
+      .to("[data-anomaly-field]", { autoAlpha: 0.46 * anomalyStrength, x: -6, duration: 0.06, ease: "none" }, "<")
+      .to(document.body, { "--anomaly": 0, duration: 0.2, ease: "power3.out" })
+      .to("[data-anomaly-field]", { autoAlpha: 0, x: 0, duration: 0.18, ease: "power3.out" }, "<");
+  };
+
+  window.setTimeout(pulseAnomaly, gsap.utils.random(12000, 26000));
+
+  if (heroVisual) {
+    const pulseHero = () => {
+      gsap.timeline({
+        onComplete: () => {
+          window.setTimeout(pulseHero, gsap.utils.random(22000, 52000));
+        }
+      })
+        .to(document.body, {
+          "--hero-dropout": 1 * anomalyStrength,
+          "--hero-contrast": 1.24,
+          duration: 0.09,
+          ease: "none"
+        })
+        .to(document.body, {
+          "--hero-dropout": 0,
+          "--hero-contrast": 1,
+          duration: 0.32,
+          ease: "power3.out"
+        });
+    };
+
+    window.setTimeout(pulseHero, gsap.utils.random(14000, 34000));
+  }
 }
 
 const progress = document.querySelector<HTMLElement>("[data-reading-progress]");
