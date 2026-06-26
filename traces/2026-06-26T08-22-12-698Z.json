@@ -1,0 +1,62 @@
+{
+  "run_id": "2026-06-26T08-22-12-698Z",
+  "repo": "serialized-novel",
+  "input": "Replace hero blobs with wave border treatment",
+  "normalized_task": {
+    "type": "unknown",
+    "risk": "low",
+    "input": "Replace hero blobs with wave border treatment",
+    "allowed_files": [
+      "src/**",
+      "tests/**",
+      "public/**",
+      "scripts/**",
+      "docs/**",
+      "README.md",
+      "astro.config.*",
+      "tailwind.config.*",
+      "tsconfig.json",
+      "package.json",
+      "package-lock.json",
+      "AGENTS.md",
+      ".gitignore",
+      "index.html",
+      "vite.config.ts",
+      "dtp.config.json",
+      "evals/**",
+      "traces/**"
+    ],
+    "blocked_files": [
+      ".env",
+      ".env.*",
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      ".next/**"
+    ],
+    "done_when": [
+      "npm run verify"
+    ],
+    "human_gate": [
+      ".github/**",
+      "firebase/**",
+      "next.config.*"
+    ]
+  },
+  "changed_files": [
+    "src/pages/[lang]/index.astro",
+    "src/scripts/siteMotion.ts",
+    "src/styles/global.css"
+  ],
+  "commands": [
+    {
+      "command": "npm run verify",
+      "exit_code": 0,
+      "stdout_tail": "\n> serialized-novel@0.1.0 verify\n> node scripts/verify.mjs\n\n\n> serialized-novel@0.1.0 build\n> astro build\n\n17:22:12 [content] Syncing content\n17:22:12 [content] Synced content\n17:22:12 [types] Generated 189ms\n17:22:12 [build] output: \"static\"\n17:22:12 [build] mode: \"static\"\n17:22:12 [build] directory: /Users/wonyoung_choi/projects/gh-portfolio/dist/\n17:22:12 [build] Collecting build info...\n17:22:12 [build] ✓ Completed in 195ms.\n17:22:12 [build] Building static entrypoints...\n17:22:12 [vite] ✓ built in 130ms\n17:22:12 [vite] ✓ built in 26ms\n17:22:12 [build] Rearranging server assets...\n\n generating static routes \n17:22:12   ├─ /ko/about/index.html (+5ms) \n17:22:12   ├─ /en/about/index.html (+1ms) \n17:22:12   ├─ /ko/episodes/001/index.html (+1ms) \n17:22:12   ├─ /ko/episodes/002/index.html (+1ms) \n17:22:12   ├─ /ko/episodes/003/index.html (+1ms) \n17:22:12   ├─ /en/episodes/001/index.html (+1ms) \n17:22:12   ├─ /en/episodes/002/index.html (+1ms) \n17:22:12   ├─ /en/episodes/003/index.html (+0ms) \n17:22:12   ├─ /ko/episodes/index.html (+1ms) \n17:22:12   ├─ /en/episodes/index.html (+1ms) \n17:22:12   ├─ /ko/index.html (+1ms) \n17:22:12   ├─ /en/index.html (+0ms) \n17:22:12   ├─ /index.html (+1ms) \n17:22:12 ✓ Completed in 22ms.\n\n17:22:12 [build] ✓ Completed in 190ms.\n17:22:12 [build] 13 page(s) built in 388ms\n17:22:12 [build] Complete!\n",
+      "stderr_tail": ""
+    }
+  ],
+  "status": "pass",
+  "remaining_risks": [],
+  "violations": []
+}

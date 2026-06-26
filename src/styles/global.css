@@ -143,46 +143,108 @@ body {
   clip-path: polygon(2% 26%, 100% 4%, 98% 48%, 0 88%);
 }
 
-.hero-liquid {
+.hero-edge-frame {
+  --edge-x: 50%;
+  --edge-y: 50%;
   position: absolute;
-  z-index: 3;
+  inset: clamp(0.75rem, 1.6vw, 1.5rem);
+  z-index: 4;
   pointer-events: none;
-  border-radius: 48% 52% 46% 54% / 58% 42% 55% 45%;
-  opacity: 0.58;
-  mix-blend-mode: plus-lighter;
-  transform: translate3d(0, 0, 0);
+  opacity: 0.86;
   background:
-    radial-gradient(circle at 34% 28%, rgba(233, 223, 205, 0.48), transparent 0.45rem),
-    radial-gradient(circle at 39% 46%, rgba(197, 155, 85, 0.5), transparent 44%),
-    radial-gradient(circle at 70% 66%, rgba(159, 185, 198, 0.36), transparent 50%),
-    radial-gradient(circle at 52% 52%, rgba(182, 59, 49, 0.24), transparent 62%);
-  box-shadow:
-    inset 0 0 42px rgba(233, 223, 205, 0.1),
-    0 0 72px rgba(197, 155, 85, 0.2);
-  filter: blur(0.4px) contrast(1.12) saturate(1.18);
+    radial-gradient(circle at var(--edge-x) var(--edge-y), rgba(197, 155, 85, 0.14), transparent 22rem),
+    linear-gradient(135deg, rgba(197, 155, 85, 0.07), transparent 34%, rgba(159, 185, 198, 0.06));
+  clip-path: polygon(0 0, 96% 0, 100% 4%, 100% 100%, 4% 100%, 0 96%);
 }
 
-.hero-liquid-a {
-  top: 14%;
-  right: 4%;
-  width: min(42vw, 34rem);
-  aspect-ratio: 1.25;
+.hero-edge {
+  position: absolute;
+  opacity: 0.74;
+  background-size: 220% 100%;
+  background-image: linear-gradient(90deg, transparent, rgba(197, 155, 85, 0.72), rgba(159, 185, 198, 0.42), transparent);
+  filter: drop-shadow(0 0 12px rgba(197, 155, 85, 0.28));
+  animation: edge-wave 7.5s ease-in-out infinite;
 }
 
-.hero-liquid-b {
-  bottom: 9%;
-  left: 31%;
-  width: min(34vw, 27rem);
-  aspect-ratio: 1.5;
-  opacity: 0.4;
+.hero-edge-top,
+.hero-edge-bottom {
+  left: 0;
+  right: 0;
+  height: 1px;
 }
 
-.hero-liquid-c {
-  top: 47%;
-  right: 24%;
-  width: min(24vw, 18rem);
-  aspect-ratio: 1;
-  opacity: 0.34;
+.hero-edge-top {
+  top: 0;
+}
+
+.hero-edge-bottom {
+  bottom: 0;
+  animation-delay: -3.2s;
+}
+
+.hero-edge-left,
+.hero-edge-right {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-size: 100% 220%;
+  background-image: linear-gradient(180deg, transparent, rgba(197, 155, 85, 0.7), rgba(159, 185, 198, 0.36), transparent);
+  animation-name: edge-wave-vertical;
+}
+
+.hero-edge-left {
+  left: 0;
+  animation-delay: -1.6s;
+}
+
+.hero-edge-right {
+  right: 0;
+  animation-delay: -4.4s;
+}
+
+.hero-corner {
+  position: absolute;
+  width: clamp(2.6rem, 7vw, 6rem);
+  height: clamp(2.6rem, 7vw, 6rem);
+  opacity: 0.88;
+  border-color: rgba(197, 155, 85, 0.64);
+  filter: drop-shadow(0 0 16px rgba(197, 155, 85, 0.24));
+  animation: corner-breathe 5.8s ease-in-out infinite;
+}
+
+.hero-corner-tl {
+  top: 0;
+  left: 0;
+  border-top: 1px solid;
+  border-left: 1px solid;
+  border-top-left-radius: 22px 34px;
+}
+
+.hero-corner-tr {
+  top: 0;
+  right: 0;
+  border-top: 1px solid;
+  border-right: 1px solid;
+  border-top-right-radius: 34px 22px;
+  animation-delay: -1.8s;
+}
+
+.hero-corner-br {
+  right: 0;
+  bottom: 0;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  border-bottom-right-radius: 22px 34px;
+  animation-delay: -3s;
+}
+
+.hero-corner-bl {
+  bottom: 0;
+  left: 0;
+  border-bottom: 1px solid;
+  border-left: 1px solid;
+  border-bottom-left-radius: 34px 22px;
+  animation-delay: -4.2s;
 }
 
 .hero-scanline {
@@ -400,6 +462,46 @@ body {
   86%,
   100% {
     transform: translateX(42%);
+  }
+}
+
+@keyframes edge-wave {
+  0%,
+  100% {
+    background-position: 0% 50%;
+    opacity: 0.48;
+    transform: scaleX(0.98);
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.9;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes edge-wave-vertical {
+  0%,
+  100% {
+    background-position: 50% 0%;
+    opacity: 0.46;
+    transform: scaleY(0.98);
+  }
+  50% {
+    background-position: 50% 100%;
+    opacity: 0.88;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes corner-breathe {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.02);
   }
 }
 

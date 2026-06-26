@@ -41,7 +41,7 @@ if (!reduceMotion) {
   const heroCopy = document.querySelector<HTMLElement>("[data-hero-copy]");
   const heroStage = document.querySelector<HTMLElement>("[data-hero-stage]");
   const heroSlices = gsap.utils.toArray<HTMLElement>("[data-hero-slice]");
-  const heroLiquids = gsap.utils.toArray<HTMLElement>("[data-hero-liquid]");
+  const heroEdgeFrame = document.querySelector<HTMLElement>("[data-hero-edge-frame]");
 
   if (heroVisual && heroCopy && !isMobile) {
     const moveVisualX = gsap.quickTo(heroVisual, "x", { duration: 0.7, ease: "power3.out" });
@@ -89,58 +89,26 @@ if (!reduceMotion) {
     window.setInterval(() => slicePulse(false), 9400);
   }
 
-  if (heroLiquids.length > 0) {
-    heroLiquids.forEach((liquid, index) => {
-      gsap.to(liquid, {
-        borderRadius: index % 2 === 0 ? "58% 42% 54% 46% / 42% 58% 44% 56%" : "42% 58% 45% 55% / 56% 44% 58% 42%",
-        opacity: index === 0 ? 0.68 : 0.46,
-        duration: 7 + index * 1.4,
-        ease: "sine.inOut",
-        repeat: -1,
-        yoyo: true
-      });
-    });
+  if (heroStage && heroEdgeFrame) {
+    const setEdgeX = gsap.quickTo(heroEdgeFrame, "--edge-x", { duration: 0.45, ease: "power3.out" });
+    const setEdgeY = gsap.quickTo(heroEdgeFrame, "--edge-y", { duration: 0.45, ease: "power3.out" });
 
-    if (heroStage) {
-      const liquidSetters = heroLiquids.map((liquid, index) => ({
-        x: gsap.quickTo(liquid, "x", { duration: 0.55 + index * 0.08, ease: "power3.out" }),
-        y: gsap.quickTo(liquid, "y", { duration: 0.55 + index * 0.08, ease: "power3.out" }),
-        scaleX: gsap.quickTo(liquid, "scaleX", { duration: 0.42, ease: "power2.out" }),
-        scaleY: gsap.quickTo(liquid, "scaleY", { duration: 0.42, ease: "power2.out" }),
-        rotate: gsap.quickTo(liquid, "rotation", { duration: 0.6, ease: "power2.out" })
-      }));
+    const moveEdgeLight = (event: PointerEvent) => {
+      const rect = heroStage.getBoundingClientRect();
+      const x = Math.min(Math.max(((event.clientX - rect.left) / rect.width) * 100, 0), 100);
+      const y = Math.min(Math.max(((event.clientY - rect.top) / rect.height) * 100, 0), 100);
+      setEdgeX(`${x}%`);
+      setEdgeY(`${y}%`);
+    };
 
-      const moveLiquids = (event: PointerEvent) => {
-        const rect = heroStage.getBoundingClientRect();
-        const xRatio = (event.clientX - rect.left) / rect.width - 0.5;
-        const yRatio = (event.clientY - rect.top) / rect.height - 0.5;
-        const strength = event.pointerType === "touch" ? 0.72 : 1;
+    const resetEdgeLight = () => {
+      setEdgeX("50%");
+      setEdgeY("50%");
+    };
 
-        liquidSetters.forEach((setter, index) => {
-          const depth = (index + 1) / heroLiquids.length;
-          const direction = index % 2 === 0 ? 1 : -1;
-          setter.x(xRatio * (72 + index * 28) * strength * direction);
-          setter.y(yRatio * (46 + index * 18) * strength);
-          setter.scaleX(1 + Math.abs(xRatio) * 0.34 * depth);
-          setter.scaleY(1 + Math.abs(yRatio) * 0.28 * depth);
-          setter.rotate(xRatio * 8 * direction);
-        });
-      };
-
-      const resetLiquids = () => {
-        liquidSetters.forEach((setter) => {
-          setter.x(0);
-          setter.y(0);
-          setter.scaleX(1);
-          setter.scaleY(1);
-          setter.rotate(0);
-        });
-      };
-
-      heroStage.addEventListener("pointermove", moveLiquids, { passive: true });
-      heroStage.addEventListener("pointerleave", resetLiquids, { passive: true });
-      heroStage.addEventListener("pointercancel", resetLiquids, { passive: true });
-    }
+    heroStage.addEventListener("pointermove", moveEdgeLight, { passive: true });
+    heroStage.addEventListener("pointerleave", resetEdgeLight, { passive: true });
+    heroStage.addEventListener("pointercancel", resetEdgeLight, { passive: true });
   }
 
   const titleGlow = document.querySelector<HTMLElement>("[data-title-glow]");
