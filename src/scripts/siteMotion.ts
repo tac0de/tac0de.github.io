@@ -41,7 +41,6 @@ if (!reduceMotion) {
   const heroCopy = document.querySelector<HTMLElement>("[data-hero-copy]");
   const heroStage = document.querySelector<HTMLElement>("[data-hero-stage]");
   const heroSlices = gsap.utils.toArray<HTMLElement>("[data-hero-slice]");
-  const heroEdgeFrame = document.querySelector<HTMLElement>("[data-hero-edge-frame]");
   const heroRift = document.querySelector<HTMLElement>("[data-hero-rift]");
 
   if (heroVisual && heroCopy && !isMobile) {
@@ -90,9 +89,7 @@ if (!reduceMotion) {
     window.setInterval(() => slicePulse(false), 9400);
   }
 
-  if (heroStage && heroEdgeFrame) {
-    const setEdgeX = gsap.quickTo(heroEdgeFrame, "--edge-x", { duration: 0.45, ease: "power3.out" });
-    const setEdgeY = gsap.quickTo(heroEdgeFrame, "--edge-y", { duration: 0.45, ease: "power3.out" });
+  if (heroStage && heroRift) {
     const setRiftX = heroRift ? gsap.quickTo(heroRift, "--rift-x", { duration: 0.7, ease: "power3.out" }) : undefined;
     const setRiftY = heroRift ? gsap.quickTo(heroRift, "--rift-y", { duration: 0.7, ease: "power3.out" }) : undefined;
 
@@ -100,15 +97,11 @@ if (!reduceMotion) {
       const rect = heroStage.getBoundingClientRect();
       const x = Math.min(Math.max(((event.clientX - rect.left) / rect.width) * 100, 0), 100);
       const y = Math.min(Math.max(((event.clientY - rect.top) / rect.height) * 100, 0), 100);
-      setEdgeX(`${x}%`);
-      setEdgeY(`${y}%`);
       setRiftX?.(`${x}%`);
       setRiftY?.(`${y}%`);
     };
 
     const resetEdgeLight = () => {
-      setEdgeX("50%");
-      setEdgeY("50%");
       setRiftX?.("52%");
       setRiftY?.("42%");
     };
@@ -176,19 +169,6 @@ if (!reduceMotion) {
         { autoAlpha: 1, x: 0, filter: "brightness(1)", duration: 0.78, ease: "power3.out", stagger: 0.06 }
       );
     }
-  });
-
-  gsap.utils.toArray<HTMLElement>("[data-archive-rail]").forEach((rail) => {
-    gsap.to(rail, {
-      yPercent: -4,
-      ease: "none",
-      scrollTrigger: {
-        trigger: rail,
-        start: "top bottom",
-        end: "bottom top",
-        scrub: 1.2
-      }
-    });
   });
 
   gsap.utils.toArray<HTMLElement>(".memory-interference").forEach((sentence) => {

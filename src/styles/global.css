@@ -196,49 +196,6 @@ body {
   animation: rift-current 13s ease-in-out infinite;
 }
 
-.hero-edge-waves {
-  --edge-x: 50%;
-  --edge-y: 50%;
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-  opacity: 0.86;
-  background:
-    radial-gradient(circle at var(--edge-x) var(--edge-y), rgba(197, 155, 85, 0.24), transparent 18rem),
-    linear-gradient(135deg, rgba(197, 155, 85, 0.09), transparent 38%, rgba(159, 185, 198, 0.08));
-  filter: url("#krontium-goo");
-}
-
-.hero-edge-waves::before,
-.hero-edge-waves::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.hero-edge-waves::before {
-  opacity: 0.62;
-  background:
-    radial-gradient(circle at 8% 18%, rgba(197, 155, 85, 0.48), transparent 4rem),
-    radial-gradient(circle at 92% 74%, rgba(159, 185, 198, 0.38), transparent 5rem),
-    repeating-linear-gradient(102deg, transparent 0 1.6rem, rgba(197, 155, 85, 0.26) 1.68rem 1.82rem, transparent 1.9rem 3.9rem);
-  mask:
-    linear-gradient(#000 0 0) top / 100% clamp(4rem, 10vw, 8rem) no-repeat,
-    linear-gradient(#000 0 0) bottom / 100% clamp(4rem, 10vw, 8rem) no-repeat,
-    linear-gradient(#000 0 0) left / clamp(3rem, 8vw, 6rem) 100% no-repeat,
-    linear-gradient(#000 0 0) right / clamp(3rem, 8vw, 6rem) 100% no-repeat;
-  animation: edge-current 10.5s ease-in-out infinite;
-}
-
-.hero-edge-waves::after {
-  opacity: 0.38;
-  background: linear-gradient(90deg, transparent, rgba(233, 223, 205, 0.34), transparent);
-  clip-path: polygon(0 16%, 14% 11%, 29% 18%, 45% 9%, 63% 17%, 81% 10%, 100% 15%, 100% 20%, 82% 17%, 65% 24%, 47% 16%, 30% 25%, 13% 18%, 0 23%);
-  animation: edge-flash 7.8s steps(1, end) infinite;
-}
-
 .memory-tax-stream {
   position: absolute;
   inset-inline: 0;
@@ -275,59 +232,6 @@ body {
   width: 1.25rem;
   height: 1px;
   background: linear-gradient(90deg, rgba(197, 155, 85, 0), rgba(197, 155, 85, 0.9));
-}
-
-.hero-wave {
-  position: absolute;
-  opacity: 0.78;
-  filter: drop-shadow(0 0 26px rgba(197, 155, 85, 0.28));
-  background:
-    radial-gradient(circle at 12% 50%, rgba(197, 155, 85, 0.48), transparent 0.85rem),
-    linear-gradient(90deg, transparent, rgba(197, 155, 85, 0.42), rgba(159, 185, 198, 0.32), transparent);
-  background-size: 260% 100%;
-  animation: clipped-edge-wave 8.5s ease-in-out infinite;
-}
-
-.hero-wave-top,
-.hero-wave-bottom {
-  left: -3%;
-  right: -3%;
-  height: clamp(3rem, 8vw, 6.5rem);
-}
-
-.hero-wave-top {
-  top: -1px;
-  clip-path: polygon(0 0, 100% 0, 100% 34%, 86% 48%, 68% 29%, 49% 43%, 31% 30%, 12% 45%, 0 31%);
-}
-
-.hero-wave-bottom {
-  bottom: -1px;
-  clip-path: polygon(0 69%, 13% 52%, 32% 71%, 52% 57%, 69% 73%, 88% 54%, 100% 67%, 100% 100%, 0 100%);
-  animation-delay: -3.4s;
-}
-
-.hero-wave-left,
-.hero-wave-right {
-  top: -3%;
-  bottom: -3%;
-  width: clamp(3rem, 7vw, 6rem);
-  background:
-    radial-gradient(circle at 50% 12%, rgba(197, 155, 85, 0.32), transparent 0.7rem),
-    linear-gradient(180deg, transparent, rgba(197, 155, 85, 0.22), rgba(159, 185, 198, 0.18), transparent);
-  background-size: 100% 260%;
-  animation-name: clipped-edge-wave-vertical;
-}
-
-.hero-wave-left {
-  left: -1px;
-  clip-path: polygon(0 0, 35% 0, 51% 14%, 33% 31%, 48% 50%, 31% 68%, 45% 86%, 32% 100%, 0 100%);
-  animation-delay: -1.8s;
-}
-
-.hero-wave-right {
-  right: -1px;
-  clip-path: polygon(67% 0, 100% 0, 100% 100%, 69% 100%, 52% 84%, 70% 68%, 54% 50%, 72% 32%, 55% 13%);
-  animation-delay: -5.1s;
 }
 
 .hero-scanline {
@@ -374,7 +278,7 @@ body {
 
 .archive-depth,
 .archive-page {
-  min-height: 150svh;
+  min-height: 190svh;
 }
 
 .archive-depth::before,
@@ -390,22 +294,28 @@ body {
   mask-image: linear-gradient(180deg, transparent, black 12%, black 88%, transparent);
 }
 
-.archive-rail,
-.archive-loop {
+.archive-loop-window {
   position: relative;
-  display: grid;
-  gap: clamp(0.9rem, 2vw, 1.2rem);
+  overflow: hidden;
+  min-height: 150svh;
+  max-height: 170svh;
   padding-block: 1rem;
+  mask-image: linear-gradient(180deg, transparent, black 7%, black 93%, transparent);
 }
 
-.archive-rail::before,
-.archive-loop::before {
+.archive-loop-window::before {
   content: "";
   position: absolute;
   inset: 0 auto 0 1.05rem;
   width: 1px;
   opacity: 0.62;
   background: linear-gradient(180deg, transparent, rgba(197, 155, 85, 0.55), rgba(159, 185, 198, 0.32), transparent);
+}
+
+.archive-loop-track {
+  display: grid;
+  gap: clamp(0.9rem, 2vw, 1.2rem);
+  animation: archive-loop-scroll 52s linear infinite;
 }
 
 .archive-record {
@@ -623,42 +533,6 @@ body {
   }
 }
 
-@keyframes edge-current {
-  0%,
-  100% {
-    background-position:
-      0 0,
-      0 0,
-      0 0;
-    transform: scale(1);
-  }
-  50% {
-    background-position:
-      0.8rem -0.5rem,
-      -0.9rem 0.7rem,
-      4rem 0;
-    transform: scale(1.01);
-  }
-}
-
-@keyframes edge-flash {
-  0%,
-  72%,
-  79%,
-  100% {
-    opacity: 0;
-    transform: translateY(0);
-  }
-  74% {
-    opacity: 0.54;
-    transform: translateY(0.35rem);
-  }
-  77% {
-    opacity: 0.18;
-    transform: translateY(-0.2rem);
-  }
-}
-
 @keyframes rift-current {
   0%,
   100% {
@@ -727,31 +601,12 @@ body {
   }
 }
 
-@keyframes clipped-edge-wave {
-  0%,
+@keyframes archive-loop-scroll {
+  0% {
+    transform: translateY(0);
+  }
   100% {
-    background-position: 0% 50%;
-    opacity: 0.34;
-    transform: translateY(0) scaleX(0.98);
-  }
-  50% {
-    background-position: 100% 50%;
-    opacity: 0.78;
-    transform: translateY(0.35rem) scaleX(1.02);
-  }
-}
-
-@keyframes clipped-edge-wave-vertical {
-  0%,
-  100% {
-    background-position: 50% 0%;
-    opacity: 0.3;
-    transform: translateX(0) scaleY(0.98);
-  }
-  50% {
-    background-position: 50% 100%;
-    opacity: 0.72;
-    transform: translateX(0.32rem) scaleY(1.02);
+    transform: translateY(-50%);
   }
 }
 

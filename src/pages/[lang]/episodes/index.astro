@@ -15,12 +15,12 @@ const episodes = (await getCollection(collection, ({ data }) => data.status === 
   .sort((a, b) => a.data.episode - b.data.episode);
 const basePath = `/${lang}`;
 const locale = lang === "ko" ? "ko-KR" : "en-US";
-const archiveRecords = [
+const archiveSeed = [
   ...episodes.map((episode) => episode.data.description),
   ...t.archiveRecords,
-  ...episodes.map((episode) => episode.data.title),
-  ...t.archiveRecords
+  ...episodes.map((episode) => episode.data.title)
 ];
+const archiveRecords = [...archiveSeed, ...archiveSeed];
 ---
 
 <BaseLayout title={t.episodesTitle} description={t.description} lang={lang} navEpisodes={t.navEpisodes} navAbout={t.navAbout}>
@@ -47,13 +47,15 @@ const archiveRecords = [
           ))}
         </div>
 
-        <div class="archive-loop mt-16" data-archive-rail>
-          {archiveRecords.map((record, index) => (
-            <div class="archive-record" data-archive-record>
-              <span>{t.archiveLoopLabel} {String((index % 9) + 1).padStart(2, "0")}</span>
-              <p>{record}</p>
-            </div>
-          ))}
+        <div class="archive-loop-window mt-16" data-archive-rail>
+          <div class="archive-loop-track">
+            {archiveRecords.map((record, index) => (
+              <div class="archive-record" data-archive-record>
+                <span>{t.archiveLoopLabel} {String((index % archiveSeed.length) + 1).padStart(2, "0")}</span>
+                <p>{record}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
