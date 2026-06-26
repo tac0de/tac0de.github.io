@@ -4,6 +4,8 @@
 @theme {
   --font-sans: Inter, Pretendard, system-ui, sans-serif;
   --font-serif: Literata, "Noto Serif KR", Georgia, serif;
+  --font-serif-ko: "KoPubWorld Batang", "Noto Serif KR", "Apple SD Gothic Neo", serif;
+  --font-serif-en: Literata, "Source Serif 4", Georgia, serif;
   --color-ink: #0b0e12;
   --color-paper: #f4efe4;
   --color-line: #3b4248;
@@ -38,6 +40,30 @@ body {
   font-kerning: normal;
   line-break: strict;
   word-break: keep-all;
+}
+
+.reader-copy {
+  font-size: 1.1rem;
+}
+
+.reader-copy-ko {
+  font-family: var(--font-serif-ko);
+  letter-spacing: 0;
+}
+
+.reader-copy-ko :where(p) {
+  margin-block: 1.75rem;
+  line-height: 2.02;
+}
+
+.reader-copy-en {
+  font-family: var(--font-serif-en);
+  letter-spacing: 0;
+}
+
+.reader-copy-en :where(p) {
+  margin-block: 1.48rem;
+  line-height: 1.78;
 }
 
 .surface-grain {
@@ -77,7 +103,9 @@ body {
 
 [data-reveal],
 [data-episode-card],
-[data-memory-shard] {
+[data-memory-shard],
+[data-scroll-reveal],
+.reader-copy :where(p) {
   will-change: transform, opacity;
 }
 

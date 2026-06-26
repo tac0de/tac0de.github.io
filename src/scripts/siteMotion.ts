@@ -1,8 +1,11 @@
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 if (!reduceMotion) {
+  gsap.registerPlugin(ScrollTrigger);
+
   gsap.set("[data-reveal]", { autoAlpha: 0, y: 18 });
   gsap.to("[data-reveal]", {
     autoAlpha: 1,
@@ -53,6 +56,30 @@ if (!reduceMotion) {
       { passive: true }
     );
   }
+
+  ScrollTrigger.batch("[data-scroll-reveal]", {
+    start: "top 84%",
+    once: true,
+    onEnter: (elements) => {
+      gsap.fromTo(
+        elements,
+        { autoAlpha: 0, y: 34 },
+        { autoAlpha: 1, y: 0, duration: 0.7, ease: "power3.out", stagger: 0.08 }
+      );
+    }
+  });
+
+  ScrollTrigger.batch(".reader-copy p", {
+    start: "top 88%",
+    once: true,
+    onEnter: (elements) => {
+      gsap.fromTo(
+        elements,
+        { autoAlpha: 0.18, y: 22 },
+        { autoAlpha: 1, y: 0, duration: 0.72, ease: "power2.out", stagger: 0.04 }
+      );
+    }
+  });
 }
 
 const progress = document.querySelector<HTMLElement>("[data-reading-progress]");

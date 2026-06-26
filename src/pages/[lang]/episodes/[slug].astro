@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
-import { collectionsByLanguage, copy, formatReadingTime, isLanguage, languages } from "../../../i18n";
+import { collectionsByLanguage, copy, isLanguage, languages } from "../../../i18n";
 import "../../../styles/global.css";
 
 export async function getStaticPaths() {
@@ -24,19 +24,43 @@ const lang = isLanguage(Astro.props.lang) ? Astro.props.lang : "ko";
 const { episode } = Astro.props;
 const t = copy[lang];
 const { Content } = await render(episode);
+const collection = collectionsByLanguage[lang];
+const episodes = (await getCollection(collection, ({ data }) => data.status === "published"))
+  .sort((a, b) => a.data.episode - b.data.episode);
+const currentIndex = episodes.findIndex((item) => item.id === episode.id);
+const previous = currentIndex > 0 ? episodes[currentIndex - 1] : undefined;
+const next = currentIndex >= 0 ? episodes[currentIndex + 1] : undefined;
 ---
 
 <BaseLayout title={`${episode.data.title} | Krontium`} description={episode.data.description} lang={lang} navEpisodes={t.navEpisodes} navAbout={t.navAbout}>
-  <article class="mx-auto max-w-3xl px-5 py-12 md:py-20">
+  <article class="reader-surface mx-auto max-w-[46rem] px-5 py-12 md:py-20">
     <a data-reveal class="text-sm font-semibold text-brass hover:text-bone" href={`/${lang}/episodes/`}>{t.backEpisodes}</a>
     <header data-reveal class="mt-8 border-b border-bone/12 pb-8">
-      <p class="text-sm font-semibold text-cold">LEVY {String(episode.data.episode).padStart(2, "0")}</p>
+      <p class="text-sm font-semibold text-cold">CHAPTER {String(episode.data.episode).padStart(2, "0")}</p>
       <h1 class="mt-3 font-serif text-4xl font-semibold leading-tight text-bone md:text-6xl">{episode.data.title}</h1>
       <p class="mt-5 leading-7 text-bone/62">{episode.data.description}</p>
-      <p class="mt-5 text-sm text-bone/45">{formatReadingTime(lang, episode.data.readingMinutes)}</p>
+      <p class="mt-5 text-sm text-bone/45">{t.cadence}</p>
     </header>
-    <div data-reveal class="reading-flow prose prose-invert prose-lg mt-10 max-w-none font-serif prose-p:my-7 prose-p:leading-9 prose-p:text-bone/84">
+    <div data-reveal class={`reading-flow reader-copy prose prose-invert mt-10 max-w-none font-serif ${lang === "ko" ? "reader-copy-ko" : "reader-copy-en"}`}>
       <Content />
     </div>
+    <nav data-reveal class="mt-16 grid gap-3 border-t border-bone/12 pt-8 md:grid-cols-2">
+      {previous ? (
+        <a class="metal-panel rounded-md border border-bone/12 p-5 transition hover:border-brass/60" href={`/${lang}/episodes/${previous.id}/`}>
+          <p class="text-sm font-semibold text-cold">{t.previousEpisode}</p>
+          <p class="mt-2 font-serif text-xl text-bone">{previous.data.title}</p>
+        </a>
+      ) : (
+        <div class="rounded-md border border-bone/8 p-5 text-bone/36">{t.noPreviousEpisode}</div>
+      )}
+      {next ? (
+        <a class="metal-panel rounded-md border border-bone/12 p-5 text-right transition hover:border-brass/60" href={`/${lang}/episodes/${next.id}/`}>
+          <p class="text-sm font-semibold text-cold">{t.nextEpisode}</p>
+          <p class="mt-2 font-serif text-xl text-bone">{next.data.title}</p>
+        </a>
+      ) : (
+        <div class="rounded-md border border-bone/8 p-5 text-right text-bone/36">{t.noNextEpisode}</div>
+      )}
+    </nav>
   </article>
 </BaseLayout>
