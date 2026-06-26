@@ -86,6 +86,29 @@ body {
   line-height: 1.78;
 }
 
+.memory-interference {
+  position: relative;
+  display: inline;
+  color: color-mix(in srgb, #e9dfcd 88%, #9fb9c6);
+  text-shadow:
+    0.04em 0 rgba(159, 185, 198, calc(0.2 + var(--sentence-glow, 0) * 0.22)),
+    -0.04em 0 rgba(182, 59, 49, calc(0.16 + var(--sentence-glow, 0) * 0.2)),
+    0 0 calc(var(--sentence-glow, 0) * 28px) rgba(197, 155, 85, 0.26);
+  background-image: linear-gradient(180deg, transparent 58%, rgba(197, 155, 85, 0.18) 58% 82%, transparent 82%);
+  animation: sentence-static 9s steps(1, end) infinite;
+}
+
+.memory-interference::after {
+  content: "";
+  position: absolute;
+  inset: 45% -0.08em auto;
+  height: 1px;
+  opacity: 0;
+  background: rgba(159, 185, 198, 0.65);
+  transform: translateX(-0.18em);
+  animation: sentence-scan 9s steps(1, end) infinite;
+}
+
 .scroll-aura {
   background:
     radial-gradient(circle at 18% 24%, rgba(197, 155, 85, 0.16), transparent 24rem),
@@ -180,11 +203,40 @@ body {
   inset: 0;
   z-index: 4;
   pointer-events: none;
-  opacity: 0.68;
+  opacity: 0.86;
   background:
-    radial-gradient(circle at var(--edge-x) var(--edge-y), rgba(197, 155, 85, 0.16), transparent 20rem),
-    linear-gradient(135deg, rgba(197, 155, 85, 0.055), transparent 38%, rgba(159, 185, 198, 0.05));
+    radial-gradient(circle at var(--edge-x) var(--edge-y), rgba(197, 155, 85, 0.24), transparent 18rem),
+    linear-gradient(135deg, rgba(197, 155, 85, 0.09), transparent 38%, rgba(159, 185, 198, 0.08));
   filter: url("#krontium-goo");
+}
+
+.hero-edge-waves::before,
+.hero-edge-waves::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-edge-waves::before {
+  opacity: 0.62;
+  background:
+    radial-gradient(circle at 8% 18%, rgba(197, 155, 85, 0.48), transparent 4rem),
+    radial-gradient(circle at 92% 74%, rgba(159, 185, 198, 0.38), transparent 5rem),
+    repeating-linear-gradient(102deg, transparent 0 1.6rem, rgba(197, 155, 85, 0.26) 1.68rem 1.82rem, transparent 1.9rem 3.9rem);
+  mask:
+    linear-gradient(#000 0 0) top / 100% clamp(4rem, 10vw, 8rem) no-repeat,
+    linear-gradient(#000 0 0) bottom / 100% clamp(4rem, 10vw, 8rem) no-repeat,
+    linear-gradient(#000 0 0) left / clamp(3rem, 8vw, 6rem) 100% no-repeat,
+    linear-gradient(#000 0 0) right / clamp(3rem, 8vw, 6rem) 100% no-repeat;
+  animation: edge-current 10.5s ease-in-out infinite;
+}
+
+.hero-edge-waves::after {
+  opacity: 0.38;
+  background: linear-gradient(90deg, transparent, rgba(233, 223, 205, 0.34), transparent);
+  clip-path: polygon(0 16%, 14% 11%, 29% 18%, 45% 9%, 63% 17%, 81% 10%, 100% 15%, 100% 20%, 82% 17%, 65% 24%, 47% 16%, 30% 25%, 13% 18%, 0 23%);
+  animation: edge-flash 7.8s steps(1, end) infinite;
 }
 
 .memory-tax-stream {
@@ -227,11 +279,11 @@ body {
 
 .hero-wave {
   position: absolute;
-  opacity: 0.68;
-  filter: drop-shadow(0 0 18px rgba(197, 155, 85, 0.18));
+  opacity: 0.78;
+  filter: drop-shadow(0 0 26px rgba(197, 155, 85, 0.28));
   background:
-    radial-gradient(circle at 12% 50%, rgba(197, 155, 85, 0.35), transparent 0.7rem),
-    linear-gradient(90deg, transparent, rgba(197, 155, 85, 0.28), rgba(159, 185, 198, 0.22), transparent);
+    radial-gradient(circle at 12% 50%, rgba(197, 155, 85, 0.48), transparent 0.85rem),
+    linear-gradient(90deg, transparent, rgba(197, 155, 85, 0.42), rgba(159, 185, 198, 0.32), transparent);
   background-size: 260% 100%;
   animation: clipped-edge-wave 8.5s ease-in-out infinite;
 }
@@ -318,6 +370,103 @@ body {
   background:
     linear-gradient(135deg, rgba(233, 223, 205, 0.08), rgba(233, 223, 205, 0.02)),
     linear-gradient(180deg, rgba(11, 14, 18, 0.74), rgba(7, 9, 13, 0.9));
+}
+
+.archive-depth,
+.archive-page {
+  min-height: 150svh;
+}
+
+.archive-depth::before,
+.archive-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.42;
+  background:
+    linear-gradient(90deg, transparent 0 49%, rgba(197, 155, 85, 0.18) 49.1% 49.2%, transparent 49.3%),
+    repeating-linear-gradient(180deg, rgba(233, 223, 205, 0.045) 0 1px, transparent 1px 8.5rem);
+  mask-image: linear-gradient(180deg, transparent, black 12%, black 88%, transparent);
+}
+
+.archive-rail,
+.archive-loop {
+  position: relative;
+  display: grid;
+  gap: clamp(0.9rem, 2vw, 1.2rem);
+  padding-block: 1rem;
+}
+
+.archive-rail::before,
+.archive-loop::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 1.05rem;
+  width: 1px;
+  opacity: 0.62;
+  background: linear-gradient(180deg, transparent, rgba(197, 155, 85, 0.55), rgba(159, 185, 198, 0.32), transparent);
+}
+
+.archive-record {
+  position: relative;
+  overflow: hidden;
+  min-height: clamp(7rem, 13vw, 10.5rem);
+  margin-left: 2.1rem;
+  padding: clamp(1.1rem, 2.4vw, 1.7rem);
+  border: 1px solid rgba(233, 223, 205, 0.1);
+  background:
+    linear-gradient(135deg, rgba(233, 223, 205, 0.07), rgba(233, 223, 205, 0.018)),
+    linear-gradient(180deg, rgba(7, 9, 13, 0.72), rgba(7, 9, 13, 0.42));
+  clip-path: polygon(0 0, 96% 0, 100% 18%, 98% 100%, 4% 100%, 0 86%);
+}
+
+.archive-record::before {
+  content: "";
+  position: absolute;
+  left: 0.92rem;
+  top: 1.45rem;
+  width: 0.58rem;
+  height: 0.58rem;
+  border-radius: 999px;
+  background: #c59b55;
+  box-shadow: 0 0 28px rgba(197, 155, 85, 0.55);
+}
+
+.archive-record::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.34;
+  background:
+    linear-gradient(105deg, transparent 38%, rgba(159, 185, 198, 0.12), transparent 62%),
+    repeating-linear-gradient(0deg, transparent 0 0.9rem, rgba(233, 223, 205, 0.035) 0.94rem 0.98rem);
+  transform: translateX(-32%);
+  animation: archive-record-sheen 8.8s ease-in-out infinite;
+}
+
+.archive-record span {
+  position: relative;
+  z-index: 1;
+  display: block;
+  padding-left: 1.4rem;
+  color: rgba(159, 185, 198, 0.7);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.archive-record p {
+  position: relative;
+  z-index: 1;
+  margin-top: 1.1rem;
+  max-width: 44rem;
+  color: rgba(233, 223, 205, 0.76);
+  font-family: var(--font-serif);
+  font-size: clamp(1.25rem, 2.2vw, 2.1rem);
+  line-height: 1.28;
 }
 
 .memory-shard-chip {
@@ -437,6 +586,79 @@ body {
   }
 }
 
+@keyframes sentence-static {
+  0%,
+  79%,
+  86%,
+  100% {
+    filter: none;
+    opacity: 1;
+  }
+  80% {
+    filter: contrast(1.3);
+    opacity: 0.72;
+  }
+  82% {
+    filter: none;
+    opacity: 1;
+  }
+  84% {
+    filter: saturate(1.4);
+    opacity: 0.86;
+  }
+}
+
+@keyframes sentence-scan {
+  0%,
+  79%,
+  86%,
+  100% {
+    opacity: 0;
+    transform: translateX(-0.18em);
+  }
+  80%,
+  84% {
+    opacity: 0.85;
+    transform: translateX(0.28em);
+  }
+}
+
+@keyframes edge-current {
+  0%,
+  100% {
+    background-position:
+      0 0,
+      0 0,
+      0 0;
+    transform: scale(1);
+  }
+  50% {
+    background-position:
+      0.8rem -0.5rem,
+      -0.9rem 0.7rem,
+      4rem 0;
+    transform: scale(1.01);
+  }
+}
+
+@keyframes edge-flash {
+  0%,
+  72%,
+  79%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  74% {
+    opacity: 0.54;
+    transform: translateY(0.35rem);
+  }
+  77% {
+    opacity: 0.18;
+    transform: translateY(-0.2rem);
+  }
+}
+
 @keyframes rift-current {
   0%,
   100% {
@@ -487,6 +709,21 @@ body {
   }
   62% {
     opacity: 0.62;
+  }
+}
+
+@keyframes archive-record-sheen {
+  0%,
+  62% {
+    transform: translateX(-42%);
+    opacity: 0.18;
+  }
+  78% {
+    opacity: 0.45;
+  }
+  100% {
+    transform: translateX(36%);
+    opacity: 0.18;
   }
 }
 
@@ -571,7 +808,8 @@ body {
 [data-episode-card],
 [data-memory-shard],
 [data-scroll-reveal],
-[data-hero-slice] {
+[data-hero-slice],
+[data-archive-record] {
   will-change: transform, opacity;
 }
 

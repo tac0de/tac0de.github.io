@@ -166,6 +166,50 @@ if (!reduceMotion) {
     }
   });
 
+  ScrollTrigger.batch("[data-archive-record]", {
+    start: "top 88%",
+    once: true,
+    onEnter: (elements) => {
+      gsap.fromTo(
+        elements,
+        { autoAlpha: 0, x: 28, filter: "brightness(0.78)" },
+        { autoAlpha: 1, x: 0, filter: "brightness(1)", duration: 0.78, ease: "power3.out", stagger: 0.06 }
+      );
+    }
+  });
+
+  gsap.utils.toArray<HTMLElement>("[data-archive-rail]").forEach((rail) => {
+    gsap.to(rail, {
+      yPercent: -4,
+      ease: "none",
+      scrollTrigger: {
+        trigger: rail,
+        start: "top bottom",
+        end: "bottom top",
+        scrub: 1.2
+      }
+    });
+  });
+
+  gsap.utils.toArray<HTMLElement>(".memory-interference").forEach((sentence) => {
+    gsap.fromTo(
+      sentence,
+      { "--sentence-glow": 0 },
+      {
+        "--sentence-glow": 1,
+        duration: 0.5,
+        ease: "power2.out",
+        yoyo: true,
+        repeat: 1,
+        scrollTrigger: {
+          trigger: sentence,
+          start: "top 72%",
+          once: true
+        }
+      }
+    );
+  });
+
   const aura = document.querySelector<HTMLElement>("[data-scroll-aura]");
 
   if (aura) {
