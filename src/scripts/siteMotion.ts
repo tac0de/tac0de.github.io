@@ -40,8 +40,9 @@ if (!reduceMotion) {
   const heroVisual = document.querySelector<HTMLElement>("[data-hero-visual]");
   const heroCopy = document.querySelector<HTMLElement>("[data-hero-copy]");
   const heroSlices = gsap.utils.toArray<HTMLElement>("[data-hero-slice]");
+  const heroLiquids = gsap.utils.toArray<HTMLElement>("[data-hero-liquid]");
 
-  if (heroVisual && heroCopy) {
+  if (heroVisual && heroCopy && !isMobile) {
     const moveVisualX = gsap.quickTo(heroVisual, "x", { duration: 0.7, ease: "power3.out" });
     const moveVisualY = gsap.quickTo(heroVisual, "y", { duration: 0.7, ease: "power3.out" });
     const moveCopyX = gsap.quickTo(heroCopy, "x", { duration: 0.7, ease: "power3.out" });
@@ -85,6 +86,22 @@ if (!reduceMotion) {
 
     window.setTimeout(() => slicePulse(true), 650);
     window.setInterval(() => slicePulse(false), 9400);
+  }
+
+  if (heroLiquids.length > 0) {
+    heroLiquids.forEach((liquid, index) => {
+      gsap.to(liquid, {
+        x: index % 2 === 0 ? 22 : -18,
+        y: index % 2 === 0 ? -16 : 14,
+        scaleX: index % 2 === 0 ? 1.1 : 0.94,
+        scaleY: index % 2 === 0 ? 0.93 : 1.12,
+        rotation: index % 2 === 0 ? 4 : -5,
+        duration: 7 + index * 1.4,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true
+      });
+    });
   }
 
   const titleGlow = document.querySelector<HTMLElement>("[data-title-glow]");
