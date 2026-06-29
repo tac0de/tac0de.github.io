@@ -1,8 +1,8 @@
 # tac0de
 
-Experimental CSS surfaces / browser-native visual studies.
+Modern CSS Specimen Lab.
 
-This is a static Vite + React site for CSS art experiments and browser-native visual studies. No backend, no login, no database.
+This is a static Vite + React site for CSS-first art experiments and browser-native visual studies. No backend, no login, no database.
 
 ## Commands
 

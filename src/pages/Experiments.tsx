@@ -6,15 +6,15 @@ const tones = ['cyan', 'violet', 'rose', 'amber', 'green'] as const;
 export function Experiments() {
   return (
     <div className="page-stack">
-      <section className="page-intro">
-        <span>css art studies gallery</span>
-        <h1>Experiments</h1>
+      <section className="page-intro specimen-intro">
+        <span>modern css specimen gallery</span>
+        <h1>Specimen Wall</h1>
         <p>
-          Visual studies, interface fragments, and motion sketches built directly with CSS in the
-          browser.
+          Scroll the wall. Hover a surface. The page should feel like CSS is the material, not a
+          skin around content.
         </p>
       </section>
-      <section className="card-grid">
+      <section className="card-grid specimen-wall">
         {experiments.map((experiment, index) => (
           <Card
             key={experiment.slug}

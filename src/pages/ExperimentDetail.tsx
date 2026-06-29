@@ -35,6 +35,11 @@ export function ExperimentDetail() {
             <Tag key={tag}>{tag}</Tag>
           ))}
         </div>
+        <ul className="tech-list" aria-label="CSS techniques used">
+          {experiment.techniques.map((technique) => (
+            <li key={technique}>{technique}</li>
+          ))}
+        </ul>
       </section>
       <ExperimentPreview experiment={experiment} />
     </div>

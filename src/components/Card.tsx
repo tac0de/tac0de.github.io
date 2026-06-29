@@ -1,5 +1,6 @@
 import { ArrowUpRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import type React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Tag } from './Tag';
 
 type CardProps = {
@@ -12,8 +13,23 @@ type CardProps = {
 };
 
 export function Card({ title, description, tags, status, to, tone = 'cyan' }: CardProps) {
+  const navigate = useNavigate();
+
+  function onClick(event: React.MouseEvent<HTMLAnchorElement>) {
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    const transitionDocument = document as Document & {
+      startViewTransition?: (callback: () => void) => void;
+    };
+    if (transitionDocument.startViewTransition) {
+      transitionDocument.startViewTransition(() => navigate(to));
+      return;
+    }
+    navigate(to);
+  }
+
   return (
-    <Link className={`lab-card lab-card--${tone}`} to={to}>
+    <Link className={`lab-card lab-card--${tone}`} to={to} onClick={onClick}>
       <div className="lab-card__topline">
         <span>{status}</span>
         <ArrowUpRight aria-hidden="true" size={18} />

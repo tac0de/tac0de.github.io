@@ -1,3 +1,4 @@
+import { CSSProperties, useState } from 'react';
 import { Experiment } from '../data/experiments';
 
 type ExperimentPreviewProps = {
@@ -5,92 +6,116 @@ type ExperimentPreviewProps = {
 };
 
 export function ExperimentPreview({ experiment }: ExperimentPreviewProps) {
-  if (experiment.slug === 'crt-login-screen') return <CrtLoginDemo />;
-  if (experiment.slug === 'broken-typography-poster') return <BrokenTypeDemo />;
-  if (experiment.slug === 'ocean-scan-panel') return <OceanScanDemo />;
-  if (experiment.slug === 'liquid-navigation') return <LiquidNavigationDemo />;
-  return <PixelWeatherDemo />;
+  if (experiment.slug === 'scroll-specimen-wall') return <ScrollSpecimenWallDemo />;
+  if (experiment.slug === 'sonar-interface') return <SonarInterfaceDemo />;
+  if (experiment.slug === 'morphing-type-poster') return <MorphingTypePosterDemo />;
+  if (experiment.slug === 'single-div-artifact') return <SingleDivArtifactDemo />;
+  if (experiment.slug === 'color-system-lab') return <ColorSystemLabDemo />;
+  if (experiment.slug === 'view-transition-gallery') return <ViewTransitionGalleryDemo />;
+  return <AnchorInspectorDemo />;
 }
 
-function CrtLoginDemo() {
+function ScrollSpecimenWallDemo() {
   return (
-    <div className="demo-frame crt-demo">
-      <div className="crt-panel">
-        <div className="crt-panel__bar">
-          <span>node://tac0de</span>
-          <span>00:13</span>
+    <div className="demo-frame scroll-specimen-demo">
+      <div className="scroll-wall-stage">
+        {['mask', 'depth', 'snap', 'glow', 'view', 'noise'].map((label, index) => (
+          <article className="scroll-specimen-tile" key={label} style={{ '--i': index } as CSSProperties}>
+            <span>0{index + 1}</span>
+            <strong>{label}</strong>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SonarInterfaceDemo() {
+  return (
+    <div className="demo-frame sonar-demo">
+      <div className="sonar-specimen">
+        <div className="sonar-sweep" />
+        <div className="sonar-coast sonar-coast--a" />
+        <div className="sonar-coast sonar-coast--b" />
+        <div className="sonar-label sonar-label--a">node 04 / 34.12N</div>
+        <div className="sonar-label sonar-label--b">depth -912m</div>
+        <div className="sonar-label sonar-label--c">signal 78%</div>
+      </div>
+    </div>
+  );
+}
+
+function MorphingTypePosterDemo() {
+  return (
+    <div className="demo-frame morph-type-demo">
+      <div className="morph-poster-grid" />
+      <div className="morph-word" data-word="SPECIMEN">
+        SPECIMEN
+      </div>
+      <p>clip-path / masks / blend modes</p>
+    </div>
+  );
+}
+
+function SingleDivArtifactDemo() {
+  return (
+    <div className="demo-frame artifact-demo">
+      <div className="single-artifact" aria-label="Single div CSS artifact" />
+    </div>
+  );
+}
+
+function ColorSystemLabDemo() {
+  const [hue, setHue] = useState(210);
+  return (
+    <div className="demo-frame color-system-demo" style={{ '--hue': hue } as CSSProperties}>
+      <div className="color-field">
+        <div className="color-orb color-orb--surface" />
+        <div className="color-orb color-orb--accent" />
+        <div className="color-orb color-orb--danger" />
+        <div className="color-readout">
+          <span>base oklch(72% 0.18 {hue})</span>
+          <strong>derived system</strong>
         </div>
-        <div className="crt-panel__body">
-          <p className="boot-line">access surface detected</p>
-          <p className="boot-line boot-line--delay">loading browser toy index</p>
-          <label>
-            guest id
-            <span className="terminal-input">visitor_<i /></span>
-          </label>
+      </div>
+      <label className="hue-control">
+        hue
+        <input
+          type="range"
+          min="0"
+          max="360"
+          value={hue}
+          onChange={(event) => setHue(Number(event.target.value))}
+        />
+      </label>
+    </div>
+  );
+}
+
+function ViewTransitionGalleryDemo() {
+  return (
+    <div className="demo-frame transition-gallery-demo">
+      {['one', 'two', 'three'].map((item) => (
+        <div className={`transition-panel transition-panel--${item}`} key={item}>
+          <span>{item}</span>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function BrokenTypeDemo() {
-  return (
-    <div className="demo-frame broken-type-demo">
-      <div className="poster-grid" aria-hidden="true" />
-      <div className="broken-word" data-text="BROWSER">
-        BROWSER
-      </div>
-      <div className="poster-caption">offset grid / split type / unstable rhythm</div>
-    </div>
-  );
-}
-
-function OceanScanDemo() {
-  return (
-    <div className="demo-frame ocean-demo">
-      <div className="ocean-map">
-        <div className="ocean-region ocean-region--coastal" aria-hidden="true" />
-        <div className="ocean-region ocean-region--deep" aria-hidden="true" />
-        <div className="ocean-region ocean-region--continent" aria-hidden="true" />
-        <div className="contour contour--one" aria-hidden="true" />
-        <div className="contour contour--two" aria-hidden="true" />
-        <div className="contour contour--three" aria-hidden="true" />
-        <div className="depth depth--coastal">coastal shelf / -38m</div>
-        <div className="depth depth--ocean">deep ocean / -912m</div>
-        <div className="depth depth--continent">continent edge / uplift</div>
-        <div className="sonar-ring sonar-ring--one" />
-        <div className="sonar-ring sonar-ring--two" />
-        <div className="sonar-ring sonar-ring--three" />
-        <div className="scan-line" />
-        <div className="ocean-hud ocean-hud--top">SCAN TAC-06 / current 2.4kt</div>
-        <div className="ocean-hud ocean-hud--bottom">thermal layer: fragmented / node lock 07</div>
-        <span className="ocean-node ocean-node--a">34.12N</span>
-        <span className="ocean-node ocean-node--b">-129m</span>
-        <span className="ocean-node ocean-node--c">ridge</span>
-        <span className="ocean-node ocean-node--d">abyss</span>
-      </div>
-    </div>
-  );
-}
-
-function LiquidNavigationDemo() {
-  return (
-    <div className="demo-frame liquid-demo">
-      {['lab', 'toys', 'logs'].map((item) => (
-        <span key={item}>{item}</span>
       ))}
+      <p>Route cards use View Transition API when supported.</p>
     </div>
   );
 }
 
-function PixelWeatherDemo() {
+function AnchorInspectorDemo() {
   return (
-    <div className="demo-frame pixel-weather-demo">
-      <div className="pixel-sun" />
-      <div className="pixel-cloud pixel-cloud--one" />
-      <div className="pixel-cloud pixel-cloud--two" />
-      <strong>21C</strong>
-      <span>scan drizzle</span>
+    <div className="demo-frame anchor-demo">
+      <div className="anchor-specimen">
+        <button className="anchor-target">inspect surface</button>
+        <aside className="anchor-panel">
+          <span>attached panel</span>
+          <strong>mask: radial</strong>
+          <em>fallback: absolute</em>
+        </aside>
+      </div>
     </div>
   );
 }

@@ -1,8 +1,9 @@
-import { Grid3X3, Info, RadioTower } from 'lucide-react';
+import { Grid3X3, Info, Library, RadioTower } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const links = [
   { to: '/experiments', label: 'Experiments', icon: Grid3X3 },
+  { to: '/archive', label: 'Archive', icon: Library },
   { to: '/about', label: 'About', icon: Info },
 ];
 
