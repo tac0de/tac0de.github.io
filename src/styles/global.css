@@ -145,24 +145,84 @@ input {
 .artwork-section {
   position: relative;
   z-index: 1;
-  min-height: 112svh;
-  overflow: hidden;
+  min-height: 148svh;
+  overflow: visible;
   background: transparent;
-  margin-top: -12svh;
-  mask-image: linear-gradient(to bottom, transparent 0, black 13svh, black calc(100% - 13svh), transparent 100%);
+  margin-top: -38svh;
 }
 
 .artwork-section:first-of-type {
   margin-top: 0;
-  mask-image: linear-gradient(to bottom, black 0, black calc(100% - 13svh), transparent 100%);
 }
 
-.artwork-section:last-of-type {
-  mask-image: linear-gradient(to bottom, transparent 0, black 13svh, black 100%);
+.artwork-section::before,
+.artwork-section::after {
+  content: "";
+  position: sticky;
+  top: 0;
+  display: block;
+  height: 100svh;
+  margin-bottom: -100svh;
+  pointer-events: none;
+}
+
+.artwork-section::before {
+  z-index: -1;
+  opacity: 0.72;
+  background:
+    radial-gradient(circle at 22% 28%, color-mix(in oklch, var(--cyan) 18%, transparent), transparent 34%),
+    radial-gradient(circle at 84% 70%, color-mix(in oklch, var(--rose) 14%, transparent), transparent 36%);
+}
+
+.artwork-section::after {
+  z-index: 2;
+  opacity: 0.38;
+  background: linear-gradient(to bottom, transparent 0, color-mix(in oklch, var(--ink) 64%, transparent) 48%, transparent 100%);
+  mix-blend-mode: screen;
 }
 
 .artwork-section > main {
-  mask-image: linear-gradient(to bottom, transparent 0, black 11svh, black calc(100% - 11svh), transparent 100%);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 100svh;
+  mask-image: linear-gradient(to bottom, transparent 0, black 19svh, black calc(100% - 19svh), transparent 100%);
+}
+
+.artwork-section[data-artwork="pressure-bloom"]::before {
+  background:
+    radial-gradient(circle at 28% 24%, color-mix(in oklch, var(--rose) 24%, transparent), transparent 32%),
+    radial-gradient(circle at 76% 62%, color-mix(in oklch, var(--cyan) 18%, transparent), transparent 34%);
+}
+
+.artwork-section[data-artwork="glass-wound"]::before {
+  background:
+    linear-gradient(135deg, color-mix(in oklch, white 16%, transparent), transparent 34%),
+    radial-gradient(circle at 70% 30%, color-mix(in oklch, var(--blue) 24%, transparent), transparent 38%);
+}
+
+.artwork-section[data-artwork="signal-drift"]::before {
+  background:
+    repeating-linear-gradient(90deg, color-mix(in oklch, var(--acid) 9%, transparent) 0 2px, transparent 2px 18px),
+    radial-gradient(circle at 30% 60%, color-mix(in oklch, var(--acid) 22%, transparent), transparent 36%);
+}
+
+.artwork-section[data-artwork="heat-index"]::before {
+  background:
+    radial-gradient(circle at 68% 42%, color-mix(in oklch, var(--amber) 34%, transparent), transparent 36%),
+    radial-gradient(circle at 24% 70%, color-mix(in oklch, var(--rose) 18%, transparent), transparent 38%);
+}
+
+.artwork-section[data-artwork="soft-circuit"]::before {
+  background:
+    linear-gradient(90deg, transparent 0 30%, color-mix(in oklch, var(--blue) 20%, transparent) 31%, transparent 32% 62%, color-mix(in oklch, var(--acid) 14%, transparent) 63%, transparent 64%),
+    radial-gradient(circle at 62% 54%, color-mix(in oklch, var(--blue) 18%, transparent), transparent 36%);
+}
+
+.artwork-section[data-artwork="tension-mesh"]::before {
+  background:
+    repeating-linear-gradient(28deg, transparent 0 30px, color-mix(in oklch, var(--bone) 13%, transparent) 31px 32px),
+    radial-gradient(circle at 46% 42%, color-mix(in oklch, var(--bone) 18%, transparent), transparent 36%);
 }
 
 .artwork-index {
@@ -547,13 +607,8 @@ input {
 @media (max-width: 640px) {
   .glass-wound {
     background:
-      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 16%, transparent), transparent var(--scar)),
+      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--blue) 20%, transparent), transparent var(--scar)),
       var(--ink);
-  }
-
-  .wound-pane {
-    width: 94vw;
-    height: min(74svh, 620px);
   }
 
   .wound-pane::after {
@@ -652,9 +707,9 @@ input {
 .heat-index {
   --heat: 0.4;
   background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--amber) 24%, transparent), transparent calc(8rem + var(--heat) * 18rem)),
-    radial-gradient(circle at 20% 80%, color-mix(in oklch, var(--rose) 14%, transparent), transparent 38%),
-    var(--ink);
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--amber) 46%, transparent), transparent calc(8rem + var(--heat) * 18rem)),
+    radial-gradient(circle at 20% 80%, color-mix(in oklch, var(--rose) 24%, transparent), transparent 38%),
+    linear-gradient(160deg, color-mix(in oklch, var(--bone) 78%, var(--amber)), color-mix(in oklch, var(--ink) 56%, black));
 }
 
 .heat-map {
@@ -816,9 +871,9 @@ input {
 .tension-mesh {
   --pull: 0.28;
   background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--light) 11%, transparent), transparent calc(7rem + var(--pull) * 14rem)),
-    linear-gradient(120deg, color-mix(in oklch, var(--rose) 9%, transparent), transparent 35%, color-mix(in oklch, var(--cyan) 8%, transparent)),
-    var(--ink);
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--bone) 22%, transparent), transparent calc(7rem + var(--pull) * 14rem)),
+    linear-gradient(120deg, color-mix(in oklch, var(--bone) 52%, var(--ink)), transparent 35%, color-mix(in oklch, var(--cyan) 8%, transparent)),
+    color-mix(in oklch, var(--ink) 72%, var(--bone));
 }
 
 .mesh-field {
@@ -963,24 +1018,29 @@ input {
   }
 
   .signal-drift,
-  .heat-index,
   .soft-circuit,
   .tension-mesh {
     background:
-      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 14%, transparent), transparent 18rem),
+      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--acid) 14%, transparent), transparent 18rem),
       var(--ink);
   }
 
   .heat-index {
     background:
-      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--amber) 18%, transparent), transparent 18rem),
-      var(--ink);
+      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--amber) 34%, transparent), transparent 18rem),
+      linear-gradient(160deg, color-mix(in oklch, var(--bone) 76%, var(--amber)), color-mix(in oklch, var(--ink) 58%, black));
   }
 
   .soft-circuit {
     background:
-      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 16%, transparent), transparent 18rem),
+      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--blue) 16%, transparent), transparent 18rem),
       var(--ink);
+  }
+
+  .tension-mesh {
+    background:
+      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--bone) 18%, transparent), transparent 18rem),
+      color-mix(in oklch, var(--ink) 78%, var(--bone));
   }
 }
 

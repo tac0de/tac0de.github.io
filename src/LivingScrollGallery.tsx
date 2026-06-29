@@ -83,7 +83,7 @@ export function LivingScrollGallery() {
       {order.map((key, index) => {
         const { Component, label } = artworkMap[key];
         return (
-          <section className="artwork-section" key={key} aria-label={label}>
+          <section className="artwork-section" key={key} data-artwork={key} aria-label={label}>
             <Component />
             <span className="artwork-index">{String(index + 1).padStart(2, '0')} / {label}</span>
           </section>
