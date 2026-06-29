@@ -44,9 +44,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--violet) 12%, transparent), transparent 34rem),
-    var(--ink);
+  background: var(--ink);
   color: var(--light);
 }
 
@@ -59,8 +57,8 @@ input {
   --x: 50%;
   --y: 50%;
   --pressure: 0.36;
-  --bloom: 0;
-  --bloom-size: calc(16rem + var(--pressure) * 24rem + var(--bloom) * 14rem);
+  --bloom: 0.18;
+  --bloom-size: calc(11rem + var(--pressure) * 18rem + var(--bloom) * 8rem);
   position: relative;
   width: 100vw;
   height: 100svh;
@@ -68,15 +66,14 @@ input {
   display: grid;
   place-items: center;
   isolation: isolate;
+  touch-action: none;
+  user-select: none;
   background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 28%, transparent) 0, transparent var(--bloom-size)),
-    conic-gradient(from var(--angle) at var(--x) var(--y), color-mix(in oklch, var(--rose) 18%, transparent), transparent 18%, color-mix(in oklch, var(--cyan) 18%, transparent), transparent 42%, color-mix(in oklch, var(--amber) 12%, transparent), transparent 72%),
-    linear-gradient(color-mix(in oklch, white 4%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklch, white 3%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 24%, transparent) 0, transparent var(--bloom-size)),
+    conic-gradient(from var(--angle) at var(--x) var(--y), color-mix(in oklch, var(--rose) 14%, transparent), transparent 22%, color-mix(in oklch, var(--cyan) 14%, transparent), transparent 56%),
     var(--ink);
-  background-size: auto, auto, 34px 34px, 34px 34px, auto;
   cursor: crosshair;
-  animation: rotateField 18s linear infinite, breathe 7s ease-in-out infinite alternate;
+  animation: rotateField 24s linear infinite;
 }
 
 .pressure-bloom::before,
@@ -90,20 +87,16 @@ input {
 .pressure-bloom::before {
   z-index: -2;
   background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, white 16%, transparent), transparent calc(8rem + var(--pressure) * 18rem)),
-    repeating-radial-gradient(circle at var(--x) var(--y), transparent 0 22px, color-mix(in oklch, var(--light) 9%, transparent) 23px 24px),
-    repeating-conic-gradient(from var(--angle) at var(--x) var(--y), transparent 0 10deg, color-mix(in oklch, var(--cyan) 7%, transparent) 10deg 11deg);
-  filter: blur(calc(8px - var(--pressure) * 5px)) contrast(calc(1.05 + var(--pressure) * 0.55));
-  opacity: calc(0.62 + var(--pressure) * 0.22);
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, white 12%, transparent), transparent calc(7rem + var(--pressure) * 14rem)),
+    repeating-radial-gradient(circle at var(--x) var(--y), transparent 0 24px, color-mix(in oklch, var(--light) 7%, transparent) 25px 26px);
+  opacity: calc(0.48 + var(--pressure) * 0.22);
 }
 
 .pressure-bloom::after {
   z-index: -1;
   background:
-    linear-gradient(115deg, transparent 0 28%, color-mix(in oklch, var(--rose) 18%, transparent) 29%, transparent 31% 61%, color-mix(in oklch, var(--cyan) 16%, transparent) 62%, transparent 64%),
-    radial-gradient(ellipse at var(--x) var(--y), transparent 0 18%, black 19% 76%, transparent 77%);
-  mix-blend-mode: screen;
-  opacity: calc(0.26 + var(--bloom) * 0.45);
+    linear-gradient(115deg, transparent 0 31%, color-mix(in oklch, var(--rose) 15%, transparent) 32%, transparent 34% 64%, color-mix(in oklch, var(--cyan) 13%, transparent) 65%, transparent 67%);
+  opacity: calc(0.18 + var(--bloom) * 0.34);
   clip-path: polygon(
     0 32%,
     calc(28% + var(--bloom) * 8%) 24%,
@@ -120,22 +113,23 @@ input {
 
 .bloom-surface {
   position: relative;
-  width: min(92vw, 1180px);
-  height: min(78svh, 760px);
+  width: min(94vw, 960px);
+  height: min(76svh, 680px);
   overflow: hidden;
   border: 1px solid color-mix(in oklch, var(--light) 7%, transparent);
   border-radius: 42% 58% 48% 52% / 46% 44% 56% 54%;
   background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--light) 19%, transparent), transparent calc(7rem + var(--pressure) * 16rem)),
-    conic-gradient(from calc(var(--angle) * -1) at 50% 52%, color-mix(in oklch, var(--cyan) 28%, transparent), transparent 18%, color-mix(in oklch, var(--violet) 26%, transparent), transparent 48%, color-mix(in oklch, var(--amber) 16%, transparent), transparent),
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--light) 15%, transparent), transparent calc(6rem + var(--pressure) * 13rem)),
+    conic-gradient(from calc(var(--angle) * -1) at 50% 52%, color-mix(in oklch, var(--cyan) 22%, transparent), transparent 22%, color-mix(in oklch, var(--violet) 20%, transparent), transparent 54%),
     radial-gradient(ellipse at 50% 52%, color-mix(in oklch, var(--skin) 82%, transparent), transparent 68%),
     color-mix(in oklch, var(--skin) 74%, black);
   box-shadow:
-    inset 0 0 calc(48px + var(--pressure) * 54px) color-mix(in oklch, black 54%, transparent),
+    inset 0 0 calc(34px + var(--pressure) * 36px) color-mix(in oklch, black 54%, transparent),
     inset 0 0 0 1px color-mix(in oklch, white 6%, transparent),
-    0 0 calc(34px + var(--bloom) * 80px) color-mix(in oklch, var(--cyan) 24%, transparent);
-  filter: saturate(calc(1.05 + var(--pressure) * 0.28 + var(--bloom) * 0.4));
+    0 0 calc(22px + var(--bloom) * 44px) color-mix(in oklch, var(--cyan) 20%, transparent);
+  filter: saturate(calc(1.02 + var(--pressure) * 0.18 + var(--bloom) * 0.24));
   transform: scale(calc(0.985 + var(--pressure) * 0.012));
+  will-change: transform;
 }
 
 .bloom-surface::before,
@@ -148,13 +142,12 @@ input {
 
 .bloom-surface::before {
   background:
-    linear-gradient(color-mix(in oklch, white 10%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklch, white 7%, transparent) 1px, transparent 1px),
-    repeating-radial-gradient(ellipse at var(--x) var(--y), transparent 0 18px, color-mix(in oklch, white 11%, transparent) 19px 20px);
-  background-size: 30px 30px, 30px 30px, auto;
-  mix-blend-mode: screen;
+    linear-gradient(color-mix(in oklch, white 8%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, white 6%, transparent) 1px, transparent 1px);
+  background-size: 30px 30px, 30px 30px;
+  opacity: 0.72;
   mask-image:
-    radial-gradient(circle at var(--x) var(--y), black 0 calc(9rem + var(--pressure) * 18rem), transparent calc(14rem + var(--pressure) * 22rem)),
+    radial-gradient(circle at var(--x) var(--y), black 0 calc(8rem + var(--pressure) * 15rem), transparent calc(12rem + var(--pressure) * 18rem)),
     linear-gradient(90deg, transparent, black 16%, black 84%, transparent);
 }
 
@@ -165,7 +158,6 @@ input {
   mix-blend-mode: screen;
   opacity: calc(0.28 + var(--bloom) * 0.48);
   transform: translateX(calc(-24% + var(--pressure) * 12%));
-  filter: blur(calc(10px - var(--pressure) * 6px));
 }
 
 .bloom-surface h1 {
@@ -186,7 +178,7 @@ input {
   -webkit-background-clip: text;
   opacity: calc(0.22 + var(--pressure) * 0.55 + var(--bloom) * 0.22);
   text-shadow:
-    0 0 calc(12px + var(--pressure) * 26px) color-mix(in oklch, var(--cyan) 42%, transparent),
+    0 0 calc(8px + var(--pressure) * 18px) color-mix(in oklch, var(--cyan) 38%, transparent),
     calc(var(--pressure) * 0.035em) 0 color-mix(in oklch, var(--rose) 62%, transparent);
   mask-image:
     radial-gradient(circle at var(--x) var(--y), black 0 calc(8rem + var(--pressure) * 22rem), transparent calc(13rem + var(--pressure) * 28rem)),
@@ -237,12 +229,10 @@ input {
 }
 
 .bloom-petal {
-  width: 24%;
+  width: 22%;
   aspect-ratio: 1;
   border-radius: 70% 30% 62% 38%;
   background: radial-gradient(circle at 35% 28%, color-mix(in oklch, white 24%, transparent), color-mix(in oklch, var(--violet) 22%, transparent), transparent 68%);
-  mix-blend-mode: screen;
-  filter: blur(calc(12px - var(--pressure) * 8px));
   opacity: calc(0.18 + var(--bloom) * 0.36);
 }
 
@@ -257,12 +247,6 @@ input {
   transform: rotate(64deg);
 }
 
-.bloom-petal--c {
-  left: 42%;
-  bottom: 9%;
-  transform: rotate(-28deg);
-}
-
 @media (hover: none) {
   .pressure-bloom {
     --pressure: 0.62;
@@ -271,9 +255,28 @@ input {
 }
 
 @media (max-width: 640px) {
+  .pressure-bloom {
+    background:
+      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 20%, transparent) 0, transparent var(--bloom-size)),
+      var(--ink);
+  }
+
+  .pressure-bloom::after {
+    display: none;
+  }
+
   .bloom-surface {
     width: 94vw;
-    height: 72svh;
+    height: min(74svh, 620px);
+    border-radius: 46% 54% 50% 50% / 44% 48% 52% 56%;
+  }
+
+  .bloom-surface::before {
+    background-size: 36px 36px, 36px 36px;
+  }
+
+  .bloom-petal {
+    opacity: calc(0.12 + var(--bloom) * 0.24);
   }
 }
 
