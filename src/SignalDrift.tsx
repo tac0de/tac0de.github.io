@@ -48,7 +48,6 @@ export function SignalDrift() {
         <span className="signal-band signal-band--a" />
         <span className="signal-band signal-band--b" />
         <span className="signal-band signal-band--c" />
-        <h1>signal drift</h1>
       </div>
     </main>
   );

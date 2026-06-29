@@ -56,7 +56,6 @@ export function PressureBloom() {
         <span className="bloom-rift bloom-rift--a" />
         <span className="bloom-petal bloom-petal--a" />
         <span className="bloom-petal bloom-petal--b" />
-        <h1>pressure opens</h1>
       </div>
     </main>
   );

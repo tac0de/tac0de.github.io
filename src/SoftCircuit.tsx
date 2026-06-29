@@ -48,7 +48,6 @@ export function SoftCircuit() {
         <span className="circuit-node circuit-node--a" />
         <span className="circuit-node circuit-node--b" />
         <span className="circuit-node circuit-node--c" />
-        <h1>soft circuit</h1>
       </div>
     </main>
   );

@@ -46,6 +46,12 @@
   initial-value: 0;
 }
 
+@property --pull {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 :root {
   color-scheme: dark;
   --ink: oklch(8% 0.026 250);
@@ -575,7 +581,8 @@ input {
 
 .signal-drift,
 .heat-index,
-.soft-circuit {
+.soft-circuit,
+.tension-mesh {
   --x: 50%;
   --y: 50%;
   position: relative;
@@ -872,6 +879,120 @@ input {
   bottom: 18%;
 }
 
+.tension-mesh {
+  --pull: 0.28;
+  background:
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--light) 11%, transparent), transparent calc(7rem + var(--pull) * 14rem)),
+    linear-gradient(120deg, color-mix(in oklch, var(--rose) 9%, transparent), transparent 35%, color-mix(in oklch, var(--cyan) 8%, transparent)),
+    var(--ink);
+}
+
+.mesh-field {
+  position: relative;
+  width: min(96vw, 1040px);
+  height: min(78svh, 720px);
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, white 8%, transparent);
+  border-radius: 6px;
+  background:
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, white 12%, transparent), transparent calc(4rem + var(--pull) * 11rem)),
+    linear-gradient(90deg, color-mix(in oklch, var(--light) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(0deg, color-mix(in oklch, var(--light) 5%, transparent) 1px, transparent 1px),
+    color-mix(in oklch, var(--ink) 82%, black);
+  background-size: auto, calc(18px + var(--pull) * 20px) calc(18px + var(--pull) * 20px), calc(18px + var(--pull) * 20px) calc(18px + var(--pull) * 20px), auto;
+  box-shadow:
+    inset 0 0 calc(24px + var(--pull) * 36px) color-mix(in oklch, black 58%, transparent),
+    0 0 calc(14px + var(--pull) * 28px) color-mix(in oklch, var(--light) 10%, transparent);
+}
+
+.mesh-field::before,
+.mesh-field::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  pointer-events: none;
+}
+
+.mesh-field::before {
+  background:
+    repeating-linear-gradient(28deg, transparent 0 28px, color-mix(in oklch, var(--cyan) 18%, transparent) 29px 30px),
+    repeating-linear-gradient(-34deg, transparent 0 32px, color-mix(in oklch, var(--rose) 15%, transparent) 33px 34px);
+  opacity: calc(0.26 + var(--pull) * 0.44);
+  transform:
+    translate(
+      calc((var(--x) - 50%) * 0.08),
+      calc((var(--y) - 50%) * 0.08)
+    )
+    skew(
+      calc((var(--x) - 50%) * 0.04deg),
+      calc((var(--y) - 50%) * -0.04deg)
+    );
+}
+
+.mesh-field::after {
+  background:
+    radial-gradient(circle at var(--x) var(--y), transparent 0 18%, color-mix(in oklch, var(--amber) 28%, transparent) 19%, transparent 24%),
+    conic-gradient(from calc(var(--angle) * 0.5) at var(--x) var(--y), transparent, color-mix(in oklch, var(--cyan) 18%, transparent), transparent 38%, color-mix(in oklch, var(--rose) 16%, transparent), transparent);
+  opacity: calc(0.2 + var(--pull) * 0.38);
+  mix-blend-mode: screen;
+}
+
+.mesh-thread,
+.mesh-knot {
+  position: absolute;
+  pointer-events: none;
+}
+
+.mesh-thread {
+  left: 50%;
+  top: 50%;
+  width: 120%;
+  height: 1px;
+  transform-origin: center;
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, white 64%, transparent), transparent);
+  opacity: calc(0.2 + var(--pull) * 0.44);
+}
+
+.mesh-thread--a {
+  transform: translate(-50%, -50%) rotate(calc(18deg + var(--pull) * 10deg));
+}
+
+.mesh-thread--b {
+  transform: translate(-50%, -50%) rotate(calc(-22deg - var(--pull) * 12deg));
+}
+
+.mesh-thread--c {
+  transform: translate(-50%, -50%) rotate(calc(64deg + var(--pull) * 8deg));
+}
+
+.mesh-thread--d {
+  transform: translate(-50%, -50%) rotate(calc(-74deg - var(--pull) * 9deg));
+}
+
+.mesh-knot {
+  width: clamp(10px, 3.6vw, 28px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: color-mix(in oklch, var(--light) 62%, transparent);
+  box-shadow: 0 0 calc(8px + var(--pull) * 18px) color-mix(in oklch, var(--light) 38%, transparent);
+  opacity: calc(0.3 + var(--pull) * 0.34);
+}
+
+.mesh-knot--a {
+  left: calc(var(--x) - 8%);
+  top: calc(var(--y) - 10%);
+}
+
+.mesh-knot--b {
+  right: calc(100% - var(--x) - 12%);
+  top: calc(var(--y) + 14%);
+}
+
+.mesh-knot--c {
+  left: 24%;
+  bottom: 18%;
+}
+
 @media (hover: none) {
   .signal-drift {
     --drift: 0.48;
@@ -884,19 +1005,25 @@ input {
   .soft-circuit {
     --pulse: 0.46;
   }
+
+  .tension-mesh {
+    --pull: 0.42;
+  }
 }
 
 @media (max-width: 640px) {
   .signal-field,
   .heat-map,
-  .circuit-skin {
+  .circuit-skin,
+  .mesh-field {
     width: 94vw;
     height: min(74svh, 620px);
   }
 
   .signal-drift,
   .heat-index,
-  .soft-circuit {
+  .soft-circuit,
+  .tension-mesh {
     background:
       radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 14%, transparent), transparent 18rem),
       var(--ink);

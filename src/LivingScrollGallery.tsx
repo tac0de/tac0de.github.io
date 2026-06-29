@@ -4,8 +4,9 @@ import { HeatIndex } from './HeatIndex';
 import { PressureBloom } from './PressureBloom';
 import { SignalDrift } from './SignalDrift';
 import { SoftCircuit } from './SoftCircuit';
+import { TensionMesh } from './TensionMesh';
 
-type ArtworkKey = 'pressure-bloom' | 'glass-wound' | 'signal-drift' | 'heat-index' | 'soft-circuit';
+type ArtworkKey = 'pressure-bloom' | 'glass-wound' | 'signal-drift' | 'heat-index' | 'soft-circuit' | 'tension-mesh';
 
 const artworkMap = {
   'pressure-bloom': {
@@ -27,6 +28,10 @@ const artworkMap = {
   'soft-circuit': {
     label: 'soft circuit',
     Component: SoftCircuit,
+  },
+  'tension-mesh': {
+    label: 'tension mesh',
+    Component: TensionMesh,
   },
 } satisfies Record<ArtworkKey, { label: string; Component: ComponentType }>;
 

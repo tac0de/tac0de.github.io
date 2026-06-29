@@ -58,7 +58,6 @@ export function GlassWound() {
         <span className="wound-line wound-line--b" />
         <span className="wound-chip wound-chip--a" />
         <span className="wound-chip wound-chip--b" />
-        <h1>surface remembers</h1>
       </div>
     </main>
   );

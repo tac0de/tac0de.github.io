@@ -48,7 +48,6 @@ export function HeatIndex() {
         <span className="heat-cell heat-cell--a" />
         <span className="heat-cell heat-cell--b" />
         <span className="heat-cell heat-cell--c" />
-        <h1>heat index</h1>
       </div>
     </main>
   );
