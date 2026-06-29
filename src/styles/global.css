@@ -4,49 +4,19 @@
   initial-value: 0deg;
 }
 
-@property --breath {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --pressure {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --bloom {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --cut {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --drift {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --heat {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --pulse {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 0;
-}
-
 @property --pull {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --tear {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --repair {
   syntax: "<number>";
   inherits: true;
   initial-value: 0;
@@ -60,16 +30,13 @@
 
 :root {
   color-scheme: dark;
-  --ink: oklch(8% 0.026 250);
-  --skin: oklch(18% 0.045 265);
+  --ink: oklch(7% 0.024 252);
+  --bone: oklch(88% 0.04 92);
   --light: oklch(94% 0.025 240);
   --cyan: oklch(82% 0.16 210);
-  --violet: oklch(72% 0.2 292);
+  --blue: oklch(72% 0.18 232);
   --rose: oklch(72% 0.22 18);
   --amber: oklch(84% 0.17 86);
-  --acid: oklch(86% 0.19 132);
-  --blue: oklch(72% 0.18 232);
-  --bone: oklch(88% 0.04 92);
   font-family:
     "SFMono-Regular", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
 }
@@ -82,7 +49,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow: hidden;
   background: var(--ink);
   color: var(--light);
 }
@@ -92,42 +59,46 @@ input {
   font: inherit;
 }
 
-.living-scroll-gallery {
+.mesh-scroll-work {
   --scroll-flow: 0;
   --scroll-shift: 0%;
+  --pull: calc(0.2 + var(--scroll-flow) * 0.72);
+  --tear: clamp(0, (var(--scroll-flow) - 0.46) * 2.8, 1);
+  --repair: clamp(0, (var(--scroll-flow) - 0.74) * 3.8, 1);
+  position: relative;
   width: 100vw;
   height: 100svh;
   overflow-x: hidden;
   overflow-y: auto;
-  overscroll-behavior-y: auto;
-  scroll-behavior: smooth;
   background:
-    radial-gradient(circle at calc(18% + var(--scroll-flow) * 62%) 22%, color-mix(in oklch, var(--cyan) 12%, transparent), transparent 30%),
-    radial-gradient(circle at calc(82% - var(--scroll-flow) * 48%) 78%, color-mix(in oklch, var(--rose) 10%, transparent), transparent 34%),
-    linear-gradient(180deg, var(--ink), color-mix(in oklch, var(--ink) 86%, black));
+    radial-gradient(circle at calc(18% + var(--scroll-flow) * 64%) 18%, color-mix(in oklch, var(--bone) 22%, transparent), transparent 30%),
+    radial-gradient(circle at 82% 72%, color-mix(in oklch, var(--blue) 16%, transparent), transparent 38%),
+    linear-gradient(145deg, color-mix(in oklch, var(--bone) 34%, var(--ink)), var(--ink) 46%, color-mix(in oklch, black 74%, var(--blue)));
 }
 
-.gallery-atmosphere {
+.mesh-scroll-work::before,
+.mesh-scroll-work::after {
+  content: "";
   position: fixed;
-  inset: -20%;
+  inset: -18%;
   z-index: 0;
   pointer-events: none;
 }
 
-.gallery-atmosphere--a {
+.mesh-scroll-work::before {
   background:
-    repeating-linear-gradient(112deg, transparent 0 34px, color-mix(in oklch, white 5%, transparent) 35px 36px),
-    radial-gradient(circle at var(--scroll-shift) 50%, color-mix(in oklch, var(--cyan) 14%, transparent), transparent 36%);
-  opacity: 0.72;
-  transform: translateY(calc(var(--scroll-flow) * -8%));
+    repeating-linear-gradient(28deg, transparent 0 calc(24px + var(--scroll-flow) * 22px), color-mix(in oklch, var(--bone) 10%, transparent) calc(25px + var(--scroll-flow) * 22px) calc(26px + var(--scroll-flow) * 22px)),
+    radial-gradient(circle at var(--scroll-shift) 52%, color-mix(in oklch, var(--cyan) 10%, transparent), transparent 42%);
+  opacity: calc(0.46 + var(--scroll-flow) * 0.18);
+  transform: translateX(calc((var(--scroll-flow) - 0.5) * -10%));
 }
 
-.gallery-atmosphere--b {
+.mesh-scroll-work::after {
   background:
-    conic-gradient(from calc(var(--angle) + var(--scroll-flow) * 1turn) at 50% 50%, transparent, color-mix(in oklch, var(--amber) 8%, transparent), transparent 34%, color-mix(in oklch, var(--violet) 9%, transparent), transparent 62%);
-  opacity: 0.5;
+    conic-gradient(from calc(var(--angle) + var(--scroll-flow) * 0.8turn) at 52% 48%, transparent, color-mix(in oklch, var(--rose) 10%, transparent), transparent 36%, color-mix(in oklch, var(--bone) 12%, transparent), transparent 64%);
   mix-blend-mode: screen;
-  animation: rotateField 48s linear infinite;
+  opacity: 0.42;
+  animation: rotateField 64s linear infinite;
 }
 
 .gallery-mark {
@@ -135,490 +106,44 @@ input {
   top: max(12px, env(safe-area-inset-top));
   left: max(14px, env(safe-area-inset-left));
   z-index: 20;
-  color: color-mix(in oklch, var(--light) 56%, transparent);
+  color: color-mix(in oklch, var(--bone) 66%, transparent);
   font-size: 0.72rem;
   letter-spacing: 0;
   pointer-events: none;
   mix-blend-mode: screen;
 }
 
-.artwork-section {
+.mesh-stage {
   position: relative;
   z-index: 1;
-  min-height: 148svh;
-  overflow: visible;
-  background: transparent;
-  margin-top: -38svh;
+  min-height: 420svh;
 }
 
-.artwork-section:first-of-type {
-  margin-top: 0;
-}
-
-.artwork-section::before,
-.artwork-section::after {
-  content: "";
+.mesh-stage > .tension-mesh {
   position: sticky;
   top: 0;
-  display: block;
   height: 100svh;
-  margin-bottom: -100svh;
-  pointer-events: none;
 }
 
-.artwork-section::before {
-  z-index: -1;
-  opacity: 0.72;
-  background:
-    radial-gradient(circle at 22% 28%, color-mix(in oklch, var(--cyan) 18%, transparent), transparent 34%),
-    radial-gradient(circle at 84% 70%, color-mix(in oklch, var(--rose) 14%, transparent), transparent 36%);
-}
-
-.artwork-section::after {
-  z-index: 2;
-  opacity: 0.38;
-  background: linear-gradient(to bottom, transparent 0, color-mix(in oklch, var(--ink) 64%, transparent) 48%, transparent 100%);
-  mix-blend-mode: screen;
-}
-
-.artwork-section > main {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  height: 100svh;
-  mask-image: linear-gradient(to bottom, transparent 0, black 19svh, black calc(100% - 19svh), transparent 100%);
-}
-
-.artwork-section[data-artwork="pressure-bloom"]::before {
-  background:
-    radial-gradient(circle at 28% 24%, color-mix(in oklch, var(--rose) 24%, transparent), transparent 32%),
-    radial-gradient(circle at 76% 62%, color-mix(in oklch, var(--cyan) 18%, transparent), transparent 34%);
-}
-
-.artwork-section[data-artwork="glass-wound"]::before {
-  background:
-    linear-gradient(135deg, color-mix(in oklch, white 16%, transparent), transparent 34%),
-    radial-gradient(circle at 70% 30%, color-mix(in oklch, var(--blue) 24%, transparent), transparent 38%);
-}
-
-.artwork-section[data-artwork="signal-drift"]::before {
-  background:
-    repeating-linear-gradient(90deg, color-mix(in oklch, var(--acid) 9%, transparent) 0 2px, transparent 2px 18px),
-    radial-gradient(circle at 30% 60%, color-mix(in oklch, var(--acid) 22%, transparent), transparent 36%);
-}
-
-.artwork-section[data-artwork="heat-index"]::before {
-  background:
-    radial-gradient(circle at 68% 42%, color-mix(in oklch, var(--amber) 34%, transparent), transparent 36%),
-    radial-gradient(circle at 24% 70%, color-mix(in oklch, var(--rose) 18%, transparent), transparent 38%);
-}
-
-.artwork-section[data-artwork="soft-circuit"]::before {
-  background:
-    linear-gradient(90deg, transparent 0 30%, color-mix(in oklch, var(--blue) 20%, transparent) 31%, transparent 32% 62%, color-mix(in oklch, var(--acid) 14%, transparent) 63%, transparent 64%),
-    radial-gradient(circle at 62% 54%, color-mix(in oklch, var(--blue) 18%, transparent), transparent 36%);
-}
-
-.artwork-section[data-artwork="tension-mesh"]::before {
-  background:
-    repeating-linear-gradient(28deg, transparent 0 30px, color-mix(in oklch, var(--bone) 13%, transparent) 31px 32px),
-    radial-gradient(circle at 46% 42%, color-mix(in oklch, var(--bone) 18%, transparent), transparent 36%);
-}
-
-.artwork-index {
-  position: absolute;
-  left: max(14px, env(safe-area-inset-left));
-  bottom: max(12px, env(safe-area-inset-bottom));
-  z-index: 10;
-  color: color-mix(in oklch, var(--light) 44%, transparent);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  pointer-events: none;
-}
-
-.pressure-bloom {
-  --x: 50%;
-  --y: 50%;
-  --pressure: 0.36;
-  --bloom: 0.18;
-  --bloom-size: calc(11rem + var(--pressure) * 18rem + var(--bloom) * 8rem);
-  position: relative;
-  width: 100%;
-  height: 100svh;
-  overflow: hidden;
-  display: grid;
-  place-items: center;
-  isolation: isolate;
-  touch-action: pan-y;
-  user-select: none;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 24%, transparent) 0, transparent var(--bloom-size)),
-    conic-gradient(from calc(var(--angle) + var(--scroll-flow) * 0.45turn) at var(--x) var(--y), color-mix(in oklch, var(--rose) 14%, transparent), transparent 22%, color-mix(in oklch, var(--cyan) 14%, transparent), transparent 56%),
-    var(--ink);
-  cursor: crosshair;
-  animation: rotateField 24s linear infinite;
-}
-
-.pressure-bloom::before,
-.pressure-bloom::after {
-  content: "";
-  position: absolute;
-  inset: -12%;
-  pointer-events: none;
-}
-
-.pressure-bloom::before {
-  z-index: -2;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, white 12%, transparent), transparent calc(7rem + var(--pressure) * 14rem)),
-    repeating-radial-gradient(circle at var(--x) var(--y), transparent 0 24px, color-mix(in oklch, var(--light) 7%, transparent) 25px 26px);
-  opacity: calc(0.48 + var(--pressure) * 0.22);
-}
-
-.pressure-bloom::after {
-  z-index: -1;
-  background:
-    linear-gradient(115deg, transparent 0 31%, color-mix(in oklch, var(--rose) 15%, transparent) 32%, transparent 34% 64%, color-mix(in oklch, var(--cyan) 13%, transparent) 65%, transparent 67%);
-  opacity: calc(0.18 + var(--bloom) * 0.34);
-  clip-path: polygon(
-    0 32%,
-    calc(28% + var(--bloom) * 8%) 24%,
-    48% calc(44% - var(--pressure) * 8%),
-    68% 28%,
-    100% 35%,
-    100% 68%,
-    72% calc(60% + var(--pressure) * 9%),
-    48% 78%,
-    24% 64%,
-    0 72%
-  );
-}
-
-.bloom-surface {
-  position: relative;
-  width: min(94vw, 960px);
-  height: min(76svh, 680px);
-  overflow: hidden;
-  border: 1px solid color-mix(in oklch, var(--light) 7%, transparent);
-  border-radius: 42% 58% 48% 52% / 46% 44% 56% 54%;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--light) 15%, transparent), transparent calc(6rem + var(--pressure) * 13rem)),
-    conic-gradient(from calc(var(--angle) * -1) at 50% 52%, color-mix(in oklch, var(--cyan) 22%, transparent), transparent 22%, color-mix(in oklch, var(--violet) 20%, transparent), transparent 54%),
-    radial-gradient(ellipse at 50% 52%, color-mix(in oklch, var(--skin) 82%, transparent), transparent 68%),
-    color-mix(in oklch, var(--skin) 74%, black);
-  box-shadow:
-    inset 0 0 calc(34px + var(--pressure) * 36px) color-mix(in oklch, black 54%, transparent),
-    inset 0 0 0 1px color-mix(in oklch, white 6%, transparent),
-    0 0 calc(22px + var(--bloom) * 44px) color-mix(in oklch, var(--cyan) 20%, transparent);
-  filter: saturate(calc(1.02 + var(--pressure) * 0.18 + var(--bloom) * 0.24));
-  transform:
-    translateY(calc((var(--scroll-flow) - 0.5) * -4svh))
-    scale(calc(0.985 + var(--pressure) * 0.012));
-  will-change: transform;
-}
-
-.bloom-surface::before,
-.bloom-surface::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.bloom-surface::before {
-  background:
-    linear-gradient(color-mix(in oklch, white 8%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklch, white 6%, transparent) 1px, transparent 1px);
-  background-size: 30px 30px, 30px 30px;
-  opacity: 0.72;
-  mask-image:
-    radial-gradient(circle at var(--x) var(--y), black 0 calc(8rem + var(--pressure) * 15rem), transparent calc(12rem + var(--pressure) * 18rem)),
-    linear-gradient(90deg, transparent, black 16%, black 84%, transparent);
-}
-
-.bloom-surface::after {
-  background:
-    radial-gradient(circle at var(--x) var(--y), transparent 0 12%, color-mix(in oklch, var(--rose) 34%, transparent) 13%, transparent 17%),
-    linear-gradient(90deg, transparent, color-mix(in oklch, var(--cyan) 30%, transparent), transparent);
-  mix-blend-mode: screen;
-  opacity: calc(0.28 + var(--bloom) * 0.48);
-  transform: translateX(calc(-24% + var(--pressure) * 12%));
-}
-
-.bloom-vein,
-.bloom-rift,
-.bloom-petal {
-  position: absolute;
-  pointer-events: none;
-}
-
-.bloom-vein {
-  left: 50%;
+.mesh-scroll-rail {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right));
   top: 50%;
-  width: 90%;
-  height: 1px;
-  transform-origin: left;
-  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--light) 64%, transparent), transparent);
-  opacity: calc(0.24 + var(--pressure) * 0.38);
-}
-
-.bloom-vein--a {
-  transform: rotate(19deg) translateX(-50%);
-}
-
-.bloom-vein--b {
-  transform: rotate(-41deg) translateX(-50%);
-}
-
-.bloom-vein--c {
-  transform: rotate(88deg) translateX(-50%);
-}
-
-.bloom-rift {
-  inset: 14% 8%;
-  border: 1px solid color-mix(in oklch, var(--rose) 40%, transparent);
-  border-radius: 50%;
-  clip-path: polygon(0 44%, 22% 34%, 42% 48%, 58% 30%, 78% 52%, 100% 40%, 100% 58%, 80% 68%, 58% 54%, 42% 72%, 20% 55%, 0 66%);
-  opacity: calc(0.28 + var(--bloom) * 0.42);
-}
-
-.bloom-rift--b {
-  inset: 24% 18%;
-  transform: rotate(18deg);
-  border-color: color-mix(in oklch, var(--cyan) 38%, transparent);
-}
-
-.bloom-petal {
-  width: 22%;
-  aspect-ratio: 1;
-  border-radius: 70% 30% 62% 38%;
-  background: radial-gradient(circle at 35% 28%, color-mix(in oklch, white 24%, transparent), color-mix(in oklch, var(--violet) 22%, transparent), transparent 68%);
-  opacity: calc(0.18 + var(--bloom) * 0.36);
-}
-
-.bloom-petal--a {
-  left: 16%;
-  top: 14%;
-}
-
-.bloom-petal--b {
-  right: 18%;
-  top: 22%;
-  transform: rotate(64deg);
-}
-
-@media (hover: none) {
-  .pressure-bloom {
-    --pressure: 0.62;
-    --bloom: 0.36;
-  }
-}
-
-@media (max-width: 640px) {
-  .pressure-bloom {
-    background:
-      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 20%, transparent) 0, transparent var(--bloom-size)),
-      var(--ink);
-  }
-
-  .pressure-bloom::after {
-    display: none;
-  }
-
-  .bloom-surface {
-    width: 94vw;
-    height: min(74svh, 620px);
-    border-radius: 46% 54% 50% 50% / 44% 48% 52% 56%;
-  }
-
-  .bloom-surface::before {
-    background-size: 36px 36px, 36px 36px;
-  }
-
-  .bloom-petal {
-    opacity: calc(0.12 + var(--bloom) * 0.24);
-  }
-
-}
-
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-@keyframes rotateField {
-  to {
-    --angle: 360deg;
-  }
-}
-
-@keyframes breathe {
-  0% {
-    --breath: 0;
-    filter: hue-rotate(0deg);
-  }
-  100% {
-    --breath: 1;
-    filter: hue-rotate(12deg);
-  }
-}
-
-.glass-wound {
-  --x: 50%;
-  --y: 50%;
-  --px: 43%;
-  --py: 56%;
-  --cut: 0.24;
-  --scar: calc(7rem + var(--cut) * 15rem);
-  position: relative;
-  width: 100%;
-  height: 100svh;
-  overflow: hidden;
+  z-index: 10;
   display: grid;
-  place-items: center;
-  isolation: isolate;
-  touch-action: pan-y;
-  user-select: none;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--blue) 18%, transparent), transparent var(--scar)),
-    linear-gradient(135deg, color-mix(in oklch, white 10%, transparent), transparent 28%, color-mix(in oklch, var(--blue) 12%, transparent)),
-    var(--ink);
-  cursor: crosshair;
-}
-
-.glass-wound::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(color-mix(in oklch, white 8%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklch, white 6%, transparent) 1px, transparent 1px);
-  background-size: 32px 32px;
-  opacity: calc(0.2 + var(--cut) * 0.18);
-  mask-image: radial-gradient(circle at var(--x) var(--y), black 0 var(--scar), transparent calc(var(--scar) + 7rem));
-}
-
-.wound-pane {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border: 0;
-  border-radius: 0;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--blue) 28%, transparent), transparent calc(6rem + var(--cut) * 10rem)),
-    radial-gradient(circle at var(--px) var(--py), color-mix(in oklch, white 18%, transparent), transparent calc(5rem + var(--cut) * 8rem)),
-    linear-gradient(120deg, color-mix(in oklch, white 6%, transparent), transparent 30% 72%, color-mix(in oklch, var(--cyan) 10%, transparent)),
-    color-mix(in oklch, var(--ink) 82%, black);
-  box-shadow:
-    inset 0 0 calc(34px + var(--cut) * 26px) color-mix(in oklch, black 48%, transparent),
-    0 0 calc(16px + var(--cut) * 28px) color-mix(in oklch, var(--cyan) 18%, transparent);
-}
-
-.wound-pane::before,
-.wound-pane::after {
-  content: "";
-  position: absolute;
-  inset: 0;
+  gap: 14px;
+  transform: translateY(-50%);
   pointer-events: none;
 }
 
-.wound-pane::before {
-  background:
-    linear-gradient(110deg, transparent 0 38%, color-mix(in oklch, white 58%, transparent) 39%, transparent 40% 62%, color-mix(in oklch, var(--cyan) 40%, transparent) 63%, transparent 64%),
-    linear-gradient(72deg, transparent 0 42%, color-mix(in oklch, var(--rose) 40%, transparent) 43%, transparent 44%);
-  opacity: calc(0.28 + var(--cut) * 0.46);
-  transform: translateY(calc((var(--scroll-flow) - 0.5) * 9svh));
-  clip-path: polygon(
-    calc(var(--px) - 26%) calc(var(--py) - 18%),
-    calc(var(--x) + 4%) calc(var(--y) - 2%),
-    calc(var(--px) + 34%) calc(var(--py) + 16%),
-    calc(var(--x) + 10%) calc(var(--y) + 5%),
-    calc(var(--px) - 18%) calc(var(--py) + 32%),
-    calc(var(--x) - 4%) calc(var(--y) + 4%)
-  );
+.mesh-stage-mark {
+  width: 5px;
+  height: 28px;
+  border-radius: 999px;
+  background: color-mix(in oklch, var(--bone) 26%, transparent);
+  opacity: 0.58;
 }
 
-.wound-pane::after {
-  background:
-    linear-gradient(color-mix(in oklch, white 8%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklch, white 5%, transparent) 1px, transparent 1px);
-  background-size: 34px 34px;
-  opacity: 0.42;
-  mask-image: linear-gradient(90deg, transparent, black 14%, black 86%, transparent);
-}
-
-.wound-line,
-.wound-chip {
-  position: absolute;
-  pointer-events: none;
-}
-
-.wound-line {
-  left: var(--px);
-  top: var(--py);
-  width: 72%;
-  height: 1px;
-  transform-origin: left;
-  background: linear-gradient(90deg, transparent, color-mix(in oklch, white 76%, transparent), transparent);
-  opacity: calc(0.24 + var(--cut) * 0.46);
-}
-
-.wound-line--a {
-  transform: rotate(24deg) translateX(-42%);
-}
-
-.wound-line--b {
-  transform: rotate(-38deg) translateX(-42%);
-}
-
-.wound-chip {
-  width: 24%;
-  aspect-ratio: 1.45;
-  border: 1px solid color-mix(in oklch, white 12%, transparent);
-  background: linear-gradient(135deg, color-mix(in oklch, white 10%, transparent), transparent);
-  opacity: calc(0.12 + var(--cut) * 0.28);
-  clip-path: polygon(12% 0, 100% 22%, 72% 100%, 0 70%);
-}
-
-.wound-chip--a {
-  left: calc(var(--x) - 18%);
-  top: calc(var(--y) - 18%);
-}
-
-.wound-chip--b {
-  right: calc(100% - var(--x) - 12%);
-  bottom: calc(100% - var(--y) - 18%);
-  transform: rotate(38deg);
-}
-
-@media (hover: none) {
-  .glass-wound {
-    --cut: 0.42;
-  }
-}
-
-@media (max-width: 640px) {
-  .glass-wound {
-    background:
-      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--blue) 20%, transparent), transparent var(--scar)),
-      var(--ink);
-  }
-
-  .wound-pane::after {
-    background-size: 40px 40px;
-  }
-}
-
-.signal-drift,
-.heat-index,
-.soft-circuit,
 .tension-mesh {
   --x: 50%;
   --y: 50%;
@@ -631,249 +156,11 @@ input {
   isolation: isolate;
   touch-action: pan-y;
   user-select: none;
+  background:
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--bone) 24%, transparent), transparent calc(6rem + var(--pull) * 18rem)),
+    radial-gradient(circle at calc(100% - var(--x)) calc(100% - var(--y)), color-mix(in oklch, var(--blue) 12%, transparent), transparent calc(8rem + var(--tear) * 12rem)),
+    color-mix(in oklch, var(--ink) 76%, var(--bone));
   cursor: crosshair;
-}
-
-.signal-drift {
-  --drift: 0.34;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--acid) 20%, transparent), transparent calc(8rem + var(--drift) * 16rem)),
-    repeating-linear-gradient(0deg, color-mix(in oklch, var(--acid) 8%, transparent) 0 1px, transparent 1px 10px),
-    linear-gradient(135deg, color-mix(in oklch, var(--acid) 12%, transparent), transparent 46%, color-mix(in oklch, var(--blue) 8%, transparent)),
-    var(--ink);
-}
-
-.signal-field {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border: 0;
-  border-radius: 0;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--acid) 16%, transparent), transparent calc(4rem + var(--drift) * 12rem)),
-    repeating-linear-gradient(90deg, color-mix(in oklch, var(--acid) 14%, transparent) 0 2px, transparent 2px calc(10px + var(--drift) * 20px)),
-    color-mix(in oklch, var(--ink) 86%, black);
-  box-shadow:
-    inset calc(var(--drift) * 18px) 0 0 color-mix(in oklch, var(--acid) 18%, transparent),
-    inset calc(var(--drift) * -18px) 0 0 color-mix(in oklch, var(--blue) 14%, transparent);
-}
-
-.signal-field::before,
-.signal-field::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.signal-field::before {
-  background:
-    linear-gradient(90deg, transparent 0 24%, color-mix(in oklch, var(--acid) 30%, transparent) 25%, transparent 27% 70%, color-mix(in oklch, var(--blue) 26%, transparent) 71%, transparent 73%),
-    repeating-linear-gradient(0deg, transparent 0 18px, color-mix(in oklch, white 12%, transparent) 19px 20px);
-  opacity: calc(0.26 + var(--drift) * 0.44);
-  transform:
-    translateX(calc((var(--x) - 50%) * 0.14 + (var(--scroll-flow) - 0.5) * 18%))
-    skewY(calc((var(--scroll-flow) - 0.5) * 8deg));
-}
-
-.signal-field::after {
-  background: radial-gradient(circle at var(--x) var(--y), transparent 0 16%, color-mix(in oklch, var(--acid) 28%, transparent) 17%, transparent 22%);
-  opacity: calc(0.22 + var(--drift) * 0.36);
-}
-
-.signal-band {
-  position: absolute;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--acid) 72%, transparent), transparent);
-  opacity: calc(0.16 + var(--drift) * 0.46);
-}
-
-.signal-band--a {
-  top: calc(var(--y) - 18%);
-}
-
-.signal-band--b {
-  top: var(--y);
-  transform: translateX(calc((var(--x) - 50%) * -0.18));
-}
-
-.signal-band--c {
-  top: calc(var(--y) + 22%);
-}
-
-.heat-index {
-  --heat: 0.4;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--amber) 46%, transparent), transparent calc(8rem + var(--heat) * 18rem)),
-    radial-gradient(circle at 20% 80%, color-mix(in oklch, var(--rose) 24%, transparent), transparent 38%),
-    linear-gradient(160deg, color-mix(in oklch, var(--bone) 78%, var(--amber)), color-mix(in oklch, var(--ink) 56%, black));
-}
-
-.heat-map {
-  position: relative;
-  width: min(118vw, 1100px);
-  height: min(82svh, 740px);
-  overflow: hidden;
-  border: 0;
-  border-radius: 52% 48% 45% 55% / 40% 52% 48% 60%;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--amber) 44%, transparent), transparent calc(3rem + var(--heat) * 15rem)),
-    radial-gradient(circle at calc(100% - var(--x)) calc(100% - var(--y)), color-mix(in oklch, var(--rose) 28%, transparent), transparent calc(4rem + var(--heat) * 13rem)),
-    conic-gradient(from calc(var(--angle) + var(--scroll-flow) * -0.35turn), color-mix(in oklch, var(--amber) 20%, transparent), color-mix(in oklch, var(--rose) 18%, transparent), transparent, color-mix(in oklch, var(--bone) 12%, transparent)),
-    color-mix(in oklch, var(--skin) 64%, black);
-  box-shadow:
-    inset 0 0 calc(26px + var(--heat) * 44px) color-mix(in oklch, black 48%, transparent),
-    0 0 calc(18px + var(--heat) * 34px) color-mix(in oklch, var(--amber) 20%, transparent);
-  animation: rotateField 36s linear infinite;
-  transform:
-    translateX(calc((var(--scroll-flow) - 0.5) * -10vw))
-    scale(calc(1 + var(--heat) * 0.02));
-}
-
-.heat-map::before,
-.heat-map::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.heat-map::before {
-  background:
-    linear-gradient(color-mix(in oklch, white 7%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklch, white 5%, transparent) 1px, transparent 1px);
-  background-size: 38px 38px;
-  mask-image: radial-gradient(circle at var(--x) var(--y), black 0 calc(8rem + var(--heat) * 17rem), transparent calc(14rem + var(--heat) * 19rem));
-}
-
-.heat-map::after {
-  background: repeating-radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--amber) 20%, transparent) 0 2px, transparent 2px 28px);
-  opacity: calc(0.24 + var(--heat) * 0.34);
-}
-
-.heat-cell {
-  position: absolute;
-  width: 26%;
-  aspect-ratio: 1;
-  border-radius: 45% 55% 50% 50%;
-  background: radial-gradient(circle, color-mix(in oklch, var(--amber) 24%, transparent), transparent 68%);
-  opacity: calc(0.16 + var(--heat) * 0.28);
-}
-
-.heat-cell--a {
-  left: 9%;
-  top: 18%;
-}
-
-.heat-cell--b {
-  right: 12%;
-  top: 24%;
-  background: radial-gradient(circle, color-mix(in oklch, var(--bone) 22%, transparent), transparent 70%);
-}
-
-.heat-cell--c {
-  left: 38%;
-  bottom: 10%;
-}
-
-.soft-circuit {
-  --pulse: 0.32;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--blue) 20%, transparent), transparent calc(7rem + var(--pulse) * 16rem)),
-    linear-gradient(160deg, color-mix(in oklch, var(--blue) 10%, transparent), transparent 38%, color-mix(in oklch, var(--acid) 8%, transparent)),
-    var(--ink);
-}
-
-.circuit-skin {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border: 0;
-  border-radius: 0;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--blue) 24%, transparent), transparent calc(5rem + var(--pulse) * 15rem)),
-    linear-gradient(90deg, transparent 0 24%, color-mix(in oklch, var(--blue) 16%, transparent) 25%, transparent 26% 52%, color-mix(in oklch, var(--acid) 10%, transparent) 53%, transparent 54%),
-    color-mix(in oklch, var(--ink) 84%, black);
-  box-shadow:
-    inset 0 0 calc(30px + var(--pulse) * 30px) color-mix(in oklch, black 50%, transparent),
-    0 0 calc(16px + var(--pulse) * 26px) color-mix(in oklch, var(--cyan) 16%, transparent);
-}
-
-.circuit-skin::before,
-.circuit-skin::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.circuit-skin::before {
-  background:
-    linear-gradient(color-mix(in oklch, var(--blue) 16%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklch, var(--acid) 10%, transparent) 1px, transparent 1px);
-  background-size:
-    calc(34px + var(--scroll-flow) * 28px)
-    calc(34px + var(--scroll-flow) * 28px);
-  opacity: calc(0.24 + var(--pulse) * 0.28);
-  mask-image:
-    radial-gradient(circle at var(--x) var(--y), black 0 calc(7rem + var(--pulse) * 16rem), transparent calc(13rem + var(--pulse) * 20rem)),
-    linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
-}
-
-.circuit-skin::after {
-  background:
-    linear-gradient(0deg, transparent 0 48%, color-mix(in oklch, var(--blue) 42%, transparent) 49%, transparent 50%),
-    linear-gradient(90deg, transparent 0 38%, color-mix(in oklch, var(--acid) 28%, transparent) 39%, transparent 40% 72%, color-mix(in oklch, var(--blue) 34%, transparent) 73%, transparent 74%);
-  opacity: calc(0.22 + var(--pulse) * 0.5);
-  clip-path: polygon(
-    8% 42%,
-    calc(26% + var(--scroll-flow) * 8%) 42%,
-    28% calc(28% + var(--scroll-flow) * 7%),
-    48% 28%,
-    48% calc(62% - var(--scroll-flow) * 8%),
-    70% 62%,
-    70% 38%,
-    92% 38%,
-    92% 58%,
-    8% 58%
-  );
-}
-
-.circuit-node {
-  position: absolute;
-  width: clamp(12px, 4vw, 34px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: color-mix(in oklch, var(--light) 64%, var(--cyan));
-  box-shadow: 0 0 calc(10px + var(--pulse) * 22px) color-mix(in oklch, var(--blue) 54%, transparent);
-  opacity: calc(0.34 + var(--pulse) * 0.42);
-}
-
-.circuit-node--a {
-  left: calc(var(--x) - 16%);
-  top: calc(var(--y) - 12%);
-}
-
-.circuit-node--b {
-  right: calc(100% - var(--x) - 12%);
-  top: calc(var(--y) + 18%);
-}
-
-.circuit-node--c {
-  left: 18%;
-  bottom: 18%;
-}
-
-.tension-mesh {
-  --pull: 0.28;
-  background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--bone) 22%, transparent), transparent calc(7rem + var(--pull) * 14rem)),
-    linear-gradient(120deg, color-mix(in oklch, var(--bone) 52%, var(--ink)), transparent 35%, color-mix(in oklch, var(--cyan) 8%, transparent)),
-    color-mix(in oklch, var(--ink) 72%, var(--bone));
 }
 
 .mesh-field {
@@ -881,21 +168,17 @@ input {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  border: 0;
-  border-radius: 0;
   background:
-    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, white 12%, transparent), transparent calc(4rem + var(--pull) * 11rem)),
-    linear-gradient(90deg, color-mix(in oklch, var(--light) 5%, transparent) 1px, transparent 1px),
-    linear-gradient(0deg, color-mix(in oklch, var(--light) 5%, transparent) 1px, transparent 1px),
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, white 18%, transparent), transparent calc(4rem + var(--pull) * 13rem)),
+    linear-gradient(90deg, color-mix(in oklch, var(--bone) 8%, transparent) 1px, transparent 1px),
+    linear-gradient(0deg, color-mix(in oklch, var(--bone) 7%, transparent) 1px, transparent 1px),
     color-mix(in oklch, var(--ink) 88%, black);
   background-size:
     auto,
-    calc(18px + var(--pull) * 20px + var(--scroll-flow) * 18px) calc(18px + var(--pull) * 20px),
-    calc(18px + var(--pull) * 20px) calc(18px + var(--pull) * 20px + var(--scroll-flow) * 18px),
+    calc(34px - var(--pull) * 14px + var(--repair) * 16px) calc(22px + var(--tear) * 34px),
+    calc(18px + var(--tear) * 42px) calc(38px - var(--repair) * 14px),
     auto;
-  box-shadow:
-    inset 0 0 calc(24px + var(--pull) * 36px) color-mix(in oklch, black 58%, transparent),
-    0 0 calc(14px + var(--pull) * 28px) color-mix(in oklch, var(--light) 10%, transparent);
+  box-shadow: inset 0 0 calc(24px + var(--pull) * 36px) color-mix(in oklch, black 58%, transparent);
 }
 
 .mesh-field::before,
@@ -908,30 +191,31 @@ input {
 
 .mesh-field::before {
   background:
-    repeating-linear-gradient(28deg, transparent 0 28px, color-mix(in oklch, var(--cyan) 18%, transparent) 29px 30px),
-    repeating-linear-gradient(-34deg, transparent 0 32px, color-mix(in oklch, var(--rose) 15%, transparent) 33px 34px);
-  opacity: calc(0.26 + var(--pull) * 0.44);
+    repeating-linear-gradient(calc(22deg + var(--scroll-flow) * 28deg), transparent 0 calc(20px - var(--pull) * 6px), color-mix(in oklch, var(--bone) 24%, transparent) calc(21px - var(--pull) * 6px) calc(22px - var(--pull) * 6px)),
+    repeating-linear-gradient(calc(-42deg - var(--scroll-flow) * 22deg), transparent 0 calc(30px + var(--repair) * 18px), color-mix(in oklch, var(--cyan) 16%, transparent) calc(31px + var(--repair) * 18px) calc(32px + var(--repair) * 18px));
+  opacity: calc(0.34 + var(--pull) * 0.38 - var(--repair) * 0.12);
   transform:
     translate(
-      calc((var(--x) - 50%) * 0.08 + (var(--scroll-flow) - 0.5) * 8%),
-      calc((var(--y) - 50%) * 0.08)
+      calc((var(--x) - 50%) * 0.16 + (var(--scroll-flow) - 0.5) * 12%),
+      calc((var(--y) - 50%) * 0.1)
     )
     skew(
-      calc((var(--x) - 50%) * 0.04deg),
-      calc((var(--y) - 50%) * -0.04deg)
+      calc((var(--x) - 50%) * 0.06deg + var(--tear) * 8deg),
+      calc((var(--y) - 50%) * -0.05deg)
     );
 }
 
 .mesh-field::after {
   background:
-    radial-gradient(circle at var(--x) var(--y), transparent 0 18%, color-mix(in oklch, var(--amber) 28%, transparent) 19%, transparent 24%),
-    conic-gradient(from calc(var(--angle) * 0.5) at var(--x) var(--y), transparent, color-mix(in oklch, var(--cyan) 18%, transparent), transparent 38%, color-mix(in oklch, var(--rose) 16%, transparent), transparent);
-  opacity: calc(0.2 + var(--pull) * 0.38);
+    radial-gradient(circle at var(--x) var(--y), transparent 0 calc(16% - var(--tear) * 5%), color-mix(in oklch, var(--amber) 30%, transparent) calc(17% - var(--tear) * 5%), transparent calc(23% + var(--repair) * 7%)),
+    conic-gradient(from calc(var(--angle) * 0.5 + var(--scroll-flow) * 1turn) at var(--x) var(--y), transparent, color-mix(in oklch, var(--cyan) 18%, transparent), transparent 36%, color-mix(in oklch, var(--rose) 24%, transparent), transparent);
+  opacity: calc(0.18 + var(--pull) * 0.32);
   mix-blend-mode: screen;
 }
 
 .mesh-thread,
-.mesh-knot {
+.mesh-knot,
+.mesh-tear {
   position: absolute;
   pointer-events: none;
 }
@@ -939,36 +223,69 @@ input {
 .mesh-thread {
   left: 50%;
   top: 50%;
-  width: 120%;
+  width: 128%;
   height: 1px;
   transform-origin: center;
-  background: linear-gradient(90deg, transparent, color-mix(in oklch, white 64%, transparent), transparent);
-  opacity: calc(0.2 + var(--pull) * 0.44);
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--bone) 58%, transparent), transparent);
+  opacity: calc(0.18 + var(--pull) * 0.52 - var(--repair) * 0.12);
 }
 
 .mesh-thread--a {
-  transform: translate(-50%, -50%) rotate(calc(18deg + var(--pull) * 10deg + var(--scroll-flow) * 24deg));
+  transform: translate(-50%, -50%) rotate(calc(18deg + var(--pull) * 18deg + var(--scroll-flow) * 34deg - var(--repair) * 22deg));
 }
 
 .mesh-thread--b {
-  transform: translate(-50%, -50%) rotate(calc(-22deg - var(--pull) * 12deg - var(--scroll-flow) * 18deg));
+  transform: translate(-50%, -50%) rotate(calc(-22deg - var(--pull) * 20deg - var(--scroll-flow) * 26deg + var(--repair) * 18deg));
 }
 
 .mesh-thread--c {
-  transform: translate(-50%, -50%) rotate(calc(64deg + var(--pull) * 8deg));
+  transform: translate(-50%, -50%) rotate(calc(64deg + var(--pull) * 16deg - var(--tear) * 28deg + var(--repair) * 18deg));
 }
 
 .mesh-thread--d {
-  transform: translate(-50%, -50%) rotate(calc(-74deg - var(--pull) * 9deg));
+  transform: translate(-50%, -50%) rotate(calc(-74deg - var(--pull) * 14deg + var(--tear) * 24deg - var(--repair) * 16deg));
+}
+
+.mesh-thread--e,
+.mesh-thread--f {
+  width: 140%;
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--bone) 48%, transparent), transparent);
+}
+
+.mesh-thread--e {
+  transform: translate(-50%, -50%) rotate(calc(6deg + var(--pull) * 42deg - var(--repair) * 20deg));
+}
+
+.mesh-thread--f {
+  transform: translate(-50%, -50%) rotate(calc(-8deg - var(--pull) * 38deg + var(--repair) * 18deg));
+}
+
+.mesh-tear {
+  width: calc(34% + var(--tear) * 18%);
+  height: 2px;
+  left: calc(var(--x) - 18%);
+  top: var(--y);
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, black 80%, var(--rose)), transparent);
+  opacity: calc(var(--tear) * (1 - var(--repair)) * 0.86);
+  transform-origin: left;
+  filter: blur(0.2px);
+}
+
+.mesh-tear--a {
+  transform: rotate(calc(18deg + var(--pull) * 16deg));
+}
+
+.mesh-tear--b {
+  transform: rotate(calc(-28deg - var(--pull) * 12deg)) translateY(16px);
 }
 
 .mesh-knot {
   width: clamp(10px, 3.6vw, 28px);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: color-mix(in oklch, var(--light) 62%, transparent);
-  box-shadow: 0 0 calc(8px + var(--pull) * 18px) color-mix(in oklch, var(--light) 38%, transparent);
-  opacity: calc(0.3 + var(--pull) * 0.34);
+  background: color-mix(in oklch, var(--bone) 62%, transparent);
+  box-shadow: 0 0 calc(7px + var(--pull) * 24px) color-mix(in oklch, var(--bone) 36%, transparent);
+  opacity: calc(0.24 + var(--pull) * 0.42);
 }
 
 .mesh-knot--a {
@@ -986,66 +303,44 @@ input {
   bottom: 18%;
 }
 
-@media (hover: none) {
-  .signal-drift {
-    --drift: 0.48;
-  }
+.mesh-knot--d {
+  left: calc(var(--x) + 18%);
+  top: calc(var(--y) - 22%);
+}
 
-  .heat-index {
-    --heat: 0.54;
-  }
-
-  .soft-circuit {
-    --pulse: 0.46;
-  }
-
-  .tension-mesh {
-    --pull: 0.42;
-  }
+.mesh-knot--e {
+  right: 18%;
+  bottom: calc(20% + var(--repair) * 16%);
 }
 
 @media (max-width: 640px) {
-  .signal-field,
-  .circuit-skin,
-  .mesh-field {
-    width: 100%;
-    height: 100%;
+  .mesh-scroll-rail {
+    right: max(10px, env(safe-area-inset-right));
+    gap: 10px;
   }
 
-  .heat-map {
-    width: 112vw;
-    height: min(78svh, 650px);
+  .mesh-stage-mark {
+    width: 4px;
+    height: 22px;
   }
 
-  .signal-drift,
-  .soft-circuit,
-  .tension-mesh {
-    background:
-      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--acid) 14%, transparent), transparent 18rem),
-      var(--ink);
-  }
-
-  .heat-index {
-    background:
-      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--amber) 34%, transparent), transparent 18rem),
-      linear-gradient(160deg, color-mix(in oklch, var(--bone) 76%, var(--amber)), color-mix(in oklch, var(--ink) 58%, black));
-  }
-
-  .soft-circuit {
-    background:
-      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--blue) 16%, transparent), transparent 18rem),
-      var(--ink);
-  }
-
-  .tension-mesh {
-    background:
-      radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--bone) 18%, transparent), transparent 18rem),
-      color-mix(in oklch, var(--ink) 78%, var(--bone));
+  .mesh-thread {
+    width: 150%;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .heat-map {
-    animation: none !important;
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes rotateField {
+  to {
+    --angle: 360deg;
   }
 }

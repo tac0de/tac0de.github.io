@@ -49,9 +49,15 @@ export function TensionMesh() {
         <span className="mesh-thread mesh-thread--b" />
         <span className="mesh-thread mesh-thread--c" />
         <span className="mesh-thread mesh-thread--d" />
+        <span className="mesh-thread mesh-thread--e" />
+        <span className="mesh-thread mesh-thread--f" />
+        <span className="mesh-tear mesh-tear--a" />
+        <span className="mesh-tear mesh-tear--b" />
         <span className="mesh-knot mesh-knot--a" />
         <span className="mesh-knot mesh-knot--b" />
         <span className="mesh-knot mesh-knot--c" />
+        <span className="mesh-knot mesh-knot--d" />
+        <span className="mesh-knot mesh-knot--e" />
       </div>
     </main>
   );
