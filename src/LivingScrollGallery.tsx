@@ -1,8 +1,11 @@
 import type { ComponentType } from 'react';
 import { GlassWound } from './GlassWound';
+import { HeatIndex } from './HeatIndex';
 import { PressureBloom } from './PressureBloom';
+import { SignalDrift } from './SignalDrift';
+import { SoftCircuit } from './SoftCircuit';
 
-type ArtworkKey = 'pressure-bloom' | 'glass-wound';
+type ArtworkKey = 'pressure-bloom' | 'glass-wound' | 'signal-drift' | 'heat-index' | 'soft-circuit';
 
 const artworkMap = {
   'pressure-bloom': {
@@ -12,6 +15,18 @@ const artworkMap = {
   'glass-wound': {
     label: 'glass wound',
     Component: GlassWound,
+  },
+  'signal-drift': {
+    label: 'signal drift',
+    Component: SignalDrift,
+  },
+  'heat-index': {
+    label: 'heat index',
+    Component: HeatIndex,
+  },
+  'soft-circuit': {
+    label: 'soft circuit',
+    Component: SoftCircuit,
   },
 } satisfies Record<ArtworkKey, { label: string; Component: ComponentType }>;
 
