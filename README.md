@@ -1,8 +1,8 @@
 # tac0de
 
-Pressure Bloom / Glass Wound.
+Living Scroll Gallery.
 
-Full-screen CSS artworks for mobile-first touch interaction. `/` shows Pressure Bloom; `/glass-wound` shows Glass Wound. No backend, no login, no database.
+Full-screen CSS artworks in a mobile-first randomized scroll gallery. No backend, no login, no database.
 
 ## Commands
 

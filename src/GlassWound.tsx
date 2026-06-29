@@ -1,6 +1,10 @@
 import { PointerEvent, useRef } from 'react';
 
-export function GlassWound() {
+type ArtworkProps = {
+  mark?: boolean;
+};
+
+export function GlassWound({ mark = false }: ArtworkProps) {
   const rootRef = useRef<HTMLElement>(null);
   const frameRef = useRef<number | undefined>(undefined);
   const pointRef = useRef({ x: 50, y: 50, px: 43, py: 56, cut: 0.28 });
@@ -58,7 +62,7 @@ export function GlassWound() {
         <span className="wound-line wound-line--b" />
         <span className="wound-chip wound-chip--a" />
         <span className="wound-chip wound-chip--b" />
-        <h1>tac0de</h1>
+        {mark && <h1>tac0de</h1>}
       </div>
     </main>
   );

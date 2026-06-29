@@ -49,7 +49,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
   background: var(--ink);
   color: var(--light);
 }
@@ -59,6 +59,33 @@ input {
   font: inherit;
 }
 
+.living-scroll-gallery {
+  width: 100vw;
+  min-height: 100svh;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  background: var(--ink);
+}
+
+.artwork-section {
+  position: relative;
+  min-height: 100svh;
+  scroll-snap-align: start;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.artwork-index {
+  position: absolute;
+  left: max(14px, env(safe-area-inset-left));
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 10;
+  color: color-mix(in oklch, var(--light) 44%, transparent);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
 .pressure-bloom {
   --x: 50%;
   --y: 50%;
@@ -66,7 +93,7 @@ input {
   --bloom: 0.18;
   --bloom-size: calc(11rem + var(--pressure) * 18rem + var(--bloom) * 8rem);
   position: relative;
-  width: 100vw;
+  width: 100%;
   height: 100svh;
   overflow: hidden;
   display: grid;
@@ -321,7 +348,7 @@ input {
   --cut: 0.24;
   --scar: calc(7rem + var(--cut) * 15rem);
   position: relative;
-  width: 100vw;
+  width: 100%;
   height: 100svh;
   overflow: hidden;
   display: grid;
