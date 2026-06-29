@@ -1,8 +1,8 @@
 # tac0de
 
-CSS experiments / tiny games / browser toys.
+Experimental CSS surfaces / browser-native visual studies.
 
-This is a static Vite + React site for small browser-native experiments. No backend, no login, no database.
+This is a static Vite + React site for CSS art experiments and browser-native visual studies. No backend, no login, no database.
 
 ## Commands
 

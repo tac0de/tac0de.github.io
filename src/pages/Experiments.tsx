@@ -7,9 +7,12 @@ export function Experiments() {
   return (
     <div className="page-stack">
       <section className="page-intro">
-        <span>css visual experiments gallery</span>
+        <span>css art studies gallery</span>
         <h1>Experiments</h1>
-        <p>Small finished surfaces, interface studies, and motion sketches built directly in the browser.</p>
+        <p>
+          Visual studies, interface fragments, and motion sketches built directly with CSS in the
+          browser.
+        </p>
       </section>
       <section className="card-grid">
         {experiments.map((experiment, index) => (
