@@ -52,6 +52,12 @@
   initial-value: 0;
 }
 
+@property --scroll-flow {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 :root {
   color-scheme: dark;
   --ink: oklch(8% 0.026 250);
@@ -84,13 +90,41 @@ input {
 }
 
 .living-scroll-gallery {
+  --scroll-flow: 0;
+  --scroll-shift: 0%;
   width: 100vw;
   height: 100svh;
   overflow-x: hidden;
   overflow-y: auto;
-  scroll-snap-type: y mandatory;
-  overscroll-behavior-y: contain;
-  background: var(--ink);
+  overscroll-behavior-y: auto;
+  scroll-behavior: smooth;
+  background:
+    radial-gradient(circle at calc(18% + var(--scroll-flow) * 62%) 22%, color-mix(in oklch, var(--cyan) 12%, transparent), transparent 30%),
+    radial-gradient(circle at calc(82% - var(--scroll-flow) * 48%) 78%, color-mix(in oklch, var(--rose) 10%, transparent), transparent 34%),
+    linear-gradient(180deg, var(--ink), color-mix(in oklch, var(--ink) 86%, black));
+}
+
+.gallery-atmosphere {
+  position: fixed;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.gallery-atmosphere--a {
+  background:
+    repeating-linear-gradient(112deg, transparent 0 34px, color-mix(in oklch, white 5%, transparent) 35px 36px),
+    radial-gradient(circle at var(--scroll-shift) 50%, color-mix(in oklch, var(--cyan) 14%, transparent), transparent 36%);
+  opacity: 0.72;
+  transform: translateY(calc(var(--scroll-flow) * -8%));
+}
+
+.gallery-atmosphere--b {
+  background:
+    conic-gradient(from calc(var(--angle) + var(--scroll-flow) * 1turn) at 50% 50%, transparent, color-mix(in oklch, var(--amber) 8%, transparent), transparent 34%, color-mix(in oklch, var(--violet) 9%, transparent), transparent 62%);
+  opacity: 0.5;
+  mix-blend-mode: screen;
+  animation: rotateField 48s linear infinite;
 }
 
 .gallery-mark {
@@ -107,10 +141,25 @@ input {
 
 .artwork-section {
   position: relative;
-  min-height: 100svh;
-  scroll-snap-align: start;
+  z-index: 1;
+  min-height: 112svh;
   overflow: hidden;
-  background: var(--ink);
+  background: transparent;
+  margin-top: -12svh;
+  mask-image: linear-gradient(to bottom, transparent 0, black 13svh, black calc(100% - 13svh), transparent 100%);
+}
+
+.artwork-section:first-of-type {
+  margin-top: 0;
+  mask-image: linear-gradient(to bottom, black 0, black calc(100% - 13svh), transparent 100%);
+}
+
+.artwork-section:last-of-type {
+  mask-image: linear-gradient(to bottom, transparent 0, black 13svh, black 100%);
+}
+
+.artwork-section > main {
+  mask-image: linear-gradient(to bottom, transparent 0, black 11svh, black calc(100% - 11svh), transparent 100%);
 }
 
 .artwork-index {
@@ -122,17 +171,6 @@ input {
   font-size: 0.68rem;
   text-transform: uppercase;
   pointer-events: none;
-}
-
-.bloom-surface h1,
-.wound-pane h1,
-.signal-field h1,
-.heat-map h1,
-.circuit-skin h1 {
-  max-width: 100%;
-  padding-inline: clamp(1rem, 7vw, 4rem);
-  overflow-wrap: anywhere;
-  text-wrap: balance;
 }
 
 .pressure-bloom {
@@ -242,33 +280,6 @@ input {
   transform: translateX(calc(-24% + var(--pressure) * 12%));
 }
 
-.bloom-surface h1 {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  margin: 0;
-  max-width: 100%;
-  color: transparent;
-  font-size: clamp(4rem, 18vw, 15rem);
-  line-height: 0.86;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-align: center;
-  background:
-    radial-gradient(circle at var(--x) var(--y), var(--light), color-mix(in oklch, var(--cyan) 78%, white) 26%, color-mix(in oklch, var(--rose) 72%, transparent) 54%, transparent 70%),
-    linear-gradient(90deg, var(--light), var(--cyan), var(--amber), var(--light));
-  background-clip: text;
-  -webkit-background-clip: text;
-  opacity: calc(0.22 + var(--pressure) * 0.55 + var(--bloom) * 0.22);
-  text-shadow:
-    0 0 calc(8px + var(--pressure) * 18px) color-mix(in oklch, var(--cyan) 38%, transparent),
-    calc(var(--pressure) * 0.035em) 0 color-mix(in oklch, var(--rose) 62%, transparent);
-  mask-image:
-    radial-gradient(circle at var(--x) var(--y), black 0 calc(8rem + var(--pressure) * 22rem), transparent calc(13rem + var(--pressure) * 28rem)),
-    repeating-linear-gradient(90deg, black 0 9px, transparent 9px 13px);
-}
-
 .bloom-vein,
 .bloom-rift,
 .bloom-petal {
@@ -363,14 +374,6 @@ input {
     opacity: calc(0.12 + var(--bloom) * 0.24);
   }
 
-  .bloom-surface h1,
-  .wound-pane h1,
-  .signal-field h1,
-  .heat-map h1,
-  .circuit-skin h1 {
-    font-size: clamp(2.45rem, 15.4vw, 5.8rem);
-    line-height: 0.92;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -483,33 +486,6 @@ input {
   background-size: 34px 34px;
   opacity: 0.42;
   mask-image: linear-gradient(90deg, transparent, black 14%, black 86%, transparent);
-}
-
-.wound-pane h1 {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  margin: 0;
-  max-width: 100%;
-  color: transparent;
-  font-size: clamp(2.9rem, 14vw, 12rem);
-  line-height: 0.86;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-align: center;
-  background:
-    radial-gradient(circle at var(--x) var(--y), var(--light), color-mix(in oklch, var(--cyan) 76%, white) 28%, transparent 62%),
-    linear-gradient(90deg, var(--light), var(--cyan), var(--rose));
-  background-clip: text;
-  -webkit-background-clip: text;
-  opacity: calc(0.14 + var(--cut) * 0.7);
-  text-shadow:
-    calc(var(--cut) * 0.04em) 0 color-mix(in oklch, var(--rose) 54%, transparent),
-    0 0 calc(8px + var(--cut) * 16px) color-mix(in oklch, var(--cyan) 28%, transparent);
-  mask-image:
-    radial-gradient(circle at var(--x) var(--y), black 0 calc(5rem + var(--cut) * 18rem), transparent calc(9rem + var(--cut) * 22rem)),
-    linear-gradient(110deg, transparent 0 35%, black 36% 43%, transparent 44% 58%, black 59% 66%, transparent 67%);
 }
 
 .wound-line,
@@ -644,29 +620,6 @@ input {
   opacity: calc(0.22 + var(--drift) * 0.36);
 }
 
-.signal-field h1 {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  margin: 0;
-  color: transparent;
-  font-size: clamp(3.2rem, 14.5vw, 12rem);
-  line-height: 0.86;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-align: center;
-  background:
-    linear-gradient(90deg, var(--light), var(--cyan), var(--rose), var(--light));
-  background-clip: text;
-  -webkit-background-clip: text;
-  opacity: calc(0.24 + var(--drift) * 0.58);
-  text-shadow:
-    calc(var(--drift) * -0.055em) 0 color-mix(in oklch, var(--cyan) 70%, transparent),
-    calc(var(--drift) * 0.05em) 0 color-mix(in oklch, var(--rose) 68%, transparent);
-  mask-image: repeating-linear-gradient(0deg, black 0 9px, transparent 9px 14px);
-}
-
 .signal-band {
   position: absolute;
   left: 0;
@@ -734,27 +687,6 @@ input {
 .heat-map::after {
   background: repeating-radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--amber) 20%, transparent) 0 2px, transparent 2px 28px);
   opacity: calc(0.24 + var(--heat) * 0.34);
-}
-
-.heat-map h1 {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  margin: 0;
-  color: transparent;
-  font-size: clamp(3.6rem, 15vw, 13rem);
-  line-height: 0.86;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-align: center;
-  background:
-    radial-gradient(circle at var(--x) var(--y), var(--light), var(--amber) 28%, var(--rose) 58%, transparent 70%),
-    linear-gradient(90deg, var(--amber), var(--rose), var(--light));
-  background-clip: text;
-  -webkit-background-clip: text;
-  opacity: calc(0.18 + var(--heat) * 0.62);
-  text-shadow: 0 0 calc(10px + var(--heat) * 18px) color-mix(in oklch, var(--amber) 34%, transparent);
 }
 
 .heat-cell {
@@ -831,27 +763,6 @@ input {
     linear-gradient(90deg, transparent 0 38%, color-mix(in oklch, var(--amber) 30%, transparent) 39%, transparent 40% 72%, color-mix(in oklch, var(--cyan) 34%, transparent) 73%, transparent 74%);
   opacity: calc(0.22 + var(--pulse) * 0.5);
   clip-path: polygon(8% 42%, 28% 42%, 28% 28%, 48% 28%, 48% 62%, 70% 62%, 70% 38%, 92% 38%, 92% 58%, 8% 58%);
-}
-
-.circuit-skin h1 {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  margin: 0;
-  color: transparent;
-  font-size: clamp(3.1rem, 14.6vw, 12rem);
-  line-height: 0.86;
-  font-weight: 900;
-  letter-spacing: 0;
-  text-align: center;
-  background:
-    radial-gradient(circle at var(--x) var(--y), var(--light), var(--cyan) 34%, var(--amber) 64%, transparent 72%),
-    linear-gradient(90deg, var(--cyan), var(--light), var(--amber));
-  background-clip: text;
-  -webkit-background-clip: text;
-  opacity: calc(0.18 + var(--pulse) * 0.66);
-  text-shadow: 0 0 calc(8px + var(--pulse) * 18px) color-mix(in oklch, var(--cyan) 34%, transparent);
 }
 
 .circuit-node {
@@ -1039,18 +950,6 @@ input {
     background:
       radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 16%, transparent), transparent 18rem),
       var(--ink);
-  }
-}
-
-@media (max-width: 640px) {
-  .bloom-surface h1,
-  .wound-pane h1,
-  .signal-field h1,
-  .heat-map h1,
-  .circuit-skin h1 {
-    font-size: clamp(2.35rem, 14.8vw, 5.6rem);
-    line-height: 0.94;
-    padding-inline: clamp(1.2rem, 8vw, 2.4rem);
   }
 }
 

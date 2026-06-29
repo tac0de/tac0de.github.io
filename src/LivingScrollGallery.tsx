@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import { type ComponentType, type UIEvent, useRef } from 'react';
 import { GlassWound } from './GlassWound';
 import { HeatIndex } from './HeatIndex';
 import { PressureBloom } from './PressureBloom';
@@ -50,10 +50,35 @@ function getSessionOrder() {
 }
 
 export function LivingScrollGallery() {
+  const rootRef = useRef<HTMLElement>(null);
+  const frameRef = useRef<number | undefined>(undefined);
   const order = getSessionOrder();
 
+  function updateFlow(event: UIEvent<HTMLElement>) {
+    const target = event.currentTarget;
+    if (frameRef.current) return;
+
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = undefined;
+      const root = rootRef.current;
+      if (!root) return;
+
+      const max = Math.max(1, target.scrollHeight - target.clientHeight);
+      const progress = target.scrollTop / max;
+      root.style.setProperty('--scroll-flow', progress.toFixed(4));
+      root.style.setProperty('--scroll-shift', `${(progress * 100).toFixed(2)}%`);
+    });
+  }
+
   return (
-    <main className="living-scroll-gallery" aria-label="tac0de living CSS artwork gallery">
+    <main
+      ref={rootRef}
+      className="living-scroll-gallery"
+      onScroll={updateFlow}
+      aria-label="tac0de living CSS artwork gallery"
+    >
+      <span className="gallery-atmosphere gallery-atmosphere--a" aria-hidden="true" />
+      <span className="gallery-atmosphere gallery-atmosphere--b" aria-hidden="true" />
       <span className="gallery-mark">tac0de</span>
       {order.map((key, index) => {
         const { Component, label } = artworkMap[key];
