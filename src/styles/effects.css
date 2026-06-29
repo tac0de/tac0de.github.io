@@ -1,443 +1,289 @@
-.scroll-specimen-demo {
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
-  padding: clamp(18px, 5vw, 48px);
-  perspective: 900px;
-}
-
-.scroll-wall-stage {
-  display: grid;
-  gap: 20px;
-  max-width: 760px;
-  margin: 0 auto;
-}
-
-.scroll-specimen-tile {
-  --local: calc(var(--i) * 38deg);
-  min-height: 210px;
-  scroll-snap-align: center;
+.chamber-frame {
   position: relative;
-  overflow: hidden;
-  display: grid;
-  align-content: end;
-  border: 1px solid color-mix(in oklch, var(--cyan) 35%, transparent);
-  border-radius: 8px;
-  padding: 22px;
+  isolation: isolate;
+  min-height: clamp(520px, 70vw, 780px);
+}
+
+.chamber-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
   background:
-    radial-gradient(circle at 20% 20%, color-mix(in oklch, var(--cyan) 20%, transparent), transparent 34%),
-    conic-gradient(from var(--local), transparent, color-mix(in oklch, var(--violet) 24%, transparent), transparent),
     linear-gradient(color-mix(in oklch, white 8%, transparent) 1px, transparent 1px),
-    color-mix(in oklch, var(--bg) 78%, black);
-  background-size: auto, auto, 24px 24px, auto;
+    linear-gradient(90deg, color-mix(in oklch, white 6%, transparent) 1px, transparent 1px),
+    conic-gradient(from var(--angle) at 50% 42%, transparent, color-mix(in oklch, var(--cyan) 14%, transparent), transparent 36%);
+  background-size: 32px 32px, 32px 32px, auto;
+  opacity: 0.78;
+  animation: spinAngle 18s linear infinite;
 }
 
-.scroll-specimen-tile span {
-  color: var(--amber);
-}
-
-.scroll-specimen-tile strong {
-  font-size: clamp(2rem, 8vw, 5rem);
-  line-height: 0.9;
-}
-
-@supports (animation-timeline: view()) {
-  .scroll-specimen-tile {
-    animation: tileFocus both ease-out;
-    animation-timeline: view();
-    animation-range: entry 0% cover 58%;
-  }
-}
-
-.sonar-demo {
+.signal-skin-demo {
   display: grid;
   place-items: center;
   background:
-    radial-gradient(circle at center, color-mix(in oklch, var(--cyan) 12%, transparent), transparent 42%),
-    #061016;
+    radial-gradient(circle at 50% 42%, color-mix(in oklch, var(--cyan) 18%, transparent), transparent 42%),
+    color-mix(in oklch, var(--bg) 88%, black);
 }
 
-.sonar-specimen {
+.living-membrane {
   position: relative;
-  width: min(86%, 660px);
+  width: min(88%, 680px);
   aspect-ratio: 1;
-  overflow: hidden;
   border: 1px solid color-mix(in oklch, var(--cyan) 42%, transparent);
   border-radius: 50%;
+  overflow: hidden;
   background:
-    repeating-radial-gradient(circle, transparent 0 9%, color-mix(in oklch, var(--cyan) 15%, transparent) 9.4% 9.8%, transparent 10% 18%),
-    linear-gradient(color-mix(in oklch, white 7%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklch, white 7%, transparent) 1px, transparent 1px),
-    #07141a;
-  background-size: auto, 32px 32px, 32px 32px, auto;
-  mask-image: radial-gradient(circle, black 0 74%, transparent 75%);
+    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--green) 24%, transparent), transparent 18%),
+    conic-gradient(from var(--angle), color-mix(in oklch, var(--cyan) 24%, transparent), transparent, color-mix(in oklch, var(--rose) 20%, transparent), transparent),
+    repeating-radial-gradient(circle, transparent 0 28px, color-mix(in oklch, white 13%, transparent) 29px 30px),
+    color-mix(in oklch, var(--bg) 78%, black);
+  mask-image: radial-gradient(circle, black 0 72%, transparent 73%);
+  animation: skinSpin 10s linear infinite;
 }
 
-.sonar-sweep {
+.living-membrane::before,
+.living-membrane::after {
+  content: "";
   position: absolute;
   inset: 0;
-  background: conic-gradient(from var(--angle), transparent 0 68%, color-mix(in oklch, var(--green) 62%, transparent), transparent 82%);
+  pointer-events: none;
+}
+
+.living-membrane::before {
+  background:
+    linear-gradient(90deg, transparent, color-mix(in oklch, var(--green) 44%, transparent), transparent),
+    repeating-linear-gradient(118deg, transparent 0 18px, color-mix(in oklch, white 10%, transparent) 18px 20px);
   mix-blend-mode: screen;
-  animation: spinAngle 5s linear infinite;
+  transform: rotate(calc(var(--angle) * 0.4));
 }
 
-.sonar-coast {
+.living-membrane::after {
+  inset: 17%;
+  border: 1px dashed color-mix(in oklch, var(--amber) 48%, transparent);
+  border-radius: 50%;
+}
+
+.membrane-ring {
   position: absolute;
-  border: 2px solid color-mix(in oklch, var(--amber) 52%, transparent);
-  filter: drop-shadow(0 0 16px color-mix(in oklch, var(--amber) 24%, transparent));
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklch, var(--text) 20%, transparent);
 }
 
-.sonar-coast--a {
-  left: 10%;
-  top: 18%;
-  width: 38%;
-  height: 62%;
-  border-radius: 48% 30% 52% 36%;
-  clip-path: polygon(0 0, 82% 0, 62% 26%, 100% 48%, 64% 100%, 0 100%);
+.membrane-ring--one {
+  inset: 12%;
 }
 
-.sonar-coast--b {
-  right: 6%;
-  top: 28%;
-  width: 30%;
-  height: 44%;
-  border-radius: 60% 38% 42% 58%;
-  border-color: color-mix(in oklch, var(--violet) 48%, transparent);
+.membrane-ring--two {
+  inset: 31%;
+  border-color: color-mix(in oklch, var(--cyan) 42%, transparent);
 }
 
-.sonar-label {
+.membrane-node {
   position: absolute;
   z-index: 2;
   border-left: 2px solid currentColor;
-  padding: 5px 8px;
-  background: color-mix(in oklch, var(--bg) 68%, transparent);
+  padding: 6px 8px;
+  background: color-mix(in oklch, var(--bg) 72%, transparent);
   color: var(--text);
   font-size: 0.78rem;
 }
 
-.sonar-label--a {
-  left: 28%;
-  top: 26%;
+.membrane-node--a {
+  left: 18%;
+  top: 24%;
   color: var(--green);
 }
 
-.sonar-label--b {
-  right: 20%;
-  top: 54%;
+.membrane-node--b {
+  right: 16%;
+  top: 44%;
   color: var(--cyan);
 }
 
-.sonar-label--c {
+.membrane-node--c {
   left: 42%;
   bottom: 18%;
   color: var(--amber);
 }
 
-.morph-type-demo {
-  position: relative;
+.membrane-word {
+  position: absolute;
+  inset: 34%;
   display: grid;
   place-items: center;
+  color: transparent;
+  font-size: clamp(2.2rem, 8vw, 6rem);
+  font-weight: 900;
+  background: linear-gradient(90deg, var(--text), var(--cyan), var(--amber));
+  background-clip: text;
+  -webkit-background-clip: text;
+  mask-image: repeating-linear-gradient(90deg, black 0 8px, transparent 8px 12px);
+}
+
+.specimen-wall-demo {
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  padding: clamp(18px, 5vw, 48px);
+  perspective: 1000px;
+  background: color-mix(in oklch, var(--bg) 88%, black);
+}
+
+.wall-tunnel {
+  display: grid;
+  gap: 18px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.wall-slab {
+  --slab-accent: color-mix(in oklch, var(--cyan) calc(36% + var(--slab) * 9%), var(--rose));
+  position: relative;
+  min-height: 230px;
+  overflow: hidden;
+  scroll-snap-align: center;
+  display: grid;
+  align-content: end;
+  gap: 8px;
+  border: 1px solid color-mix(in oklch, var(--slab-accent) 48%, transparent);
+  border-radius: 8px;
+  padding: 22px;
   background:
-    linear-gradient(135deg, color-mix(in oklch, var(--rose) 18%, transparent), transparent 44%),
+    radial-gradient(circle at calc(20% + var(--slab) * 13%) 28%, color-mix(in oklch, var(--slab-accent) 28%, transparent), transparent 26%),
+    conic-gradient(from calc(var(--angle) + var(--slab) * 32deg), transparent, color-mix(in oklch, var(--slab-accent) 18%, transparent), transparent 40%),
+    color-mix(in oklch, var(--bg) 78%, black);
+}
+
+.wall-slab::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(color-mix(in oklch, white 9%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, white 7%, transparent) 1px, transparent 1px);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(circle at 50% 50%, black, transparent 66%);
+}
+
+.wall-slab span,
+.wall-slab strong,
+.wall-slab em {
+  position: relative;
+}
+
+.wall-slab span {
+  color: var(--amber);
+}
+
+.wall-slab strong {
+  font-size: clamp(2.2rem, 8vw, 5.6rem);
+  line-height: 0.85;
+}
+
+.wall-slab em {
+  color: var(--muted);
+  font-style: normal;
+}
+
+@supports (animation-timeline: view()) {
+  .wall-slab {
+    animation: slabFocus both ease-out;
+    animation-timeline: view();
+    animation-range: entry 0% cover 58%;
+  }
+}
+
+.fracture-type-demo {
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 46%, color-mix(in oklch, var(--rose) 18%, transparent), transparent 36%),
     color-mix(in oklch, var(--bg) 88%, black);
 }
 
-.morph-poster-grid {
+.fracture-grid {
   position: absolute;
   inset: 34px;
   background:
     linear-gradient(color-mix(in oklch, white 12%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in oklch, white 12%, transparent) 1px, transparent 1px);
-  background-size: 32px 32px;
+    linear-gradient(90deg, color-mix(in oklch, white 9%, transparent) 1px, transparent 1px);
+  background-size: 30px 30px;
   mask-image: linear-gradient(to bottom, black, transparent 90%);
 }
 
-.morph-word {
+.fracture-word {
   position: relative;
-  font-size: clamp(2.35rem, 12vw, 9rem);
-  font-weight: 900;
-  line-height: 0.84;
   color: var(--text);
+  font-size: clamp(3rem, 15vw, 11rem);
+  font-weight: 900;
+  line-height: 0.78;
+  text-shadow:
+    0 0 30px color-mix(in oklch, var(--cyan) 22%, transparent),
+    0.04em 0 color-mix(in oklch, var(--rose) 62%, transparent);
 }
 
-.morph-word::before,
-.morph-word::after {
+.fracture-word::before,
+.fracture-word::after {
   content: attr(data-word);
   position: absolute;
   inset: 0;
-  opacity: 0.74;
   mix-blend-mode: screen;
+  opacity: 0.76;
 }
 
-.morph-word::before {
+.fracture-word::before {
   color: var(--rose);
-  transform: translate(-0.08em, -0.04em);
-  clip-path: polygon(0 0, 100% 0, 94% 38%, 8% 50%);
+  transform: translate(-0.08em, -0.045em);
+  clip-path: polygon(0 0, 100% 0, 92% 42%, 8% 52%);
 }
 
-.morph-word::after {
+.fracture-word::after {
   color: var(--cyan);
-  transform: translate(0.09em, 0.05em);
-  clip-path: polygon(4% 54%, 100% 40%, 100% 100%, 0 100%);
+  transform: translate(0.08em, 0.055em);
+  clip-path: polygon(5% 50%, 100% 40%, 100% 100%, 0 100%);
 }
 
-.morph-type-demo:hover .morph-word::before {
-  transform: translate(-0.18em, -0.07em) skewX(-7deg);
+.fracture-type-demo:hover .fracture-word::before {
+  transform: translate(-0.2em, -0.075em) skewX(-7deg);
 }
 
-.morph-type-demo:hover .morph-word::after {
-  transform: translate(0.18em, 0.08em) skewX(6deg);
+.fracture-type-demo:hover .fracture-word::after {
+  transform: translate(0.2em, 0.09em) skewX(6deg);
 }
 
-.morph-type-demo p {
+.fracture-readout {
   position: absolute;
-  bottom: 32px;
+  left: clamp(16px, 5vw, 44px);
+  bottom: clamp(16px, 5vw, 44px);
   color: var(--muted);
 }
 
-.artifact-demo {
-  display: grid;
-  place-items: center;
-  background:
-    radial-gradient(circle at 50% 44%, color-mix(in oklch, var(--violet) 18%, transparent), transparent 34%),
-    #0b0d12;
-}
-
-.single-artifact {
-  position: relative;
-  width: clamp(150px, 28vw, 280px);
-  aspect-ratio: 1;
-  border-radius: 43% 57% 51% 49%;
-  background:
-    radial-gradient(circle at 32% 26%, white 0 4%, transparent 5%),
-    radial-gradient(circle at 62% 70%, color-mix(in oklch, var(--cyan) 70%, white) 0 5%, transparent 6%),
-    conic-gradient(from var(--angle), var(--violet), var(--cyan), var(--amber), var(--rose), var(--violet));
-  box-shadow:
-    0 0 0 1px color-mix(in oklch, white 18%, transparent),
-    0 0 42px color-mix(in oklch, var(--cyan) 34%, transparent),
-    inset 0 0 46px color-mix(in oklch, black 42%, transparent);
-  filter: saturate(1.25);
-  animation: spinAngle 12s linear infinite;
-}
-
-.single-artifact::before,
-.single-artifact::after {
-  content: "";
-  position: absolute;
-  inset: 14%;
-  border-radius: inherit;
-}
-
-.single-artifact::before {
-  border: 1px solid color-mix(in oklch, white 46%, transparent);
-  background: repeating-linear-gradient(45deg, transparent 0 10px, color-mix(in oklch, white 10%, transparent) 10px 12px);
-  mix-blend-mode: overlay;
-}
-
-.single-artifact::after {
-  inset: 30%;
-  background: radial-gradient(circle, color-mix(in oklch, white 76%, transparent), transparent 62%);
-  filter: blur(10px);
-}
-
-.color-system-demo {
-  --base: oklch(72% 0.18 var(--hue));
-  --surface: color-mix(in oklch, var(--base) 18%, black);
-  --border: color-mix(in oklch, var(--base) 68%, white);
-  --glow: color-mix(in oklch, var(--base) 42%, transparent);
-  --danger: oklch(68% 0.22 calc(var(--hue) + 150));
-  display: grid;
-  align-content: center;
-  gap: 22px;
-  padding: clamp(18px, 5vw, 48px);
-  background: radial-gradient(circle at 50% 40%, var(--glow), transparent 44%), var(--surface);
-}
-
-.color-field {
-  position: relative;
-  min-height: 360px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-  background:
-    linear-gradient(120deg, color-mix(in oklch, var(--base) 42%, transparent), transparent 38%),
-    repeating-linear-gradient(90deg, color-mix(in oklch, white 8%, transparent) 0 1px, transparent 1px 32px);
-}
-
-.color-orb {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(2px);
-  mix-blend-mode: screen;
-}
-
-.color-orb--surface {
-  width: 48%;
-  aspect-ratio: 1;
-  left: 9%;
-  top: 16%;
-  background: var(--base);
-}
-
-.color-orb--accent {
-  width: 34%;
-  aspect-ratio: 1;
-  right: 12%;
-  top: 23%;
-  background: color-mix(in oklch, var(--base) 54%, var(--cyan));
-}
-
-.color-orb--danger {
-  width: 26%;
-  aspect-ratio: 1;
-  left: 46%;
-  bottom: 10%;
-  background: var(--danger);
-}
-
-.color-readout {
-  position: absolute;
-  left: 18px;
-  bottom: 18px;
-  display: grid;
-  gap: 6px;
-}
-
-.color-readout span {
-  color: var(--muted);
-}
-
-.color-readout strong {
-  font-size: clamp(1.6rem, 5vw, 3.6rem);
-}
-
-.hue-control {
-  display: grid;
-  gap: 8px;
-  color: var(--muted);
-}
-
-.hue-control input {
-  accent-color: var(--base);
-}
-
-.transition-gallery-demo {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  align-content: center;
-  padding: clamp(18px, 5vw, 48px);
-}
-
-.transition-panel {
-  min-height: 320px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background:
-    conic-gradient(from var(--angle), color-mix(in oklch, var(--cyan) 24%, transparent), transparent, color-mix(in oklch, var(--rose) 20%, transparent)),
-    color-mix(in oklch, var(--bg) 80%, black);
-  animation: spinAngle 14s linear infinite;
-}
-
-.transition-panel span {
-  color: var(--muted);
-}
-
-.transition-gallery-demo p {
-  grid-column: 1 / -1;
-  margin: 0;
-  color: var(--muted);
-}
-
-.anchor-demo {
-  display: grid;
-  place-items: center;
-  padding: 32px;
-}
-
-.anchor-specimen {
-  position: relative;
-  width: min(100%, 640px);
-  min-height: 360px;
-  display: grid;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background:
-    radial-gradient(circle at 45% 48%, color-mix(in oklch, var(--green) 18%, transparent), transparent 28%),
-    linear-gradient(color-mix(in oklch, white 8%, transparent) 1px, transparent 1px),
-    #10141c;
-  background-size: auto, 28px 28px, auto;
-}
-
-.anchor-target {
-  min-height: 44px;
-  border: 1px solid color-mix(in oklch, var(--green) 48%, transparent);
-  border-radius: 8px;
-  padding: 0 16px;
-  background: color-mix(in oklch, var(--green) 14%, transparent);
-  color: var(--text);
-}
-
-.anchor-panel {
-  position: absolute;
-  right: 10%;
-  top: 18%;
-  display: grid;
-  gap: 6px;
-  border: 1px solid color-mix(in oklch, var(--cyan) 42%, transparent);
-  border-radius: 8px;
-  padding: 14px;
-  background: color-mix(in oklch, var(--bg) 78%, black);
-  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
-}
-
-.anchor-specimen:has(.anchor-target:hover) .anchor-panel,
-.anchor-specimen:has(.anchor-target:focus-visible) .anchor-panel {
-  transform: translateY(-8px);
-  border-color: var(--green);
-}
-
-@supports (anchor-name: --target) {
-  .anchor-target {
-    anchor-name: --target;
+@media (max-width: 640px) {
+  .membrane-node {
+    font-size: 0.65rem;
   }
 
-  .anchor-panel {
-    position-anchor: --target;
-    top: anchor(bottom);
-    left: anchor(right);
-    right: auto;
-  }
-}
-
-@media (max-width: 680px) {
-  .sonar-specimen {
-    width: min(96%, 520px);
+  .wall-slab {
+    min-height: 190px;
   }
 
-  .transition-gallery-demo {
-    grid-template-columns: 1fr;
-  }
-
-  .transition-panel {
-    min-height: 160px;
+  .fracture-readout {
+    max-width: calc(100% - 32px);
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .morph-word::before,
-  .morph-word::after,
-  .anchor-panel {
-    transition: transform 180ms ease, border-color 180ms ease;
+  .fracture-word::before,
+  .fracture-word::after {
+    transition: transform 180ms ease;
   }
 }
 
-@keyframes tileFocus {
+@keyframes slabFocus {
   0% {
-    opacity: 0.28;
-    transform: rotateX(28deg) translateY(60px) scale(0.9);
+    opacity: 0.25;
+    transform: rotateX(24deg) translateY(60px) scale(0.9);
   }
   48% {
     opacity: 1;
@@ -445,6 +291,6 @@
   }
   100% {
     opacity: 0.46;
-    transform: rotateX(-20deg) translateY(-28px) scale(0.94);
+    transform: rotateX(-18deg) translateY(-24px) scale(0.94);
   }
 }

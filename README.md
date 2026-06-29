@@ -1,8 +1,8 @@
 # tac0de
 
-Modern CSS Specimen Lab.
+Living Specimen Field.
 
-This is a static Vite + React site for CSS-first art experiments and browser-native visual studies. No backend, no login, no database.
+This is a static Vite + React site where CSS-first specimens behave like states of one living interface surface. No backend, no login, no database.
 
 ## Commands
 

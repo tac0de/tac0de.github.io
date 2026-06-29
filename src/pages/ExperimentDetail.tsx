@@ -21,11 +21,11 @@ export function ExperimentDetail() {
   }
 
   return (
-    <div className="page-stack">
-      <section className="detail-heading">
+    <div className="page-stack observation-page">
+      <section className="detail-heading observation-heading">
         <Link className="back-link" to="/experiments">
           <ArrowLeft aria-hidden="true" size={17} />
-          <span>Experiments</span>
+          <span>Field States</span>
         </Link>
         <span>{experiment.status}</span>
         <h1>{experiment.title}</h1>

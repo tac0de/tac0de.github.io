@@ -1,30 +1,35 @@
-import { Card } from '../components/Card';
+import type { CSSProperties } from 'react';
+import { Link } from 'react-router-dom';
 import { experiments } from '../data/experiments';
-
-const tones = ['cyan', 'violet', 'rose', 'amber', 'green'] as const;
 
 export function Experiments() {
   return (
-    <div className="page-stack">
+    <div className="page-stack specimen-field-page">
       <section className="page-intro specimen-intro">
-        <span>modern css specimen gallery</span>
-        <h1>Specimen Wall</h1>
+        <span>living specimen field</span>
+        <h1>Field States</h1>
         <p>
-          Scroll the wall. Hover a surface. The page should feel like CSS is the material, not a
-          skin around content.
+          Three connected states of one CSS surface. The wall is not a gallery; it is the organism
+          opening itself for inspection.
         </p>
       </section>
-      <section className="card-grid specimen-wall">
+      <section className="living-specimen-wall">
         {experiments.map((experiment, index) => (
-          <Card
+          <Link
+            className="specimen-plate"
             key={experiment.slug}
-            title={experiment.title}
-            description={experiment.description}
-            tags={experiment.tags}
-            status={experiment.status}
             to={`/experiments/${experiment.slug}`}
-            tone={tones[index % tones.length]}
-          />
+            style={{ '--node': index } as CSSProperties}
+          >
+            <span>{experiment.status}</span>
+            <h2>{experiment.title}</h2>
+            <p>{experiment.description}</p>
+            <div className="plate-tags">
+              {experiment.tags.map((tag) => (
+                <em key={tag}>{tag}</em>
+              ))}
+            </div>
+          </Link>
         ))}
       </section>
     </div>

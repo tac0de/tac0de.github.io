@@ -1,8 +1,8 @@
 export const archiveItems = [
   {
     date: '2026.06',
-    title: 'Modern CSS Specimen Lab initialized',
-    detail: 'Site direction narrowed to CSS-first visual experiments.',
+    title: 'Living Specimen Field initialized',
+    detail: 'Site direction narrowed to one CSS surface with multiple observable states.',
   },
   {
     date: '2026.06',
