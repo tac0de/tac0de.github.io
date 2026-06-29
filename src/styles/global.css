@@ -1,22 +1,10 @@
 @property --angle {
   syntax: "<angle>";
-  inherits: false;
+  inherits: true;
   initial-value: 0deg;
 }
 
-@property --scan {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 0%;
-}
-
-@property --hue {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 210;
-}
-
-@property --signal {
+@property --breath {
   syntax: "<number>";
   inherits: true;
   initial-value: 0;
@@ -28,681 +16,290 @@
   initial-value: 0;
 }
 
-@property --depth {
-  syntax: "<length>";
+@property --bloom {
+  syntax: "<number>";
   inherits: true;
-  initial-value: 0px;
+  initial-value: 0;
 }
 
-@property --fracture {
-  syntax: "<percentage>";
-  inherits: true;
-  initial-value: 0%;
+:root {
+  color-scheme: dark;
+  --ink: oklch(8% 0.026 250);
+  --skin: oklch(18% 0.045 265);
+  --light: oklch(94% 0.025 240);
+  --cyan: oklch(82% 0.16 210);
+  --violet: oklch(72% 0.2 292);
+  --rose: oklch(72% 0.22 18);
+  --amber: oklch(84% 0.17 86);
+  font-family:
+    "SFMono-Regular", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
 }
 
-@layer reset, base, components, responsive;
-
-@layer reset {
-  * {
-    box-sizing: border-box;
-  }
-
-  body {
-    margin: 0;
-    min-width: 320px;
-    min-height: 100vh;
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  button,
-  input {
-    font: inherit;
-  }
+* {
+  box-sizing: border-box;
 }
 
-@layer base {
-  :root {
-    color-scheme: dark;
-    --bg: oklch(10% 0.025 250);
-    --text: oklch(94% 0.025 245);
-    --muted: oklch(72% 0.035 250);
-    --line: color-mix(in oklch, var(--text) 16%, transparent);
-    --cyan: oklch(82% 0.16 210);
-    --green: oklch(78% 0.18 155);
-    --amber: oklch(82% 0.17 82);
-    --rose: oklch(72% 0.2 12);
-    --violet: oklch(75% 0.18 292);
-    font-family:
-      "SFMono-Regular", "Cascadia Code", "Roboto Mono", Menlo, Consolas, monospace;
-  }
-
-  body {
-    --signal: 0;
-    --pressure: 0;
-    --depth: 0px;
-    --fracture: 0%;
-    background:
-      radial-gradient(circle at 18% calc(8% + var(--signal) * 1%), color-mix(in oklch, var(--cyan) 18%, transparent), transparent 26rem),
-      radial-gradient(circle at 90% 12%, color-mix(in oklch, var(--violet) 16%, transparent), transparent 22rem),
-      conic-gradient(from var(--angle) at 68% 22%, transparent 0 68%, color-mix(in oklch, var(--green) 7%, transparent), transparent 82%),
-      linear-gradient(color-mix(in oklch, var(--text) 4%, transparent) 1px, transparent 1px),
-      linear-gradient(90deg, color-mix(in oklch, var(--text) 3%, transparent) 1px, transparent 1px),
-      var(--bg);
-    background-size: auto, auto, auto, 34px 34px, 34px 34px, auto;
-    color: var(--text);
-    overflow-x: clip;
-    animation: organismPulse 16s ease-in-out infinite alternate;
-  }
-
-  main {
-    width: min(1180px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 18px 0 76px;
-  }
-
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 360ms;
-  }
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in oklch, var(--violet) 12%, transparent), transparent 34rem),
+    var(--ink);
+  color: var(--light);
 }
 
-@layer components {
-  .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: min(1180px, calc(100% - 32px));
-    margin: 0 auto;
-    padding: 16px 0 8px;
-    backdrop-filter: blur(16px);
-  }
+button,
+input {
+  font: inherit;
+}
 
-  .brand,
-  .button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    min-height: 34px;
-  }
+.pressure-bloom {
+  --x: 50%;
+  --y: 50%;
+  --pressure: 0.36;
+  --bloom: 0;
+  --bloom-size: calc(16rem + var(--pressure) * 24rem + var(--bloom) * 14rem);
+  position: relative;
+  width: 100vw;
+  height: 100svh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 28%, transparent) 0, transparent var(--bloom-size)),
+    conic-gradient(from var(--angle) at var(--x) var(--y), color-mix(in oklch, var(--rose) 18%, transparent), transparent 18%, color-mix(in oklch, var(--cyan) 18%, transparent), transparent 42%, color-mix(in oklch, var(--amber) 12%, transparent), transparent 72%),
+    linear-gradient(color-mix(in oklch, white 4%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, white 3%, transparent) 1px, transparent 1px),
+    var(--ink);
+  background-size: auto, auto, 34px 34px, 34px 34px, auto;
+  cursor: crosshair;
+  animation: rotateField 18s linear infinite, breathe 7s ease-in-out infinite alternate;
+}
 
-  .brand {
-    padding: 0 10px;
-    color: var(--muted);
-    font-size: 0.86rem;
-    letter-spacing: 0;
-    text-transform: lowercase;
-  }
+.pressure-bloom::before,
+.pressure-bloom::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+  pointer-events: none;
+}
 
-  .page-stack {
-    display: grid;
-    gap: 48px;
-  }
+.pressure-bloom::before {
+  z-index: -2;
+  background:
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, white 16%, transparent), transparent calc(8rem + var(--pressure) * 18rem)),
+    repeating-radial-gradient(circle at var(--x) var(--y), transparent 0 22px, color-mix(in oklch, var(--light) 9%, transparent) 23px 24px),
+    repeating-conic-gradient(from var(--angle) at var(--x) var(--y), transparent 0 10deg, color-mix(in oklch, var(--cyan) 7%, transparent) 10deg 11deg);
+  filter: blur(calc(8px - var(--pressure) * 5px)) contrast(calc(1.05 + var(--pressure) * 0.55));
+  opacity: calc(0.62 + var(--pressure) * 0.22);
+}
 
-  .title-screen {
-    --hero-accent: var(--cyan);
-    --pressure: 0.25;
-    position: relative;
-    min-height: min(820px, calc(100vh - 86px));
-    overflow: hidden;
-    display: grid;
-    place-items: center;
-    border: 1px solid color-mix(in oklch, var(--hero-accent) 38%, transparent);
-    border-radius: 8px;
-    padding: clamp(18px, 5vw, 56px);
-    isolation: isolate;
-    background:
-      linear-gradient(120deg, color-mix(in oklch, var(--hero-accent) 12%, transparent), transparent 42%),
-      color-mix(in oklch, var(--bg) 88%, black);
-    box-shadow: inset 0 0 0 1px color-mix(in oklch, white 5%, transparent), 0 28px 90px rgba(0, 0, 0, 0.34);
-  }
+.pressure-bloom::after {
+  z-index: -1;
+  background:
+    linear-gradient(115deg, transparent 0 28%, color-mix(in oklch, var(--rose) 18%, transparent) 29%, transparent 31% 61%, color-mix(in oklch, var(--cyan) 16%, transparent) 62%, transparent 64%),
+    radial-gradient(ellipse at var(--x) var(--y), transparent 0 18%, black 19% 76%, transparent 77%);
+  mix-blend-mode: screen;
+  opacity: calc(0.26 + var(--bloom) * 0.45);
+  clip-path: polygon(
+    0 32%,
+    calc(28% + var(--bloom) * 8%) 24%,
+    48% calc(44% - var(--pressure) * 8%),
+    68% 28%,
+    100% 35%,
+    100% 68%,
+    72% calc(60% + var(--pressure) * 9%),
+    48% 78%,
+    24% 64%,
+    0 72%
+  );
+}
 
-  .title-screen:hover {
-    --pressure: 1;
-    --fracture: 42%;
-  }
+.bloom-surface {
+  position: relative;
+  width: min(92vw, 1180px);
+  height: min(78svh, 760px);
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--light) 7%, transparent);
+  border-radius: 42% 58% 48% 52% / 46% 44% 56% 54%;
+  background:
+    radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--light) 19%, transparent), transparent calc(7rem + var(--pressure) * 16rem)),
+    conic-gradient(from calc(var(--angle) * -1) at 50% 52%, color-mix(in oklch, var(--cyan) 28%, transparent), transparent 18%, color-mix(in oklch, var(--violet) 26%, transparent), transparent 48%, color-mix(in oklch, var(--amber) 16%, transparent), transparent),
+    radial-gradient(ellipse at 50% 52%, color-mix(in oklch, var(--skin) 82%, transparent), transparent 68%),
+    color-mix(in oklch, var(--skin) 74%, black);
+  box-shadow:
+    inset 0 0 calc(48px + var(--pressure) * 54px) color-mix(in oklch, black 54%, transparent),
+    inset 0 0 0 1px color-mix(in oklch, white 6%, transparent),
+    0 0 calc(34px + var(--bloom) * 80px) color-mix(in oklch, var(--cyan) 24%, transparent);
+  filter: saturate(calc(1.05 + var(--pressure) * 0.28 + var(--bloom) * 0.4));
+  transform: scale(calc(0.985 + var(--pressure) * 0.012));
+}
 
-  .title-screen::before {
-    content: "";
-    position: absolute;
-    inset: 18px;
-    z-index: -1;
-    border: 1px dashed color-mix(in oklch, var(--text) 18%, transparent);
-    mask-image: linear-gradient(90deg, transparent, black 16%, black 84%, transparent);
-  }
+.bloom-surface::before,
+.bloom-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
 
-  .living-field {
-    min-height: min(820px, calc(100vh - 86px));
-  }
+.bloom-surface::before {
+  background:
+    linear-gradient(color-mix(in oklch, white 10%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklch, white 7%, transparent) 1px, transparent 1px),
+    repeating-radial-gradient(ellipse at var(--x) var(--y), transparent 0 18px, color-mix(in oklch, white 11%, transparent) 19px 20px);
+  background-size: 30px 30px, 30px 30px, auto;
+  mix-blend-mode: screen;
+  mask-image:
+    radial-gradient(circle at var(--x) var(--y), black 0 calc(9rem + var(--pressure) * 18rem), transparent calc(14rem + var(--pressure) * 22rem)),
+    linear-gradient(90deg, transparent, black 16%, black 84%, transparent);
+}
 
-  .signal-skin {
-    position: relative;
-    width: min(100%, 980px);
-    aspect-ratio: 16 / 10;
-    border: 1px solid color-mix(in oklch, var(--cyan) 30%, transparent);
-    border-radius: 8px;
-    overflow: hidden;
-    background:
-      radial-gradient(circle at 52% 48%, color-mix(in oklch, var(--cyan) 20%, transparent), transparent 16%),
-      conic-gradient(from var(--angle), color-mix(in oklch, var(--cyan) 26%, transparent), transparent, color-mix(in oklch, var(--rose) 18%, transparent), transparent),
-      repeating-radial-gradient(circle at 50% 50%, transparent 0 20px, color-mix(in oklch, white 12%, transparent) 21px 22px),
-      color-mix(in oklch, var(--bg) 74%, black);
-    mask-image:
-      radial-gradient(ellipse at 50% 50%, black 0 66%, transparent 82%),
-      linear-gradient(90deg, transparent, black 12%, black 88%, transparent);
-    animation: skinSpin 13s linear infinite;
-  }
+.bloom-surface::after {
+  background:
+    radial-gradient(circle at var(--x) var(--y), transparent 0 12%, color-mix(in oklch, var(--rose) 34%, transparent) 13%, transparent 17%),
+    linear-gradient(90deg, transparent, color-mix(in oklch, var(--cyan) 30%, transparent), transparent);
+  mix-blend-mode: screen;
+  opacity: calc(0.28 + var(--bloom) * 0.48);
+  transform: translateX(calc(-24% + var(--pressure) * 12%));
+  filter: blur(calc(10px - var(--pressure) * 6px));
+}
 
-  .signal-skin::before,
-  .signal-skin::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
+.bloom-surface h1 {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: transparent;
+  font-size: clamp(4rem, 18vw, 15rem);
+  line-height: 0.78;
+  font-weight: 900;
+  letter-spacing: 0;
+  background:
+    radial-gradient(circle at var(--x) var(--y), var(--light), color-mix(in oklch, var(--cyan) 78%, white) 26%, color-mix(in oklch, var(--rose) 72%, transparent) 54%, transparent 70%),
+    linear-gradient(90deg, var(--light), var(--cyan), var(--amber), var(--light));
+  background-clip: text;
+  -webkit-background-clip: text;
+  opacity: calc(0.22 + var(--pressure) * 0.55 + var(--bloom) * 0.22);
+  text-shadow:
+    0 0 calc(12px + var(--pressure) * 26px) color-mix(in oklch, var(--cyan) 42%, transparent),
+    calc(var(--pressure) * 0.035em) 0 color-mix(in oklch, var(--rose) 62%, transparent);
+  mask-image:
+    radial-gradient(circle at var(--x) var(--y), black 0 calc(8rem + var(--pressure) * 22rem), transparent calc(13rem + var(--pressure) * 28rem)),
+    repeating-linear-gradient(90deg, black 0 9px, transparent 9px 13px);
+}
 
-  .signal-skin::before {
-    background:
-      linear-gradient(color-mix(in oklch, white 9%, transparent) 1px, transparent 1px),
-      linear-gradient(90deg, color-mix(in oklch, white 7%, transparent) 1px, transparent 1px);
-    background-size: 28px 28px;
-    mix-blend-mode: screen;
-    mask-image: radial-gradient(circle, black 0 64%, transparent 70%);
-  }
+.bloom-vein,
+.bloom-rift,
+.bloom-petal {
+  position: absolute;
+  pointer-events: none;
+}
 
-  .signal-skin::after {
-    background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--green) 34%, transparent), transparent);
-    transform: translateX(calc(-55% + var(--pressure) * 36%));
-    mix-blend-mode: screen;
-  }
+.bloom-vein {
+  left: 50%;
+  top: 50%;
+  width: 90%;
+  height: 1px;
+  transform-origin: left;
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--light) 64%, transparent), transparent);
+  opacity: calc(0.24 + var(--pressure) * 0.38);
+}
 
-  .signal-ring {
-    position: absolute;
-    inset: 10%;
-    border: 1px solid color-mix(in oklch, var(--cyan) 42%, transparent);
-    border-radius: 50%;
-  }
+.bloom-vein--a {
+  transform: rotate(19deg) translateX(-50%);
+}
 
-  .signal-ring--two {
-    inset: 28%;
-    border-color: color-mix(in oklch, var(--amber) 42%, transparent);
-    border-style: dashed;
-  }
+.bloom-vein--b {
+  transform: rotate(-41deg) translateX(-50%);
+}
 
-  .signal-ring--three {
-    inset: 4% 18%;
-    border-color: color-mix(in oklch, var(--rose) 36%, transparent);
-    border-radius: 46% 54% 58% 42%;
-    transform: rotate(-8deg);
-  }
+.bloom-vein--c {
+  transform: rotate(88deg) translateX(-50%);
+}
 
-  .signal-thread {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 86%;
-    height: 2px;
-    transform-origin: left;
-    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-  }
+.bloom-rift {
+  inset: 14% 8%;
+  border: 1px solid color-mix(in oklch, var(--rose) 40%, transparent);
+  border-radius: 50%;
+  clip-path: polygon(0 44%, 22% 34%, 42% 48%, 58% 30%, 78% 52%, 100% 40%, 100% 58%, 80% 68%, 58% 54%, 42% 72%, 20% 55%, 0 66%);
+  opacity: calc(0.28 + var(--bloom) * 0.42);
+}
 
-  .signal-thread--a {
-    transform: rotate(28deg) translateX(-50%);
-  }
+.bloom-rift--b {
+  inset: 24% 18%;
+  transform: rotate(18deg);
+  border-color: color-mix(in oklch, var(--cyan) 38%, transparent);
+}
 
-  .signal-thread--b {
-    transform: rotate(-46deg) translateX(-50%);
-  }
+.bloom-petal {
+  width: 24%;
+  aspect-ratio: 1;
+  border-radius: 70% 30% 62% 38%;
+  background: radial-gradient(circle at 35% 28%, color-mix(in oklch, white 24%, transparent), color-mix(in oklch, var(--violet) 22%, transparent), transparent 68%);
+  mix-blend-mode: screen;
+  filter: blur(calc(12px - var(--pressure) * 8px));
+  opacity: calc(0.18 + var(--bloom) * 0.36);
+}
 
-  .signal-thread--c {
-    transform: rotate(92deg) translateX(-50%);
-    opacity: 0.72;
-  }
+.bloom-petal--a {
+  left: 16%;
+  top: 14%;
+}
 
-  .signal-core {
-    position: absolute;
-    inset: 30% 18%;
-    display: grid;
-    place-items: center;
-    color: transparent;
-    font-size: clamp(3.3rem, 14vw, 12rem);
-    font-weight: 900;
-    background: linear-gradient(90deg, var(--text), var(--cyan), var(--amber));
-    background-clip: text;
-    -webkit-background-clip: text;
-    mask-image:
-      repeating-linear-gradient(90deg, black 0 8px, transparent 8px 12px),
-      radial-gradient(ellipse at 50% 50%, black, transparent 70%);
-  }
+.bloom-petal--b {
+  right: 18%;
+  top: 22%;
+  transform: rotate(64deg);
+}
 
-  .living-readout {
-    position: absolute;
-    inset: auto clamp(18px, 5vw, 52px) clamp(18px, 5vw, 44px) clamp(18px, 5vw, 52px);
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 10px;
-    pointer-events: none;
-    color: color-mix(in oklch, var(--muted) 78%, transparent);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-  }
+.bloom-petal--c {
+  left: 42%;
+  bottom: 9%;
+  transform: rotate(-28deg);
+}
 
-  .living-readout span {
-    border-left: 1px solid color-mix(in oklch, var(--cyan) 34%, transparent);
-    padding-left: 8px;
-  }
-
-  .title-screen__signal,
-  .page-intro > span,
-  .detail-heading > span,
-  .section-heading span {
-    color: var(--amber);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  .title-screen h1 {
-    max-width: 7ch;
-    margin: 0;
-    font-size: clamp(4.4rem, 17vw, 13rem);
-    line-height: 0.78;
-    font-weight: 900;
-    letter-spacing: 0;
-    view-transition-name: tac0de-title;
-  }
-
-  .title-screen p,
-  .page-intro p,
-  .detail-heading p {
-    max-width: 760px;
-    margin: 0;
-    color: var(--muted);
-    line-height: 1.7;
-  }
-
-  .button {
-    padding: 0 16px;
-  }
-
-  .button--primary {
-    border-color: color-mix(in oklch, var(--green) 62%, transparent);
-    background: color-mix(in oklch, var(--green) 16%, transparent);
-  }
-
-  .section-block,
-  .page-intro,
-  .detail-heading {
-    display: grid;
-    gap: 14px;
-  }
-
-  .page-intro h1,
-  .detail-heading h1,
-  .section-heading h2 {
-    margin: 0;
-    font-size: clamp(2.35rem, 8vw, 5.8rem);
-    line-height: 0.94;
-  }
-
-  .page-intro--narrow {
-    max-width: 790px;
-  }
-
-  .field-strip {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px;
-  }
-
-  .living-art-strip {
-    margin-top: -26px;
-  }
-
-  .field-node {
-    --node-accent: color-mix(in oklch, var(--cyan) calc(34% + var(--node) * 9%), var(--violet));
-    position: relative;
-    overflow: hidden;
-    min-height: 190px;
-    display: grid;
-    align-content: end;
-    gap: 12px;
-    border: 1px solid color-mix(in oklch, var(--node-accent) 42%, transparent);
-    border-radius: 8px;
-    padding: 18px;
-    background:
-      conic-gradient(from calc(var(--angle) + var(--node) * 48deg), transparent, color-mix(in oklch, var(--node-accent) 20%, transparent), transparent 32%),
-      color-mix(in oklch, var(--bg) 82%, black);
-  }
-
-  .field-node::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(color-mix(in oklch, white 8%, transparent) 1px, transparent 1px),
-      linear-gradient(90deg, color-mix(in oklch, white 6%, transparent) 1px, transparent 1px);
-    background-size: 24px 24px;
-    mask-image: radial-gradient(circle at calc(26% + var(--node) * 18%) 42%, black, transparent 58%);
-    opacity: 0.7;
-  }
-
-  .field-node:hover {
-    --pressure: 1;
-    transform: translateY(-5px);
-  }
-
-  .field-node span,
-  .field-node strong,
-  .field-node p {
-    position: relative;
-    margin: 0;
-  }
-
-  .field-node span {
-    color: var(--amber);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  .field-node strong {
-    font-size: clamp(1.35rem, 4vw, 2rem);
-    line-height: 1;
-  }
-
-  .field-node p {
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  .living-specimen-wall {
-    display: grid;
-    gap: 18px;
-    perspective: 1200px;
-  }
-
-  .specimen-plate {
-    --plate-accent: color-mix(in oklch, var(--cyan) calc(42% + var(--node) * 8%), var(--rose));
-    position: relative;
-    overflow: hidden;
-    min-height: clamp(320px, 42vw, 470px);
-    display: grid;
-    align-content: end;
-    gap: 16px;
-    border: 1px solid color-mix(in oklch, var(--plate-accent) 48%, transparent);
-    border-radius: 8px;
-    padding: clamp(18px, 4vw, 34px);
-    background:
-      radial-gradient(circle at calc(22% + var(--node) * 22%) 35%, color-mix(in oklch, var(--plate-accent) 28%, transparent), transparent 26%),
-      conic-gradient(from calc(var(--angle) + var(--node) * 62deg), transparent, color-mix(in oklch, var(--plate-accent) 20%, transparent), transparent 42%),
-      color-mix(in oklch, var(--bg) 82%, black);
-    transform-style: preserve-3d;
-    scroll-snap-align: center;
-  }
-
-  .specimen-plate::before,
-  .specimen-plate::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-  }
-
-  .specimen-plate::before {
-    background:
-      repeating-linear-gradient(90deg, transparent 0 18px, color-mix(in oklch, white 7%, transparent) 18px 19px),
-      repeating-radial-gradient(circle at 50% 50%, transparent 0 26px, color-mix(in oklch, white 12%, transparent) 27px 28px);
-    mask-image: linear-gradient(90deg, transparent, black 18%, black 80%, transparent);
-    mix-blend-mode: screen;
-  }
-
-  .specimen-plate::after {
-    border: 1px solid color-mix(in oklch, var(--plate-accent) 58%, transparent);
-    border-radius: 38% 62% 44% 56%;
-    inset: 18%;
-    transform: rotate(calc(-8deg + var(--node) * 11deg));
-    opacity: 0.64;
-  }
-
-  .specimen-plate:hover,
-  .specimen-plate:focus-visible {
-    outline: none;
-    transform: translateZ(36px) rotateX(2deg);
-  }
-
-  .specimen-plate span,
-  .specimen-plate h2,
-  .specimen-plate p,
-  .plate-tags {
-    position: relative;
-    margin: 0;
-  }
-
-  .specimen-plate span {
-    color: var(--amber);
-    text-transform: uppercase;
-  }
-
-  .specimen-plate h2 {
-    max-width: 11ch;
-    font-size: clamp(2.7rem, 9vw, 7rem);
-    line-height: 0.82;
-  }
-
-  .specimen-plate p {
-    max-width: 640px;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  .plate-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .plate-tags em {
-    border: 1px solid color-mix(in oklch, var(--text) 16%, transparent);
-    border-radius: 999px;
-    padding: 4px 8px;
-    color: var(--muted);
-    font-style: normal;
-    font-size: 0.75rem;
-  }
-
-  .tag-row {
-    position: relative;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .tag {
-    border: 1px solid color-mix(in oklch, var(--text) 16%, transparent);
-    border-radius: 999px;
-    padding: 4px 8px;
-    color: var(--muted);
-    font-size: 0.75rem;
-    background: color-mix(in oklch, var(--bg) 62%, transparent);
-  }
-
-  .tech-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 6px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .tech-list li {
-    border-left: 2px solid var(--cyan);
-    padding: 3px 0 3px 8px;
-    color: var(--muted);
-    font-size: 0.78rem;
-  }
-
-  .back-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    width: fit-content;
-    color: var(--muted);
-  }
-
-  .demo-frame {
-    min-height: clamp(420px, 62vw, 720px);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    overflow: hidden;
-    background: color-mix(in oklch, var(--bg) 86%, black);
-  }
-
-  .archive-list {
-    display: grid;
-    gap: 10px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .archive-list li {
-    display: grid;
-    grid-template-columns: 110px 1fr;
-    gap: 18px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 18px;
-    background:
-      linear-gradient(90deg, color-mix(in oklch, var(--cyan) 10%, transparent), transparent),
-      color-mix(in oklch, var(--bg) 78%, black);
-  }
-
-  .archive-list span {
-    color: var(--green);
-  }
-
-  .archive-list h2,
-  .archive-list p {
-    margin: 0;
-  }
-
-  .archive-list p {
-    margin-top: 6px;
-    color: var(--muted);
+@media (hover: none) {
+  .pressure-bloom {
+    --pressure: 0.62;
+    --bloom: 0.36;
   }
 }
 
-@layer responsive {
-  @media (max-width: 820px) {
-    .site-header {
-      justify-content: center;
-    }
-
-    .signal-skin {
-      width: 100%;
-      aspect-ratio: 1;
-    }
-
-    .field-strip {
-      grid-template-columns: 1fr;
-    }
-
-    .title-screen {
-      min-height: min(720px, calc(100vh - 86px));
-    }
-  }
-
-  @media (max-width: 460px) {
-    main,
-    .site-header {
-      width: min(100% - 20px, 1180px);
-    }
-
-    .title-screen {
-      padding: 18px 12px;
-    }
-
-    .signal-skin {
-      opacity: 0.58;
-    }
-
-    .archive-list li {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .button,
-    .brand {
-      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
-    }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      scroll-behavior: auto !important;
-      transition-duration: 0.01ms !important;
-    }
+@media (max-width: 640px) {
+  .bloom-surface {
+    width: 94vw;
+    height: 72svh;
   }
 }
 
-@keyframes spinAngle {
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes rotateField {
   to {
     --angle: 360deg;
   }
 }
 
-@keyframes skinSpin {
-  50% {
-    --angle: 180deg;
-    filter: saturate(1.25);
-  }
-  100% {
-    --angle: 360deg;
-  }
-}
-
-@keyframes organismPulse {
+@keyframes breathe {
   0% {
-    --signal: 0;
-    --pressure: 0;
+    --breath: 0;
+    filter: hue-rotate(0deg);
   }
   100% {
-    --signal: 18;
-    --pressure: 0.55;
-  }
-}
-
-@keyframes textScan {
-  50% {
-    background-position: 100% 0;
-    mask-size: 18px 100%;
-  }
-}
-
-@keyframes wallFocus {
-  0% {
-    opacity: 0.18;
-    transform: translateY(60px) rotateX(20deg) scale(0.92);
-  }
-  48% {
-    opacity: 1;
-    transform: translateY(0) rotateX(0deg) scale(1.02);
-  }
-  100% {
-    opacity: 0.5;
-    transform: translateY(-20px) rotateX(-12deg) scale(0.96);
+    --breath: 1;
+    filter: hue-rotate(12deg);
   }
 }

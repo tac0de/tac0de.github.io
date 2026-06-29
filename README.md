@@ -1,8 +1,8 @@
 # tac0de
 
-Living Specimen Field.
+Pressure Bloom.
 
-This is a static Vite + React site where CSS-first specimens behave like states of one living interface surface. No backend, no login, no database.
+One full-screen CSS artwork. Pointer pressure reveals a living surface and the buried `tac0de` mark. No backend, no login, no database.
 
 ## Commands
 
