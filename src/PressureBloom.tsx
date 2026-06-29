@@ -1,10 +1,6 @@
 import { PointerEvent, useRef } from 'react';
 
-type ArtworkProps = {
-  mark?: boolean;
-};
-
-export function PressureBloom({ mark = false }: ArtworkProps) {
+export function PressureBloom() {
   const rootRef = useRef<HTMLElement>(null);
   const frameRef = useRef<number | undefined>(undefined);
   const pointRef = useRef({ x: 50, y: 50, pressure: 0.42, bloom: 0.18 });
@@ -60,7 +56,7 @@ export function PressureBloom({ mark = false }: ArtworkProps) {
         <span className="bloom-rift bloom-rift--a" />
         <span className="bloom-petal bloom-petal--a" />
         <span className="bloom-petal bloom-petal--b" />
-        {mark && <h1>tac0de</h1>}
+        <h1>pressure opens</h1>
       </div>
     </main>
   );

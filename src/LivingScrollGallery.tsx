@@ -13,7 +13,7 @@ const artworkMap = {
     label: 'glass wound',
     Component: GlassWound,
   },
-} satisfies Record<ArtworkKey, { label: string; Component: ComponentType<{ mark?: boolean }> }>;
+} satisfies Record<ArtworkKey, { label: string; Component: ComponentType }>;
 
 const artworkKeys = Object.keys(artworkMap) as ArtworkKey[];
 
@@ -34,11 +34,12 @@ export function LivingScrollGallery() {
 
   return (
     <main className="living-scroll-gallery" aria-label="tac0de living CSS artwork gallery">
+      <span className="gallery-mark">tac0de</span>
       {order.map((key, index) => {
         const { Component, label } = artworkMap[key];
         return (
           <section className="artwork-section" key={key} aria-label={label}>
-            <Component mark={index === 0} />
+            <Component />
             <span className="artwork-index">{String(index + 1).padStart(2, '0')} / {label}</span>
           </section>
         );

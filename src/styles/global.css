@@ -61,10 +61,24 @@ input {
 
 .living-scroll-gallery {
   width: 100vw;
-  min-height: 100svh;
+  height: 100svh;
   overflow-x: hidden;
+  overflow-y: auto;
   scroll-snap-type: y mandatory;
+  overscroll-behavior-y: contain;
   background: var(--ink);
+}
+
+.gallery-mark {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  z-index: 20;
+  color: color-mix(in oklch, var(--light) 56%, transparent);
+  font-size: 0.72rem;
+  letter-spacing: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
 }
 
 .artwork-section {
@@ -99,7 +113,7 @@ input {
   display: grid;
   place-items: center;
   isolation: isolate;
-  touch-action: none;
+  touch-action: pan-y;
   user-select: none;
   background:
     radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--cyan) 24%, transparent) 0, transparent var(--bloom-size)),
@@ -199,11 +213,13 @@ input {
   display: grid;
   place-items: center;
   margin: 0;
+  max-width: 100%;
   color: transparent;
   font-size: clamp(4rem, 18vw, 15rem);
-  line-height: 0.78;
+  line-height: 0.86;
   font-weight: 900;
   letter-spacing: 0;
+  text-align: center;
   background:
     radial-gradient(circle at var(--x) var(--y), var(--light), color-mix(in oklch, var(--cyan) 78%, white) 26%, color-mix(in oklch, var(--rose) 72%, transparent) 54%, transparent 70%),
     linear-gradient(90deg, var(--light), var(--cyan), var(--amber), var(--light));
@@ -354,7 +370,7 @@ input {
   display: grid;
   place-items: center;
   isolation: isolate;
-  touch-action: none;
+  touch-action: pan-y;
   user-select: none;
   background:
     radial-gradient(circle at var(--x) var(--y), color-mix(in oklch, var(--light) 10%, transparent), transparent var(--scar)),
@@ -431,10 +447,13 @@ input {
   display: grid;
   place-items: center;
   margin: 0;
+  max-width: 100%;
   color: transparent;
-  font-size: clamp(4.1rem, 18vw, 15rem);
-  line-height: 0.78;
+  font-size: clamp(2.9rem, 14vw, 12rem);
+  line-height: 0.86;
   font-weight: 900;
+  letter-spacing: 0;
+  text-align: center;
   background:
     radial-gradient(circle at var(--x) var(--y), var(--light), color-mix(in oklch, var(--cyan) 76%, white) 28%, transparent 62%),
     linear-gradient(90deg, var(--light), var(--cyan), var(--rose));
