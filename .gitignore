@@ -1,12 +1,5 @@
-node_modules/
-dist/
-.astro/
+node_modules
+dist
 .DS_Store
-*.log
-desktop.png
-mobile.png
-mobile-ko.png
-fullpage.png
-live-pages.png
-gameplay.png
-live-gameplay.png
+*.local
+*.tsbuildinfo
