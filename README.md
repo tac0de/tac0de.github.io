@@ -1,8 +1,8 @@
 # tac0de
 
-Pressure Bloom.
+Pressure Bloom / Glass Wound.
 
-One full-screen CSS artwork. Pointer pressure reveals a living surface and the buried `tac0de` mark. No backend, no login, no database.
+Full-screen CSS artworks for mobile-first touch interaction. `/` shows Pressure Bloom; `/glass-wound` shows Glass Wound. No backend, no login, no database.
 
 ## Commands
 
