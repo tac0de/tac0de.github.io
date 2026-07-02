@@ -1,5 +1,5 @@
-node_modules
-dist
+dist/
+artifacts/
+node_modules/
+tsconfig.tsbuildinfo
 .DS_Store
-*.local
-*.tsbuildinfo

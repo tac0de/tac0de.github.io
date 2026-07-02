@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Northbank Atlas">
+  <rect width="64" height="64" fill="#f0eadf"/>
+  <path d="M8 12h48M8 24h48M8 36h48M8 48h48M16 8v48M32 8v48M48 8v48" stroke="#1b2522" stroke-opacity=".16" stroke-width="1"/>
+  <rect x="13" y="15" width="12" height="12" fill="#263331"/>
+  <rect x="28" y="15" width="12" height="12" fill="#8b7d4b"/>
+  <rect x="43" y="15" width="9" height="27" fill="#86a990"/>
+  <rect x="13" y="30" width="12" height="22" fill="#566264"/>
+  <rect x="28" y="30" width="12" height="22" fill="#443c52"/>
+  <path d="M34 8v48M8 38h48" stroke="#efd05b" stroke-width="3" stroke-linecap="square"/>
+  <circle cx="34" cy="38" r="7" fill="#f0eadf" stroke="#1b2522" stroke-width="2"/>
+  <circle cx="34" cy="38" r="2" fill="#1b2522"/>
+</svg>

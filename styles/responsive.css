@@ -1,0 +1,194 @@
+@media (min-width: 720px) {
+  body {
+    display: grid;
+    min-height: 100svh;
+    place-items: start center;
+  }
+}
+
+@media (max-width: 380px) {
+  .city-plane {
+    --cell: clamp(43px, 14.3vw, 50px);
+    padding: 12px;
+  }
+
+  .atlas-masthead {
+    top: 20px;
+  }
+
+  .atlas-masthead h1 {
+    font-size: clamp(2.85rem, 14.2vw, 3.35rem);
+  }
+
+  .scene-label {
+    left: 14px;
+    right: 14px;
+    top: 186px;
+  }
+
+  .atlas-deck {
+    bottom: 52px;
+  }
+
+  .atlas-deck span {
+    padding: 6px;
+    font-size: 0.45rem;
+  }
+
+  .atlas-deck strong {
+    font-size: 0.82rem;
+  }
+
+  .project-stamp span {
+    min-height: 25px;
+    font-size: 0.5rem;
+  }
+
+  .planning-panel h2 {
+    font-size: clamp(1.85rem, 11vw, 2.8rem);
+  }
+
+  .planning-panel {
+    min-height: 158svh;
+    padding-block: 94svh 30px;
+  }
+
+  .planning-panel::before {
+    inset: 76svh 0 0;
+  }
+
+  .atlas-summary {
+    min-height: 124svh;
+    margin-top: 18svh;
+    padding-block: 22svh 96px;
+  }
+
+  .approval-matrix span {
+    grid-template-columns: 62px 1fr;
+    min-height: 42px;
+    font-size: 0.52rem;
+  }
+
+  .planning-panel dl > div {
+    grid-template-columns: 74px 1fr;
+  }
+}
+
+@media (max-width: 340px), (max-height: 680px) {
+  .city-plane {
+    --plan-scale: 1.03;
+    --cell: clamp(39px, 13vw, 43px);
+    padding: 10px;
+  }
+
+  .atlas-masthead {
+    left: 14px;
+    right: 14px;
+    top: 16px;
+  }
+
+  .atlas-masthead p,
+  .atlas-masthead span {
+    font-size: 0.48rem;
+  }
+
+  .atlas-masthead h1 {
+    font-size: clamp(2.35rem, 13.2vw, 2.82rem);
+  }
+
+  .scene-label {
+    left: 14px;
+    right: 14px;
+    top: 164px;
+  }
+
+  .scene-label span {
+    font-size: 0.48rem;
+  }
+
+  .atlas-deck {
+    left: 14px;
+    right: 14px;
+    bottom: 48px;
+  }
+
+  .atlas-deck span {
+    min-height: 40px;
+    padding: 5px;
+  }
+
+  .map-note::after {
+    font-size: 0.4rem;
+  }
+
+  .note-scale::after {
+    font-size: 0.37rem;
+  }
+
+  .map-note {
+    padding: 2px 3px;
+  }
+
+  .grid-axis {
+    font-size: 0.39rem;
+  }
+
+  .axis-y {
+    left: -18px;
+  }
+
+  .project-stamp {
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .project-stamp span {
+    min-height: 23px;
+    font-size: 0.44rem;
+  }
+
+  .planning-scroll {
+    padding-inline: 14px;
+  }
+
+  .planning-panel {
+    min-height: 150svh;
+    padding-block: 88svh 28px;
+  }
+
+  .planning-panel::before {
+    inset: 70svh 0 0;
+  }
+
+  .atlas-summary {
+    min-height: 120svh;
+    margin-top: 16svh;
+    padding-block: 20svh 92px;
+  }
+
+  .approval-matrix span {
+    grid-template-columns: 58px 1fr;
+    min-height: 40px;
+    font-size: 0.49rem;
+  }
+
+  .approval-matrix strong {
+    padding-inline: 8px;
+    font-size: 0.47rem;
+  }
+
+  .planning-panel dt,
+  .planning-panel dd {
+    font-size: 0.56rem;
+  }
+
+  .planning-panel .summary-grid span {
+    min-height: 86px;
+    font-size: 0.54rem;
+  }
+
+  .planning-panel .summary-grid strong {
+    font-size: 1.32rem;
+  }
+}

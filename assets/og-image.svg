@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Northbank Atlas CSS-only city planning preview">
+  <defs>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M36 0H0v36" fill="none" stroke="#1b2522" stroke-opacity=".075" stroke-width="1"/>
+      <circle cx="18" cy="18" r="1.1" fill="#1b2522" fill-opacity=".055"/>
+    </pattern>
+    <pattern id="redline" width="108" height="108" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <path d="M0 18H36" stroke="#c4312b" stroke-opacity=".36" stroke-width="2"/>
+    </pattern>
+    <filter id="sheetShadow" x="-18%" y="-18%" width="136%" height="136%">
+      <feDropShadow dx="0" dy="22" stdDeviation="18" flood-color="#1b2522" flood-opacity=".18"/>
+    </filter>
+    <filter id="signalGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="#f0eadf"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#redline)" opacity=".42"/>
+  <path d="M602 0v630" stroke="#c4312b" stroke-opacity=".3" stroke-width="2"/>
+  <rect x="34" y="34" width="1132" height="562" fill="none" stroke="#1b2522" stroke-opacity=".22" stroke-width="2"/>
+  <path d="M34 64h1132M64 34v562" stroke="#1b2522" stroke-opacity=".16"/>
+
+  <g transform="translate(84 68)">
+    <text x="0" y="0" fill="#1b2522" font-family="Arial Black, Arial, sans-serif" font-size="22" font-weight="900" letter-spacing="3">CSS-ONLY CITY ATLAS</text>
+    <text x="0" y="94" fill="#1b2522" font-family="Arial Black, Arial, sans-serif" font-size="88" font-weight="900">NORTHBANK</text>
+    <text x="0" y="178" fill="#1b2522" font-family="Arial Black, Arial, sans-serif" font-size="88" font-weight="900">DISTRICT</text>
+    <text x="0" y="222" fill="#1b2522" fill-opacity=".66" font-family="Arial Black, Arial, sans-serif" font-size="20" font-weight="900" letter-spacing="3">HARBOR FRAMEWORK PLAN / 2040</text>
+
+    <g transform="translate(0 382)">
+      <rect width="632" height="88" fill="#fbf6ea" fill-opacity=".76" stroke="#1b2522" stroke-opacity=".18"/>
+      <path d="M210 0v88M420 0v88" stroke="#1b2522" stroke-opacity=".16"/>
+      <rect width="5" height="88" fill="#c4312b" fill-opacity=".82"/>
+      <text x="28" y="39" fill="#1b2522" font-family="Arial Black, Arial, sans-serif" font-size="30" font-weight="900">22 HA</text>
+      <text x="28" y="64" fill="#1b2522" fill-opacity=".62" font-family="Arial Black, Arial, sans-serif" font-size="13" font-weight="900" letter-spacing="1.4">FRAMEWORK AREA</text>
+      <text x="238" y="39" fill="#1b2522" font-family="Arial Black, Arial, sans-serif" font-size="30" font-weight="900">5 MIN</text>
+      <text x="238" y="64" fill="#1b2522" fill-opacity=".62" font-family="Arial Black, Arial, sans-serif" font-size="13" font-weight="900" letter-spacing="1.4">STATION WALKSHED</text>
+      <text x="448" y="39" fill="#1b2522" font-family="Arial Black, Arial, sans-serif" font-size="30" font-weight="900">38%</text>
+      <text x="448" y="64" fill="#1b2522" fill-opacity=".62" font-family="Arial Black, Arial, sans-serif" font-size="13" font-weight="900" letter-spacing="1.4">PUBLIC REALM</text>
+    </g>
+  </g>
+
+  <g transform="translate(765 86)">
+    <rect x="-22" y="-22" width="386" height="386" fill="#fbf6ea" fill-opacity=".82" stroke="#1b2522" stroke-opacity=".18" filter="url(#sheetShadow)"/>
+    <g transform="rotate(-3 171 171)">
+      <rect width="342" height="342" fill="#fbf6ea" stroke="#1b2522" stroke-opacity=".24"/>
+      <rect x="20" y="20" width="302" height="302" fill="#eef1df"/>
+      <path d="M80 20v302M141 20v302M202 20v302M263 20v302M20 80h302M20 141h302M20 202h302M20 263h302" stroke="#fbf6ea" stroke-width="7"/>
+      <path d="M171 20v302M20 171h302" stroke="#f0da8a" stroke-width="12" filter="url(#signalGlow)"/>
+      <path d="M276 20v302" stroke="#4f9363" stroke-width="9" stroke-dasharray="21 13"/>
+      <path d="M20 224c42-10 93 8 132-2 56-13 95-58 170-40" fill="none" stroke="#6fa9bd" stroke-width="11" stroke-opacity=".76"/>
+      <rect x="20" y="20" width="53" height="53" fill="#263331"/>
+      <rect x="82" y="20" width="53" height="53" fill="#8b7d4b"/>
+      <rect x="144" y="20" width="53" height="53" fill="#566264"/>
+      <rect x="206" y="20" width="53" height="53" fill="#263331"/>
+      <rect x="269" y="20" width="53" height="302" fill="#86a990"/>
+      <rect x="20" y="82" width="53" height="53" fill="#8b7d4b"/>
+      <rect x="82" y="82" width="53" height="53" fill="#566264"/>
+      <rect x="144" y="82" width="53" height="177" fill="#443c52"/>
+      <rect x="206" y="82" width="53" height="53" fill="#566264"/>
+      <rect x="20" y="144" width="53" height="53" fill="#566264"/>
+      <rect x="82" y="144" width="53" height="53" fill="#8b7d4b"/>
+      <rect x="206" y="144" width="53" height="53" fill="#263331"/>
+      <rect x="20" y="206" width="53" height="116" fill="#566264"/>
+      <rect x="82" y="206" width="53" height="53" fill="#263331"/>
+      <rect x="144" y="269" width="53" height="53" fill="#8b7d4b"/>
+      <rect x="206" y="206" width="53" height="116" fill="#566264"/>
+      <circle cx="171" cy="171" r="27" fill="#f0da8a" stroke="#1b2522" stroke-opacity=".58" stroke-width="4"/>
+      <circle cx="171" cy="171" r="8" fill="#1b2522"/>
+      <path d="M36 36h30M36 36v30M306 306h-30M306 306v-30" stroke="#1b2522" stroke-opacity=".44" stroke-width="3"/>
+    </g>
+  </g>
+
+  <g transform="translate(762 492)">
+    <rect width="330" height="70" fill="#fbf6ea" fill-opacity=".82" stroke="#1b2522" stroke-opacity=".18"/>
+    <text x="24" y="44" fill="#c4312b" font-family="Arial Black, Arial, sans-serif" font-size="24" font-weight="900" letter-spacing="2">APPROVED</text>
+    <path d="M198 22h80M198 44h80" stroke="#c4312b" stroke-opacity=".42" stroke-width="2"/>
+  </g>
+</svg>
