@@ -1,192 +1,38 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#15130a" />
     <meta
       name="description"
-      content="A CSS-only urban planning atlas for a fictional harbor district: transit, public realm, water edge, utilities, phasing, and approval logic."
+      content="A mobile-first Three.js backrooms game prototype with lo-fi rendering, signal hunting, and procedural horror spaces."
     />
-    <meta name="theme-color" content="#f0eadf" />
-    <meta property="og:title" content="Northbank Atlas" />
+    <meta property="og:title" content="Backrooms Drift" />
     <meta
       property="og:description"
-      content="A mobile-first CSS-only city planning atlas built as a static GitHub Pages site."
+      content="Follow the signal, record the echoes, and escape the room before it forgets you."
     />
-    <meta property="og:url" content="https://tac0de.github.io/" />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://tac0de.github.io/assets/og-image.png" />
+    <meta property="og:image" content="./og-image.svg" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Northbank Atlas" />
-    <meta
-      name="twitter:description"
-      content="A mobile-first CSS-only city planning atlas built as a static GitHub Pages site."
-    />
-    <meta name="twitter:image" content="https://tac0de.github.io/assets/og-image.png" />
-    <link rel="canonical" href="https://tac0de.github.io/" />
-    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="./styles/index.css" />
-    <title>Northbank Atlas</title>
+    <title>Backrooms Drift</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   </head>
   <body>
-    <main class="sim-app">
-      <section class="sim-stage" aria-label="Northbank district atlas cover">
-        <header class="atlas-masthead">
-          <p>CSS-Only City Atlas</p>
-          <h1>Northbank District</h1>
-          <span>Harbor Framework Plan / 2040</span>
-        </header>
-
-        <div class="scene-label" aria-hidden="true">
-          <span>Transit Layer</span>
-          <span>Green Loop</span>
-          <span>Water Edge</span>
-          <span>Utility Grid</span>
-          <span>Phase Buildout</span>
-        </div>
-
-        <div class="city-plane" aria-hidden="true">
-          <span class="block b1" data-zone="RES"></span>
-          <span class="block b2" data-zone="MXD"></span>
-          <span class="block b3" data-zone="ROW"></span>
-          <span class="block b4" data-zone="RES"></span>
-          <span class="block b5" data-zone="OS"></span>
-          <span class="block b6" data-zone="MXD"></span>
-          <span class="block b7" data-zone="ROW"></span>
-          <span class="block b8" data-zone="CIV"></span>
-          <span class="block b9" data-zone="UTL"></span>
-          <span class="block b10" data-zone="OS"></span>
-          <span class="block b11" data-zone="ROW"></span>
-          <span class="block b12" data-zone="MXD"></span>
-          <span class="block b13" data-zone="CIV"></span>
-          <span class="block b14" data-zone="UTL"></span>
-          <span class="block b15" data-zone="OS"></span>
-          <span class="block b16" data-zone="ROW"></span>
-          <span class="block b17" data-zone="RES"></span>
-          <span class="block b18" data-zone="MXD"></span>
-          <span class="block b19" data-zone="ROW"></span>
-          <span class="block b20" data-zone="OS"></span>
-          <span class="corridor corridor-x"></span>
-          <span class="corridor corridor-y"></span>
-          <span class="greenway greenway-x"></span>
-          <span class="greenway greenway-y"></span>
-          <span class="waterline"></span>
-          <span class="walk-loop loop-a"></span>
-          <span class="walk-loop loop-b"></span>
-          <span class="map-feature station">NBK</span>
-          <span class="map-feature school">SCH</span>
-          <span class="map-feature pier">PIER</span>
-          <span class="map-feature quay">QUAY</span>
-          <span class="frontage frontage-a"></span>
-          <span class="frontage frontage-b"></span>
-          <span class="utility-grid utility-grid-a"></span>
-          <span class="utility-grid utility-grid-b"></span>
-          <span class="phase-tag phase-one">P1</span>
-          <span class="phase-tag phase-two">P2</span>
-          <span class="map-note note-core">C-1</span>
-          <span class="map-note note-plaza">CIVIC SQ</span>
-          <span class="map-note note-buffer">BUFFER</span>
-          <span class="map-note note-transit">BRT-02</span>
-          <span class="map-note note-loop">2.8KM LOOP</span>
-          <span class="map-note note-scale">1:1000</span>
-          <span class="grid-axis axis-x">
-            <span>A</span>
-            <span>B</span>
-            <span>C</span>
-            <span>D</span>
-            <span>E</span>
-          </span>
-          <span class="grid-axis axis-y">
-            <span>01</span>
-            <span>02</span>
-            <span>03</span>
-            <span>04</span>
-            <span>05</span>
-          </span>
-        </div>
-
-        <aside class="atlas-deck" aria-label="Plan summary">
-          <span><strong>22 ha</strong> framework area</span>
-          <span><strong>5 min</strong> station walkshed</span>
-          <span><strong>38%</strong> public realm</span>
-        </aside>
-
-        <div class="project-stamp" aria-label="Project stamp">
-          <span>NB-2040</span>
-          <span>Atlas 01</span>
-          <span>CSS Only</span>
-        </div>
-      </section>
-
-      <section class="planning-scroll" aria-label="Northbank planning plates">
-        <article class="planning-panel plate-condition">
-          <p>01 / Existing Condition</p>
-          <h2>Rail Edge</h2>
-          <div class="plate-figure" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-          <div class="plate-strip" aria-label="Existing condition notes">
-            <span><strong>420m</strong> station walkshed</span>
-            <span><strong>2 cuts</strong> rail seam severed</span>
-            <span><strong>6 ha</strong> controlled release</span>
-          </div>
-        </article>
-
-        <article class="planning-panel plate-armature">
-          <p>02 / Armature</p>
-          <h2>Civic Spine</h2>
-          <div class="plate-figure" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-          <div class="plate-note">Station square + BRT spine + canal setback. One civic line governs parcel release.</div>
-        </article>
-
-        <article class="planning-panel plate-stack">
-          <p>03 / Layer Stack</p>
-          <h2>Five Systems</h2>
-          <div class="layer-list" aria-label="Planning layers">
-            <span><i></i>BRT / Walk</span>
-            <span><i></i>Civic Rooms</span>
-            <span><i></i>Canal Setback</span>
-            <span><i></i>Utility + Light</span>
-            <span><i></i>Phase Release</span>
-          </div>
-        </article>
-
-        <article class="planning-panel plate-section">
-          <p>04 / Section Cut</p>
-          <h2>Water Street</h2>
-          <div class="section-cut" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-          <div class="plate-note">Floodable ground floor. Shaded walk. Quay room held below residential edge.</div>
-        </article>
-
-        <article class="planning-panel plate-delivery">
-          <p>05 / Delivery Sequence</p>
-          <h2>Public First</h2>
-          <ol class="phase-line" aria-label="Delivery phases">
-            <li><strong>P1</strong> Station square / BRT crossing</li>
-            <li><strong>P2</strong> Canal setback / civic anchors</li>
-            <li><strong>P3</strong> Frontage release / stewardship ledger</li>
-          </ol>
-        </article>
-
-        <article class="planning-panel atlas-summary">
-          <p>06 / Final Plate</p>
-          <h2>Plan Effects</h2>
-          <div class="summary-grid" aria-label="Planning scorecard">
-            <span><strong>+14</strong> public crossings</span>
-            <span><strong>2.8 km</strong> shaded loop</span>
-            <span><strong>4</strong> water rooms</span>
-            <span><strong>0</strong> private dead ends</span>
-          </div>
-          <div class="approval-matrix" aria-label="Conditional approval matrix">
-            <span><strong>Status</strong> Conditional approval</span>
-            <span><strong>Hold</strong> Flood code before release</span>
-            <span><strong>Next</strong> Station square procurement</span>
-          </div>
-          <div class="final-register" aria-label="Planning register">
-            <span>First move / station square before sale</span>
-            <span>Risk / floodable ground-floor code</span>
-            <span>Proof / one district grid</span>
-          </div>
-        </article>
-      </section>
-    </main>
+    <canvas id="game"></canvas>
+    <div id="hud" aria-hidden="true">
+      <div class="readout">
+        <span id="zone">LEVEL 0</span>
+        <span id="signal">SIGNAL 00%</span>
+      </div>
+      <div id="beacon">▲</div>
+      <div id="reticle"></div>
+      <div id="stick">
+        <div id="stick-knob"></div>
+      </div>
+      <div id="status" class="hint">Find the humming exit</div>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

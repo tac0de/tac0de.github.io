@@ -1,10 +1,19 @@
 {
-  "name": "northbank-atlas",
-  "version": "0.0.1",
+  "name": "gh-portfolio-backrooms",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "verify": "test -f index.html && test -f 404.html && test -f .nojekyll && test -f styles/index.css && test -f assets/favicon.svg && test -f assets/og-image.svg && test -f assets/og-image.png && ! grep -R '<script' index.html 404.html styles assets",
-    "build": "rm -rf dist && mkdir -p dist && cp index.html 404.html .nojekyll dist/ && cp -R styles assets dist/"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "^0.166.1"
+  },
+  "devDependencies": {
+    "@types/three": "^0.166.0",
+    "typescript": "^5.5.4",
+    "vite": "^8.1.3"
   }
 }

@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#15130a"/>
+      <stop offset="0.52" stop-color="#2b2816"/>
+      <stop offset="1" stop-color="#0f1718"/>
+    </linearGradient>
+    <pattern id="wall" width="92" height="92" patternUnits="userSpaceOnUse">
+      <rect width="92" height="92" fill="#c6b85e"/>
+      <path d="M0 0h92v92H0zM0 46h92M46 0v92" fill="none" stroke="#74692f" stroke-width="4" opacity="0.45"/>
+      <path d="M14 18h18M58 72h22M63 23h10" stroke="#413918" stroke-width="3" opacity="0.35"/>
+    </pattern>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <path d="M90 72h1020v486H90z" fill="url(#wall)" opacity="0.95"/>
+  <path d="M468 164h264v332H468z" fill="#12120c"/>
+  <path d="M505 203h190v254H505z" fill="#162123"/>
+  <path d="M530 230h140v198H530z" fill="#0a0c0c"/>
+  <path d="M90 558h1020L736 416H464z" fill="#5a5130"/>
+  <path d="M386 558l112-142M814 558L702 416" stroke="#2a2618" stroke-width="8" opacity="0.65"/>
+  <g filter="url(#glow)">
+    <path d="M600 302l34 58h-68z" fill="#2ed6bd"/>
+    <path d="M583 363h34v35h-34z" fill="#2ed6bd"/>
+  </g>
+  <path d="M96 112h1008M96 160h1008M96 208h1008M96 256h1008M96 304h1008M96 352h1008M96 400h1008M96 448h1008M96 496h1008" stroke="#fff1a8" stroke-width="2" opacity="0.06"/>
+  <text x="90" y="116" fill="#f3e7bd" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700">SIGNAL 03/03</text>
+  <text x="90" y="532" fill="#f3e7bd" font-family="Arial, Helvetica, sans-serif" font-size="78" font-weight="800">BACKROOMS DRIFT</text>
+  <text x="94" y="582" fill="#9debd9" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="700">follow the hum · record the echoes · escape lost time</text>
+  <rect width="1200" height="630" fill="none" stroke="#f7df8a" stroke-width="8" opacity="0.35"/>
+</svg>
