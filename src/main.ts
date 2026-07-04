@@ -33,6 +33,15 @@ const LOFI_RENDER_SCALE = 0.42;
 const EXIT_RADIUS = 1.45;
 const MAX_PROPS = 520;
 
+const ASSET_PATHS = {
+  wallpaper: "./assets/wallpaper.png",
+  carpet: "./assets/carpet.png",
+  ceiling: "./assets/ceiling.png",
+  signalBeacon: "./assets/signal-beacon.png",
+  warningSign: "./assets/warning-sign.png",
+  vhsOverlay: "./assets/vhs-overlay.png"
+};
+
 const AUDIO_PROFILE = {
   masterVolume: 0.22,
   humFrequency: 49,
@@ -245,6 +254,14 @@ scene.fog = new THREE.FogExp2(0x17140b, 0.036);
 const camera = new THREE.PerspectiveCamera(67, window.innerWidth / window.innerHeight, 0.05, 82);
 camera.position.set(0, 1.55, 0);
 
+const textureLoader = new THREE.TextureLoader();
+const wallTexture = loadGameTexture(ASSET_PATHS.wallpaper, 2, 1);
+const floorTexture = loadGameTexture(ASSET_PATHS.carpet, 2, 2);
+const ceilingTexture = loadGameTexture(ASSET_PATHS.ceiling, 2, 2);
+const signalTexture = loadGameTexture(ASSET_PATHS.signalBeacon, 1, 1);
+const warningSignTexture = loadGameTexture(ASSET_PATHS.warningSign, 1, 1);
+const vhsOverlayTexture = loadGameTexture(ASSET_PATHS.vhsOverlay, 1, 1);
+
 const renderer = new THREE.WebGLRenderer({
   canvas,
   antialias: false,
@@ -264,7 +281,9 @@ const postMaterial = new THREE.ShaderMaterial({
     uResolution: { value: new THREE.Vector2(320, 180) },
     uNoise: { value: 0.18 },
     uBlackout: { value: 0 },
-    uPalette: { value: 7.0 }
+    uPalette: { value: 7.0 },
+    uOverlayMix: { value: 0.16 },
+    tOverlay: { value: vhsOverlayTexture }
   },
   vertexShader: `
     varying vec2 vUv;
@@ -280,6 +299,8 @@ const postMaterial = new THREE.ShaderMaterial({
     uniform float uNoise;
     uniform float uBlackout;
     uniform float uPalette;
+    uniform float uOverlayMix;
+    uniform sampler2D tOverlay;
     varying vec2 vUv;
 
     float hash(vec2 p) {
@@ -300,6 +321,12 @@ const postMaterial = new THREE.ShaderMaterial({
 
       float n = hash(floor(uv * uResolution.xy) + floor(uTime * 24.0));
       color += (n - 0.5) * uNoise;
+
+      vec3 overlay = texture2D(tOverlay, fract(uv + vec2(uTime * 0.006, uTime * -0.002))).rgb;
+      float overlayKey = distance(overlay, vec3(0.0, 1.0, 0.0));
+      float overlayAlpha = smoothstep(0.10, 0.42, overlayKey) * uOverlayMix;
+      color = mix(color, color + (overlay - vec3(0.0, 0.55, 0.0)) * 0.45, overlayAlpha);
+
       color *= 0.86 + 0.14 * sin(scan * 3.14159);
       color = floor(max(color, vec3(0.0)) * uPalette) / uPalette;
       color *= 1.0 - smoothstep(0.3, 1.05, uBlackout);
@@ -318,23 +345,20 @@ const playerLamp = new THREE.PointLight(0xffe7a6, 1.85, 12, 2.4);
 playerLamp.position.copy(camera.position);
 scene.add(playerLamp);
 
-const texture = makeBackroomsTexture();
-texture.colorSpace = THREE.SRGBColorSpace;
-texture.wrapS = THREE.RepeatWrapping;
-texture.wrapT = THREE.RepeatWrapping;
-
 const wallMaterial = new THREE.MeshStandardMaterial({
-  map: texture,
+  map: wallTexture,
   roughness: 0.92,
   metalness: 0,
   color: 0xd9c766
 });
 const floorMaterial = new THREE.MeshStandardMaterial({
+  map: floorTexture,
   color: 0x6f6440,
   roughness: 0.96,
   metalness: 0
 });
 const ceilingMaterial = new THREE.MeshStandardMaterial({
+  map: ceilingTexture,
   color: 0xbba956,
   roughness: 0.98,
   metalness: 0
@@ -366,6 +390,8 @@ const landmarkMaterial = new THREE.MeshStandardMaterial({
   roughness: 0.9,
   metalness: 0
 });
+const echoSpriteMaterial = makeChromaKeyMaterial(signalTexture, 1.45, 0.95);
+const warningSignMaterial = makeChromaKeyMaterial(warningSignTexture, 1.0, 0.88);
 
 const wallMesh = new THREE.InstancedMesh(
   new THREE.BoxGeometry(TILE, WALL_HEIGHT, 0.18),
@@ -398,8 +424,8 @@ const stainMesh = new THREE.InstancedMesh(
   MAX_PROPS
 );
 const echoMesh = new THREE.InstancedMesh(
-  new THREE.OctahedronGeometry(0.36, 0),
-  echoMaterial,
+  new THREE.PlaneGeometry(1.45, 1.45),
+  echoSpriteMaterial,
   12
 );
 const landmarkMesh = new THREE.InstancedMesh(
@@ -407,7 +433,12 @@ const landmarkMesh = new THREE.InstancedMesh(
   landmarkMaterial,
   MAX_PROPS
 );
-scene.add(wallMesh, floorMesh, ceilingMesh, exitMesh, lampMesh, stainMesh, echoMesh, landmarkMesh);
+const warningSignMesh = new THREE.InstancedMesh(
+  new THREE.PlaneGeometry(1.28, 2.18),
+  warningSignMaterial,
+  MAX_PROPS
+);
+scene.add(wallMesh, floorMesh, ceilingMesh, exitMesh, lampMesh, stainMesh, echoMesh, landmarkMesh, warningSignMesh);
 
 const chunks = new Map<string, Chunk>();
 const openCells = new Set<string>();
@@ -531,7 +562,7 @@ function updateCamera(delta: number): void {
   const danger = signal / 100;
   playerLamp.intensity = 1.55 + Math.sin(clock.elapsedTime * 17.0) * (0.08 + danger * 0.35);
   ambient.intensity = 1.38 - danger * 0.22;
-  texture.offset.x = Math.sin(clock.elapsedTime * 2.0) * 0.003 + danger * Math.sin(clock.elapsedTime * 13.0) * 0.01;
+  wallTexture.offset.x = Math.sin(clock.elapsedTime * 2.0) * 0.003 + danger * Math.sin(clock.elapsedTime * 13.0) * 0.01;
 
   signal = THREE.MathUtils.damp(signal, nearestSignal(), 2.6, delta);
   const echoesLeft = LEVEL_THEMES[levelIndex % LEVEL_THEMES.length].echoCells.length - collectedEchoes.size;
@@ -609,6 +640,7 @@ function rebuildInstances(): void {
   let stainCount = 0;
   let echoCount = 0;
   let landmarkCount = 0;
+  let warningSignCount = 0;
 
   for (const cell of cells) {
     if (!cell.open) continue;
@@ -638,7 +670,7 @@ function rebuildInstances(): void {
     }
 
     if (cell.echo && !collectedEchoes.has(echoKey(cell.x, cell.z)) && echoCount < 12) {
-      setTransform(echoMesh, echoCount, wx, 1.32 + Math.sin(clock.elapsedTime * 2 + cell.x) * 0.08, wz, 1, 1, 1, 0, noise(cell.x, cell.z) * Math.PI, 0);
+      setTransform(echoMesh, echoCount, wx, 1.38, wz, 1, 1, 1, 0, Math.PI, 0);
       echoCount += 1;
     }
 
@@ -649,6 +681,24 @@ function rebuildInstances(): void {
       setBox(landmarkMesh, landmarkCount + 2, wx - inset, WALL_HEIGHT * 0.45, wz + inset, 1, 1, 1, 0);
       setBox(landmarkMesh, landmarkCount + 3, wx + inset, WALL_HEIGHT * 0.45, wz + inset, 1, 1, 1, 0);
       landmarkCount += 4;
+
+      if (warningSignCount < MAX_PROPS) {
+        const faceNorth = noise(cell.x * 2, cell.z * 2) > 0.5;
+        setTransform(
+          warningSignMesh,
+          warningSignCount,
+          wx + (faceNorth ? 0 : TILE * 0.42),
+          1.38,
+          wz + (faceNorth ? -TILE * 0.42 : 0),
+          1,
+          1,
+          1,
+          0,
+          faceNorth ? 0 : Math.PI / 2,
+          0
+        );
+        warningSignCount += 1;
+      }
     }
 
     wallCount = addBoundaryWall(cell.x, cell.z, 0, -1, wx, wz - TILE / 2, 0, wallCount);
@@ -665,6 +715,7 @@ function rebuildInstances(): void {
   stainMesh.count = stainCount;
   echoMesh.count = echoCount;
   landmarkMesh.count = landmarkCount;
+  warningSignMesh.count = warningSignCount;
   wallMesh.instanceMatrix.needsUpdate = true;
   floorMesh.instanceMatrix.needsUpdate = true;
   ceilingMesh.instanceMatrix.needsUpdate = true;
@@ -673,6 +724,7 @@ function rebuildInstances(): void {
   stainMesh.instanceMatrix.needsUpdate = true;
   echoMesh.instanceMatrix.needsUpdate = true;
   landmarkMesh.instanceMatrix.needsUpdate = true;
+  warningSignMesh.instanceMatrix.needsUpdate = true;
 }
 
 function addBoundaryWall(
@@ -900,6 +952,7 @@ function updatePost(delta: number, time: number): void {
   postMaterial.uniforms.uNoise.value = 0.14 + danger * 0.22 + blackout * 0.55;
   postMaterial.uniforms.uBlackout.value = blackout;
   postMaterial.uniforms.uPalette.value = LEVEL_THEMES[levelIndex % LEVEL_THEMES.length].palette;
+  postMaterial.uniforms.uOverlayMix.value = 0.1 + danger * 0.08 + blackout * 0.18;
 }
 
 function setBox(
@@ -1036,6 +1089,58 @@ function makeRenderTarget(width: number, height: number): THREE.WebGLRenderTarge
   return target;
 }
 
+function loadGameTexture(path: string, repeatX: number, repeatY: number): THREE.Texture {
+  const loadedTexture = textureLoader.load(path);
+  loadedTexture.colorSpace = THREE.SRGBColorSpace;
+  loadedTexture.wrapS = THREE.RepeatWrapping;
+  loadedTexture.wrapT = THREE.RepeatWrapping;
+  loadedTexture.repeat.set(repeatX, repeatY);
+  loadedTexture.magFilter = THREE.NearestFilter;
+  loadedTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  loadedTexture.generateMipmaps = true;
+  loadedTexture.anisotropy = 2;
+  return loadedTexture;
+}
+
+function makeChromaKeyMaterial(source: THREE.Texture, glow: number, opacity: number): THREE.ShaderMaterial {
+  source.wrapS = THREE.ClampToEdgeWrapping;
+  source.wrapT = THREE.ClampToEdgeWrapping;
+
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      tMap: { value: source },
+      uGlow: { value: glow },
+      uOpacity: { value: opacity }
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D tMap;
+      uniform float uGlow;
+      uniform float uOpacity;
+      varying vec2 vUv;
+
+      void main() {
+        vec4 texel = texture2D(tMap, vUv);
+        float greenKey = distance(texel.rgb, vec3(0.0, 1.0, 0.0));
+        float alpha = smoothstep(0.12, 0.34, greenKey) * uOpacity;
+        vec3 keyedColor = max(texel.rgb - vec3(0.0, 0.55, 0.0), vec3(0.0));
+        keyedColor += keyedColor * uGlow * 0.18;
+        if (alpha < 0.04) discard;
+        gl_FragColor = vec4(keyedColor, alpha);
+      }
+    `,
+    transparent: true,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
+}
+
 function startAudio(): void {
   if (audio) {
     audio.resume();
@@ -1060,40 +1165,6 @@ function updateAudio(time: number): void {
 function triggerDropout(duration: number): void {
   if (!audio) return;
   audio.triggerDropout(duration, clock.elapsedTime);
-}
-
-function makeBackroomsTexture(): THREE.CanvasTexture {
-  const size = 128;
-  const paint = document.createElement("canvas");
-  paint.width = size;
-  paint.height = size;
-  const ctx = paint.getContext("2d");
-
-  if (!ctx) throw new Error("Canvas 2D context is unavailable.");
-
-  ctx.fillStyle = "#d0bd61";
-  ctx.fillRect(0, 0, size, size);
-
-  for (let y = 0; y < size; y += 16) {
-    for (let x = 0; x < size; x += 16) {
-      const shade = 178 + Math.floor(noise(x, y) * 32);
-      ctx.fillStyle = `rgb(${shade + 30}, ${shade + 18}, ${shade - 36})`;
-      ctx.fillRect(x, y, 15, 15);
-    }
-  }
-
-  ctx.strokeStyle = "rgba(68, 57, 24, 0.34)";
-  ctx.lineWidth = 2;
-  for (let i = 0; i <= size; i += 16) {
-    ctx.beginPath();
-    ctx.moveTo(i, 0);
-    ctx.lineTo(i, size);
-    ctx.moveTo(0, i);
-    ctx.lineTo(size, i);
-    ctx.stroke();
-  }
-
-  return new THREE.CanvasTexture(paint);
 }
 
 function noise(x: number, z: number): number {
