@@ -1,4 +1,4 @@
-# Untitled Card Camp MVP
+# Card Camp MVP
 
 Stacklands-inspired card survival prototype for Tacode Arcade.
 
@@ -12,33 +12,35 @@ Stacklands-inspired card survival prototype for Tacode Arcade.
 
 ## First Playable Scope
 
-- Cards: `Villager`, `Berry Bush`, `Berry`, `Wood`, `Stone`, `Campfire`
+- Cards: `Villager`, `Berry Bush`, `Tree`, `Berry`, `Wood`, `Stone`, `Campfire`, `Cooked Berry`
 - Actions: drag, stack, unstack, timed production
 - Recipes:
   - `Villager + Berry Bush -> Berry`
   - `Villager + Tree -> Wood`
   - `Wood + Stone -> Campfire`
-  - `Villager + Campfire + Berry -> Cooked Berry`
+  - `Campfire + Berry -> Cooked Berry`
 - Pressure:
   - Villager eats one food every day cycle
 - Missing food creates a warning state first, not instant failure
 
 ## Current Build
 
-- Implemented drag and stack detection
+- Implemented mobile-first drag and strict overlap recipe detection
 - Implemented timed recipes
 - Implemented `Villager + Berry Bush -> Berry`
 - Implemented `Villager + Tree -> Wood`
 - Implemented `Wood + Stone -> Campfire`
-- Implemented day timer and berry consumption
+- Implemented `Campfire + Berry -> Cooked Berry`
+- Implemented day timer and food consumption
+- Implemented generated card art and tabletop surface
 
 ## Interaction Rules
 
-- A stack is a vertical pile of cards with a single top target.
-- Dragging a card onto a valid target starts a timer.
-- Invalid combinations briefly shake and separate.
-- Timers pause while the card is being dragged.
-- Mobile drag must prioritize large hit targets and clear stacking feedback.
+- Dragging a card onto a valid target starts a timer only when the cards visibly overlap.
+- Invalid combinations briefly warn and return to their previous position.
+- Valid combinations move into a work state instead of staying visually stuck together.
+- Tap-select remains available as a mobile fallback for drag misses.
+- Mobile layout keeps initial cards inside the visible table.
 
 ## Visual Direction
 

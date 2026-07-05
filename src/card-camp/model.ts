@@ -1,4 +1,12 @@
-export type CardKind = "villager" | "berryBush" | "tree" | "stone" | "berry" | "wood" | "campfire";
+export type CardKind =
+  | "villager"
+  | "berryBush"
+  | "tree"
+  | "stone"
+  | "berry"
+  | "wood"
+  | "campfire"
+  | "cookedBerry";
 
 export type CardState = "idle" | "working" | "hungry" | "warning";
 
@@ -37,6 +45,7 @@ export type CampState = {
   day: number;
   warnings: number;
   message: string;
+  goalMet: boolean;
 };
 
 export const CARD_DEFS: Record<CardKind, { label: string; type: string }> = {
@@ -46,7 +55,8 @@ export const CARD_DEFS: Record<CardKind, { label: string; type: string }> = {
   stone: { label: "Stone", type: "resource" },
   berry: { label: "Berry", type: "food" },
   wood: { label: "Wood", type: "resource" },
-  campfire: { label: "Campfire", type: "craft" }
+  campfire: { label: "Campfire", type: "craft" },
+  cookedBerry: { label: "Cooked Berry", type: "food" }
 };
 
 export const RECIPES: Recipe[] = [
@@ -70,6 +80,13 @@ export const RECIPES: Recipe[] = [
     result: "campfire",
     seconds: 5,
     reusable: []
+  },
+  {
+    id: "cook-berry",
+    inputs: ["campfire", "berry"],
+    result: "cookedBerry",
+    seconds: 4,
+    reusable: ["campfire"]
   }
 ];
 
@@ -89,7 +106,8 @@ export function createInitialState(): CampState {
     dayLength: 42,
     day: 1,
     warnings: 0,
-    message: "Drag Villager onto Berry Bush to produce food."
+    message: "Drag Villager onto Berry Bush to produce food.",
+    goalMet: false
   };
 }
 
@@ -125,6 +143,8 @@ export function tickCamp(state: CampState, delta: number): void {
   for (const order of done) {
     completeWorkOrder(state, order);
   }
+
+  state.goalMet = state.goalMet || state.cards.some((card) => card.kind === "campfire");
 }
 
 export function startRecipe(state: CampState, recipe: Recipe, cards: CampCard[]): void {
@@ -132,12 +152,12 @@ export function startRecipe(state: CampState, recipe: Recipe, cards: CampCard[])
   const y = cards.reduce((sum, card) => sum + card.y, 0) / cards.length;
   const orderId = `work-${nextId++}`;
 
-  for (const card of cards) {
+  cards.forEach((card, index) => {
     card.state = "working";
     card.stackId = orderId;
-    card.x = x;
-    card.y = y;
-  }
+    card.x = x + (index - (cards.length - 1) / 2) * 18;
+    card.y = y + index * 10;
+  });
 
   state.workOrders.push({
     id: orderId,
@@ -172,23 +192,24 @@ function completeWorkOrder(state: CampState, order: WorkOrder): void {
     if (used.has(card.id)) {
       card.state = "idle";
       card.stackId = undefined;
-      card.x += card.kind === "villager" ? -54 : 54;
-      card.y += 16;
+      card.x = order.x + (card.kind === "villager" ? -128 : 112);
+      card.y = order.y + 18;
     }
   }
 
   state.cards.push(createCard(order.recipe.result, order.x + 128, order.y + 22));
   state.message = `${CARD_DEFS[order.recipe.result].label} produced.`;
+  state.goalMet = state.goalMet || order.recipe.result === "campfire";
 }
 
 function resolveDay(state: CampState): void {
   state.day += 1;
   state.dayRemaining = state.dayLength;
 
-  const berry = state.cards.find((card) => card.kind === "berry");
-  if (berry) {
-    state.cards = state.cards.filter((card) => card.id !== berry.id);
-    state.message = "Villager ate one Berry.";
+  const food = state.cards.find((card) => card.kind === "cookedBerry") ?? state.cards.find((card) => card.kind === "berry");
+  if (food) {
+    state.cards = state.cards.filter((card) => card.id !== food.id);
+    state.message = `Villager ate one ${CARD_DEFS[food.kind].label}.`;
     for (const card of state.cards) {
       if (card.kind === "villager") card.state = "idle";
     }

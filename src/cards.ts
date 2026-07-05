@@ -11,6 +11,17 @@ import {
 
 document.documentElement.dataset.page = "cards";
 
+const CARD_ART: Record<CampCard["kind"], string> = {
+  villager: "/assets/card-camp/villager.png",
+  berryBush: "/assets/card-camp/berry-bush.png",
+  tree: "/assets/card-camp/tree.png",
+  stone: "/assets/card-camp/stone.png",
+  berry: "/assets/card-camp/berry.png",
+  wood: "/assets/card-camp/wood.png",
+  campfire: "/assets/card-camp/campfire.png",
+  cookedBerry: "/assets/card-camp/cooked-berry.png"
+};
+
 const table = document.querySelector<HTMLDivElement>("#card-table");
 const cardLayer = document.querySelector<HTMLDivElement>("#card-layer");
 const workLayer = document.querySelector<HTMLDivElement>("#work-layer");
@@ -18,8 +29,9 @@ const message = document.querySelector<HTMLParagraphElement>("#camp-message");
 const dayLabel = document.querySelector<HTMLSpanElement>("#camp-day");
 const foodLabel = document.querySelector<HTMLSpanElement>("#camp-food");
 const timerLabel = document.querySelector<HTMLSpanElement>("#camp-timer");
+const goalLabel = document.querySelector<HTMLSpanElement>("#camp-goal");
 
-if (!table || !cardLayer || !workLayer || !message || !dayLabel || !foodLabel || !timerLabel) {
+if (!table || !cardLayer || !workLayer || !message || !dayLabel || !foodLabel || !timerLabel || !goalLabel) {
   throw new Error("Card camp shell is missing required DOM nodes.");
 }
 
@@ -30,6 +42,7 @@ const messageElement = message;
 const dayElement = dayLabel;
 const foodElement = foodLabel;
 const timerElement = timerLabel;
+const goalElement = goalLabel;
 
 const state = createInitialState();
 const cardNodes = new Map<string, HTMLButtonElement>();
@@ -39,14 +52,23 @@ let active:
       pointerId: number;
       offsetX: number;
       offsetY: number;
+      originX: number;
+      originY: number;
       moved: boolean;
     }
   | undefined;
+let activeDropTargetId: string | undefined;
 let selectedCardId: string | undefined;
 let lastTime = performance.now();
+let didFitInitialLayout = false;
+let suppressClickUntil = 0;
 
 render();
 requestAnimationFrame(loop);
+window.addEventListener("resize", () => {
+  fitCardsInsideTable();
+  render();
+});
 
 function loop(now: number): void {
   const delta = Math.min((now - lastTime) / 1000, 0.1);
@@ -57,10 +79,18 @@ function loop(now: number): void {
 }
 
 function render(): void {
+  if (!didFitInitialLayout) {
+    layoutInitialCards();
+    didFitInitialLayout = true;
+  }
+  fitCardsInsideTable();
+
   messageElement.textContent = state.message;
   dayElement.textContent = `Day ${state.day}`;
-  foodElement.textContent = `Food ${state.cards.filter((card) => card.kind === "berry").length}`;
+  foodElement.textContent = `Food ${foodScore()}`;
   timerElement.textContent = `Dusk ${Math.ceil(state.dayRemaining)}s`;
+  goalElement.textContent = state.goalMet ? "Goal Campfire lit" : "Goal Light campfire";
+  goalElement.classList.toggle("is-met", state.goalMet);
 
   for (const card of state.cards) {
     let node = cardNodes.get(card.id);
@@ -76,7 +106,10 @@ function render(): void {
     }
 
     const def = CARD_DEFS[card.kind];
-    node.className = `camp-card camp-card-${card.kind} is-${card.state}${selectedCardId === card.id ? " is-selected" : ""}`;
+    const isTarget = activeDropTargetId === card.id;
+    const isDragging = active?.card.id === card.id;
+    node.className = `camp-card camp-card-${card.kind} is-${card.state}${selectedCardId === card.id ? " is-selected" : ""}${isTarget ? " is-drop-target" : ""}${isDragging ? " is-dragging" : ""}`;
+    node.style.setProperty("--card-art", `url("${CARD_ART[card.kind]}")`);
     node.style.transform = `translate(${card.x}px, ${card.y}px)`;
     node.disabled = card.state === "working";
     node.innerHTML = `
@@ -95,8 +128,11 @@ function render(): void {
   workLayerElement.replaceChildren(...state.workOrders.map((order) => {
     const bar = document.createElement("div");
     bar.className = "work-order";
-    bar.style.transform = `translate(${order.x}px, ${order.y - 20}px)`;
-    bar.innerHTML = `<span style="width: ${100 - (order.remaining / order.total) * 100}%"></span>`;
+    bar.style.transform = `translate(${order.x - 12}px, ${order.y - 26}px)`;
+    bar.innerHTML = `
+      <strong>${CARD_DEFS[order.recipe.result].label}</strong>
+      <span style="width: ${100 - (order.remaining / order.total) * 100}%"></span>
+    `;
     return bar;
   }));
 }
@@ -113,13 +149,15 @@ function onPointerDown(event: PointerEvent): void {
     pointerId: event.pointerId,
     offsetX: event.clientX - nodeRect.left,
     offsetY: event.clientY - nodeRect.top,
+    originX: card.x,
+    originY: card.y,
     moved: false
   };
 
   node.setPointerCapture(event.pointerId);
-  node.classList.add("is-dragging");
   card.x = event.clientX - tableRect.left - active.offsetX;
   card.y = event.clientY - tableRect.top - active.offsetY;
+  activeDropTargetId = undefined;
   render();
 
   node.addEventListener("pointermove", onPointerMove);
@@ -131,8 +169,10 @@ function onPointerMove(event: PointerEvent): void {
   if (!active || active.pointerId !== event.pointerId) return;
 
   const tableRect = tableElement.getBoundingClientRect();
-  active.card.x = clamp(event.clientX - tableRect.left - active.offsetX, 0, tableRect.width - 132);
-  active.card.y = clamp(event.clientY - tableRect.top - active.offsetY, 0, tableRect.height - 172);
+  const size = cardSize();
+  active.card.x = clamp(event.clientX - tableRect.left - active.offsetX, 0, tableRect.width - size.width);
+  active.card.y = clamp(event.clientY - tableRect.top - active.offsetY, 0, tableRect.height - size.height);
+  activeDropTargetId = findDropTarget(active.card)?.id;
   active.moved = true;
   render();
 }
@@ -142,22 +182,25 @@ function onPointerUp(event: PointerEvent): void {
   node.removeEventListener("pointermove", onPointerMove);
   node.removeEventListener("pointerup", onPointerUp);
   node.removeEventListener("pointercancel", onPointerUp);
-  node.classList.remove("is-dragging");
 
   if (!active || active.pointerId !== event.pointerId) return;
 
   const dropped = active.card;
   const moved = active.moved;
+  const originX = active.originX;
+  const originY = active.originY;
   active = undefined;
+  activeDropTargetId = undefined;
 
   if (!moved) {
     render();
     return;
   }
+  suppressClickUntil = performance.now() + 350;
   const target = findDropTarget(dropped);
 
   if (!target) {
-    dropped.state = "idle";
+    returnCardToOrigin(dropped, originX, originY);
     render();
     return;
   }
@@ -165,21 +208,22 @@ function onPointerUp(event: PointerEvent): void {
   const recipe = findRecipe([dropped.kind, target.kind]);
   if (!recipe) {
     cancelInvalidStack(state, dropped);
-    dropped.x = target.x + 42;
-    dropped.y = target.y + 26;
-    window.setTimeout(() => {
-      dropped.state = "idle";
-      render();
-    }, 320);
+    returnCardToOrigin(dropped, originX, originY, 320);
     render();
     return;
   }
 
+  alignForCraft(dropped, target);
   startRecipe(state, recipe, [dropped, target]);
   render();
 }
 
 function onCardClick(event: MouseEvent): void {
+  if (performance.now() < suppressClickUntil) {
+    event.preventDefault();
+    return;
+  }
+
   const node = event.currentTarget as HTMLButtonElement;
   const card = state.cards.find((candidate) => candidate.id === node.dataset.cardId);
   if (!card || card.state === "working") return;
@@ -217,15 +261,90 @@ function onCardClick(event: MouseEvent): void {
     return;
   }
 
+  alignForCraft(selected, card);
   startRecipe(state, recipe, [selected, card]);
   render();
 }
 
 function findDropTarget(card: CampCard): CampCard | undefined {
-  return state.cards.find((candidate) => {
-    if (candidate.id === card.id || candidate.state === "working") return false;
-    return Math.hypot(candidate.x - card.x, candidate.y - card.y) < 168;
+  let best: { card: CampCard; overlap: number } | undefined;
+  for (const candidate of state.cards) {
+    if (candidate.id === card.id || candidate.state === "working") continue;
+    if (!findRecipe([card.kind, candidate.kind])) continue;
+
+    const overlap = overlapRatio(card, candidate);
+    if (overlap >= 0.28 && (!best || overlap > best.overlap)) {
+      best = { card: candidate, overlap };
+    }
+  }
+  return best?.card;
+}
+
+function layoutInitialCards(): void {
+  const size = cardSize();
+  const tableRect = tableElement.getBoundingClientRect();
+  const columns = tableRect.width < 620 ? 2 : 4;
+  const gap = tableRect.width < 620 ? 14 : 26;
+  const startX = Math.max(10, (tableRect.width - columns * size.width - (columns - 1) * gap) / 2);
+  const startY = tableRect.width < 620 ? 18 : 56;
+
+  state.cards.forEach((card, index) => {
+    const column = index % columns;
+    const row = Math.floor(index / columns);
+    card.x = startX + column * (size.width + gap);
+    card.y = startY + row * (size.height + 20);
   });
+}
+
+function fitCardsInsideTable(): void {
+  const size = cardSize();
+  const tableRect = tableElement.getBoundingClientRect();
+  for (const card of state.cards) {
+    card.x = clamp(card.x, 0, Math.max(0, tableRect.width - size.width));
+    card.y = clamp(card.y, 0, Math.max(0, tableRect.height - size.height));
+  }
+}
+
+function cardSize(): { width: number; height: number } {
+  const tableRect = tableElement.getBoundingClientRect();
+  if (tableRect.width <= 380) return { width: 104, height: 136 };
+  if (tableRect.width <= 620) return { width: 116, height: 152 };
+  return { width: 132, height: 172 };
+}
+
+function overlapRatio(a: CampCard, b: CampCard): number {
+  const size = cardSize();
+  const xOverlap = Math.max(0, Math.min(a.x + size.width, b.x + size.width) - Math.max(a.x, b.x));
+  const yOverlap = Math.max(0, Math.min(a.y + size.height, b.y + size.height) - Math.max(a.y, b.y));
+  return (xOverlap * yOverlap) / (size.width * size.height);
+}
+
+function alignForCraft(a: CampCard, b: CampCard): void {
+  const size = cardSize();
+  const tableRect = tableElement.getBoundingClientRect();
+  const centerX = clamp((a.x + b.x) / 2, 0, Math.max(0, tableRect.width - size.width));
+  const centerY = clamp((a.y + b.y) / 2, 32, Math.max(32, tableRect.height - size.height - 24));
+  a.x = clamp(centerX - 12, 0, Math.max(0, tableRect.width - size.width));
+  a.y = clamp(centerY + 8, 0, Math.max(0, tableRect.height - size.height));
+  b.x = clamp(centerX + 12, 0, Math.max(0, tableRect.width - size.width));
+  b.y = clamp(centerY - 8, 0, Math.max(0, tableRect.height - size.height));
+}
+
+function returnCardToOrigin(card: CampCard, x: number, y: number, delay = 0): void {
+  card.x = x;
+  card.y = y;
+  window.setTimeout(() => {
+    card.state = "idle";
+    render();
+  }, delay);
+}
+
+function foodScore(): number {
+  return state.cards.reduce((score, card) => {
+    if (card.kind === "cookedBerry") return score + 2;
+    if (card.kind === "berry") return score + 1;
+    return score;
+  }, 0);
 }
 
 function clamp(value: number, min: number, max: number): number {

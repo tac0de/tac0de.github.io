@@ -26,13 +26,13 @@ export const games: GameEntry[] = [
   },
   {
     slug: "cards",
-    title: "Untitled Card Camp",
+    title: "Card Camp",
     status: "Playable",
     route: "./games/cards/",
-    description: "Drag, stack, produce food, and survive the day timer.",
+    description: "Stack cards, craft a campfire, cook food, and survive dusk.",
     tags: ["Cards", "Crafting", "Simulation"],
     tileClass: "game-tile-cards",
     playable: true,
-    demonstrates: "Drag interactions, stacked state, timed resource loops, compact system design."
+    demonstrates: "Mobile-first card interactions, crafting recipes, timed food pressure, compact system design."
   }
 ];
