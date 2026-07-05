@@ -6,7 +6,8 @@
 
 - 루트는 게임 선택 화면
 - `/games/backrooms/`는 첫 번째 playable title인 Backrooms Drift
-- 다음 타이틀은 Stacklands-inspired card survival prototype
+- `/games/cards/`는 Stacklands-inspired card survival prototype
+- 카드 게임은 drag, stack, timed production, day hunger loop 지원
 - 모바일 우선 1인칭 탐색
 - 플레이어 주변 청크만 렌더링하는 절차적 백룸
 - `InstancedMesh` 기반 벽, 바닥, 천장 렌더링

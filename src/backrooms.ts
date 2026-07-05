@@ -32,6 +32,7 @@ const LOOK_SENSITIVITY = 0.0032;
 const LOFI_RENDER_SCALE = 0.42;
 const EXIT_RADIUS = 1.45;
 const MAX_PROPS = 520;
+const FIRST_PLAY_HELP_SECONDS = 10;
 
 const ASSET_PATHS = {
   wallpaper: "/assets/wallpaper.png",
@@ -555,13 +556,14 @@ function moveAxis(dx: number, dz: number): void {
 
 function updateCamera(delta: number): void {
   const breathing = Math.sin(clock.elapsedTime * 6.2) * 0.015;
+  const introHelp = levelIndex === 0 ? 1 - THREE.MathUtils.smoothstep(clock.elapsedTime, 0, FIRST_PLAY_HELP_SECONDS) : 0;
   camera.position.set(player.x, player.y + breathing, player.z);
   camera.rotation.set(pitch, yaw, 0, "YXZ");
 
   playerLamp.position.copy(camera.position);
   const danger = signal / 100;
-  playerLamp.intensity = 1.55 + Math.sin(clock.elapsedTime * 17.0) * (0.08 + danger * 0.35);
-  ambient.intensity = 1.38 - danger * 0.22;
+  playerLamp.intensity = 1.55 + introHelp * 0.75 + Math.sin(clock.elapsedTime * 17.0) * (0.08 + danger * 0.35);
+  ambient.intensity = 1.38 + introHelp * 0.38 - danger * 0.22;
   wallTexture.offset.x = Math.sin(clock.elapsedTime * 2.0) * 0.003 + danger * Math.sin(clock.elapsedTime * 13.0) * 0.01;
 
   signal = THREE.MathUtils.damp(signal, nearestSignal(), 2.6, delta);
@@ -816,7 +818,8 @@ function nearestSignal(): number {
 
   const theme = LEVEL_THEMES[levelIndex % LEVEL_THEMES.length];
   const drift = Math.sin(clock.elapsedTime * 1.7 + player.x * 0.05) * theme.signalNoise * 100;
-  return THREE.MathUtils.clamp(100 - nearest * (levelIndex % 2 === 0 ? 3.2 : 2.7) + drift, 0, 100);
+  const introHelp = levelIndex === 0 ? 1 - THREE.MathUtils.smoothstep(clock.elapsedTime, 0, FIRST_PLAY_HELP_SECONDS) : 0;
+  return THREE.MathUtils.clamp(100 - nearest * (levelIndex % 2 === 0 ? 3.2 : 2.7) + drift + introHelp * 12, 0, 100);
 }
 
 function updateGameState(delta: number): void {
@@ -910,7 +913,8 @@ function updateBeacon(): void {
   const dz = signalTarget.z - player.z;
   const wrongness = levelIndex % 2 === 1 ? Math.sin(clock.elapsedTime * 1.3) * 0.42 : 0;
   const bearing = Math.atan2(dx, dz) + yaw + wrongness;
-  const strength = THREE.MathUtils.clamp(signal / 100, 0.16, 1);
+  const introHelp = levelIndex === 0 ? 1 - THREE.MathUtils.smoothstep(clock.elapsedTime, 0, FIRST_PLAY_HELP_SECONDS) : 0;
+  const strength = THREE.MathUtils.clamp(signal / 100 + introHelp * 0.24, 0.28, 1);
   beacon.style.opacity = `${strength}`;
   beacon.style.transform = `translate(-50%, -50%) scale(${0.86 + strength * 0.34}) rotate(${bearing}rad)`;
 }
@@ -921,6 +925,11 @@ function updateSignalStatus(): void {
   const echoesLeft = totalEchoes - collectedEchoes.size;
 
   if (echoesLeft > 0) {
+    if (levelIndex === 0 && clock.elapsedTime < FIRST_PLAY_HELP_SECONDS) {
+      statusText.textContent = "Follow the arrow and record 3 echoes";
+      return;
+    }
+
     if (signal > 80) {
       statusText.textContent = levelIndex % 2 === 0 ? "Echo is close" : "Echo changed position";
     } else if (signal > 44) {
@@ -949,10 +958,11 @@ function updatePost(delta: number, time: number): void {
 
   const danger = signal / 100;
   postMaterial.uniforms.uTime.value = time;
-  postMaterial.uniforms.uNoise.value = 0.14 + danger * 0.22 + blackout * 0.55;
+  const introHelp = levelIndex === 0 ? 1 - THREE.MathUtils.smoothstep(clock.elapsedTime, 0, FIRST_PLAY_HELP_SECONDS) : 0;
+  postMaterial.uniforms.uNoise.value = 0.14 + danger * 0.22 + blackout * 0.55 - introHelp * 0.06;
   postMaterial.uniforms.uBlackout.value = blackout;
   postMaterial.uniforms.uPalette.value = LEVEL_THEMES[levelIndex % LEVEL_THEMES.length].palette;
-  postMaterial.uniforms.uOverlayMix.value = 0.1 + danger * 0.08 + blackout * 0.18;
+  postMaterial.uniforms.uOverlayMix.value = 0.1 + danger * 0.08 + blackout * 0.18 - introHelp * 0.04;
 }
 
 function setBox(
