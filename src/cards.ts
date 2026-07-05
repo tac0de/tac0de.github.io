@@ -12,14 +12,14 @@ import {
 document.documentElement.dataset.page = "cards";
 
 const CARD_ART: Record<CampCard["kind"], string> = {
-  villager: "/assets/card-camp/villager.png",
-  berryBush: "/assets/card-camp/berry-bush.png",
-  tree: "/assets/card-camp/tree.png",
-  stone: "/assets/card-camp/stone.png",
-  berry: "/assets/card-camp/berry.png",
-  wood: "/assets/card-camp/wood.png",
-  campfire: "/assets/card-camp/campfire.png",
-  cookedBerry: "/assets/card-camp/cooked-berry.png"
+  villager: "/assets/card-camp/villager.jpg",
+  berryBush: "/assets/card-camp/berry-bush.jpg",
+  tree: "/assets/card-camp/tree.jpg",
+  stone: "/assets/card-camp/stone.jpg",
+  berry: "/assets/card-camp/berry.jpg",
+  wood: "/assets/card-camp/wood.jpg",
+  campfire: "/assets/card-camp/campfire.jpg",
+  cookedBerry: "/assets/card-camp/cooked-berry.jpg"
 };
 
 const table = document.querySelector<HTMLDivElement>("#card-table");

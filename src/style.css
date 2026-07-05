@@ -196,7 +196,7 @@ html[data-page="cards"] body {
   padding: 52px 14px 32px;
   background:
     linear-gradient(to bottom, rgba(29, 17, 8, 0.5), rgba(14, 9, 4, 0.78)),
-    url("/assets/card-camp/tabletop.png");
+    url("/assets/card-camp/tabletop.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -260,16 +260,16 @@ html[data-page="cards"] body {
 }
 
 #camp-day {
-  --readout-icon: url("/assets/card-camp/icon-day.png");
+  --readout-icon: url("/assets/card-camp/icon-day.jpg");
 }
 
 #camp-food {
-  --readout-icon: url("/assets/card-camp/icon-food.png");
+  --readout-icon: url("/assets/card-camp/icon-food.jpg");
 }
 
 #camp-timer,
 #camp-goal {
-  --readout-icon: url("/assets/card-camp/icon-hunger.png");
+  --readout-icon: url("/assets/card-camp/icon-hunger.jpg");
 }
 
 #camp-goal.is-met {
@@ -287,7 +287,7 @@ html[data-page="cards"] body {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.06), transparent),
     linear-gradient(to bottom, rgba(31, 19, 8, 0.14), rgba(22, 12, 4, 0.38)),
-    url("/assets/card-camp/tabletop.png");
+    url("/assets/card-camp/tabletop.jpg");
   background-size: cover;
   background-position: center;
   box-shadow:
