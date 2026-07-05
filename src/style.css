@@ -17,12 +17,181 @@ body {
   user-select: none;
 }
 
+html[data-page="arcade"],
+html[data-page="arcade"] body {
+  min-height: 100%;
+  height: auto;
+  overflow: auto;
+  touch-action: manipulation;
+}
+
+body {
+  background:
+    radial-gradient(circle at 18% 16%, rgba(46, 214, 189, 0.16), transparent 26rem),
+    radial-gradient(circle at 78% 4%, rgba(247, 223, 138, 0.11), transparent 30rem),
+    linear-gradient(135deg, #0f0e09 0%, #17140b 42%, #101719 100%);
+}
+
+.arcade-shell {
+  width: min(1120px, calc(100% - 32px));
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 72px 0 56px;
+}
+
+.arcade-hero {
+  max-width: 760px;
+  margin-bottom: 46px;
+}
+
+.arcade-kicker,
+.tile-status,
+.tile-tags {
+  margin: 0;
+  color: #9debd9;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.arcade-hero h1 {
+  margin: 8px 0 14px;
+  color: #f7df8a;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: clamp(56px, 11vw, 132px);
+  font-weight: 900;
+  line-height: 0.86;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 20px rgba(247, 223, 138, 0.2),
+    4px 4px 0 rgba(0, 0, 0, 0.55);
+}
+
+.arcade-copy {
+  max-width: 620px;
+  margin: 0;
+  color: rgba(243, 231, 189, 0.78);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.game-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.game-tile {
+  position: relative;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(243, 231, 189, 0.22);
+  border-radius: 8px;
+  color: #f3e7bd;
+  text-decoration: none;
+  background:
+    linear-gradient(to top, rgba(8, 8, 5, 0.96), rgba(8, 8, 5, 0.38)),
+    var(--tile-bg);
+  background-size: cover;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.32);
+}
+
+.game-tile::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 238, 162, 0.08) 0,
+      rgba(255, 238, 162, 0.08) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.game-tile-live {
+  --tile-bg:
+    linear-gradient(110deg, rgba(17, 20, 13, 0.55), rgba(10, 12, 12, 0.2)),
+    url("/assets/wallpaper.png");
+}
+
+.game-tile-soon {
+  --tile-bg:
+    linear-gradient(135deg, rgba(50, 37, 18, 0.7), rgba(16, 23, 24, 0.72)),
+    repeating-linear-gradient(25deg, #6b4f25 0 22px, #293b34 22px 44px);
+}
+
+.tile-title,
+.tile-copy,
+.tile-tags,
+.tile-status {
+  position: relative;
+  z-index: 1;
+}
+
+.tile-title {
+  max-width: 520px;
+  color: #f7df8a;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: 42px;
+  line-height: 0.98;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.tile-copy {
+  max-width: 420px;
+  color: rgba(243, 231, 189, 0.82);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.game-tile-live:hover {
+  border-color: rgba(157, 235, 217, 0.72);
+  transform: translateY(-2px);
+}
+
+.game-tile-soon {
+  opacity: 0.82;
+}
+
 #game {
   display: block;
   width: 100vw;
   height: 100vh;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+}
+
+.back-link {
+  position: fixed;
+  z-index: 5;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  padding: 7px 9px;
+  border: 1px solid rgba(157, 235, 217, 0.34);
+  color: rgba(157, 235, 217, 0.88);
+  background: rgba(15, 14, 9, 0.48);
+  backdrop-filter: blur(8px);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-decoration: none;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
+}
+
+.back-link:hover {
+  border-color: rgba(157, 235, 217, 0.8);
 }
 
 #hud {
@@ -166,6 +335,34 @@ body {
 
   .hint::after {
     content: " · WASD + drag";
+  }
+}
+
+@media (max-width: 720px) {
+  .arcade-shell {
+    width: min(100% - 24px, 520px);
+    padding: 44px 0 36px;
+  }
+
+  .arcade-hero {
+    margin-bottom: 28px;
+  }
+
+  .arcade-copy {
+    font-size: 15px;
+  }
+
+  .game-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .game-tile {
+    min-height: 250px;
+    padding: 18px;
+  }
+
+  .tile-title {
+    font-size: 34px;
   }
 }
 

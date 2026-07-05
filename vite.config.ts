@@ -1,3 +1,4 @@
+import { resolve } from "node:path";
 import { defineConfig } from "vite";
 
 export default defineConfig({
@@ -9,6 +10,12 @@ export default defineConfig({
   build: {
     target: "es2020",
     sourcemap: false,
-    chunkSizeWarningLimit: 700
+    chunkSizeWarningLimit: 700,
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, "index.html"),
+        backrooms: resolve(__dirname, "games/backrooms/index.html")
+      }
+    }
   }
 });

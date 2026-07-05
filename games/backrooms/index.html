@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#15130a" />
+    <meta
+      name="description"
+      content="A mobile-first Three.js backrooms game prototype with lo-fi rendering, signal hunting, and procedural horror spaces."
+    />
+    <meta property="og:title" content="Backrooms Drift" />
+    <meta
+      property="og:description"
+      content="Follow the signal, record the echoes, and escape the room before it forgets you."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="../../og-image.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>Backrooms Drift</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="back-link" href="../../" aria-label="Back to arcade">ARCADE</a>
+    <canvas id="game"></canvas>
+    <div id="hud" aria-hidden="true">
+      <div class="readout">
+        <span id="zone">LEVEL 0</span>
+        <span id="signal">SIGNAL 00%</span>
+      </div>
+      <div id="beacon">▲</div>
+      <div id="reticle"></div>
+      <div id="stick">
+        <div id="stick-knob"></div>
+      </div>
+      <div id="status" class="hint">Find the humming exit</div>
+    </div>
+    <script type="module" src="/src/backrooms.ts"></script>
+  </body>
+</html>

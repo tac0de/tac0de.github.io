@@ -1,9 +1,12 @@
-# Backrooms Drift
+# Tacode Arcade
 
-Three.js 기반 모바일 웹 백룸 탐색 게임 프로토타입.
+플레이 가능한 웹 게임 실험 포트폴리오.
 
 ## 현재 방향
 
+- 루트는 게임 선택 화면
+- `/games/backrooms/`는 첫 번째 playable title인 Backrooms Drift
+- 다음 타이틀은 Stacklands-inspired card survival prototype
 - 모바일 우선 1인칭 탐색
 - 플레이어 주변 청크만 렌더링하는 절차적 백룸
 - `InstancedMesh` 기반 벽, 바닥, 천장 렌더링
