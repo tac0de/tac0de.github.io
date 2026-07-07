@@ -227,8 +227,6 @@ function completeWorkOrder(state: CampState, order: WorkOrder): void {
 function resolveDay(state: CampState): void {
   state.day += 1;
   state.dayRemaining = state.dayLength;
-  clearResolvedEvents(state);
-  addNightEvent(state);
 
   const foodNeeded = state.cards.some((card) => card.kind === "coldNight") ? 2 : 1;
   const foodCards = state.cards.filter((card) => card.kind === "cookedBerry" || card.kind === "berry");
@@ -242,6 +240,8 @@ function resolveDay(state: CampState): void {
       return true;
     });
     state.message = foodNeeded > 1 ? "Cold night. Villager ate extra food." : `Villager ate one ${CARD_DEFS[foodCards[0].kind].label}.`;
+    clearResolvedEvents(state);
+    addNightEvent(state);
     for (const card of state.cards) {
       if (card.kind === "villager") card.state = "idle";
     }
@@ -252,6 +252,8 @@ function resolveDay(state: CampState): void {
   if (food) {
     state.cards = state.cards.filter((card) => card.id !== food.id);
     state.message = `Villager ate one ${CARD_DEFS[food.kind].label}.`;
+    clearResolvedEvents(state);
+    addNightEvent(state);
     for (const card of state.cards) {
       if (card.kind === "villager") card.state = "idle";
     }
@@ -260,6 +262,8 @@ function resolveDay(state: CampState): void {
 
   state.warnings += 1;
   state.message = "No food. Villager is hungry.";
+  clearResolvedEvents(state);
+  addNightEvent(state);
   for (const card of state.cards) {
     if (card.kind === "villager") card.state = "hungry";
   }

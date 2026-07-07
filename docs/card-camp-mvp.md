@@ -1,6 +1,6 @@
 # Card Camp MVP
 
-Stacklands-inspired card survival prototype for Tacode Arcade.
+Three.js tabletop, Stacklands-inspired card survival prototype for Tacode Arcade.
 
 ## Core Loop
 
@@ -37,6 +37,7 @@ Stacklands-inspired card survival prototype for Tacode Arcade.
 - Implemented `Campfire + Berry -> Cooked Berry`
 - Implemented day timer and food consumption
 - Implemented image-generated card icon sprite, minimal event symbols, and tabletop surface
+- Implemented Three.js tabletop renderer with 3D card slabs and work bars
 - Implemented proximity cooking near campfire
 - Implemented Villager routines for repeated source work
 - Implemented dusk event cards
@@ -56,6 +57,7 @@ Stacklands-inspired card survival prototype for Tacode Arcade.
 ## Visual Direction
 
 - Warm tabletop, small paper cards, soft shadows, tactile edges.
+- The card table is rendered as a Three.js scene, not DOM card elements.
 - Cards should read clearly at phone width with simple casual generated symbols.
 - Card faces should not show item names; labels live in accessible names and game messages.
 - Status should be shown on the card surface before adding side panels.

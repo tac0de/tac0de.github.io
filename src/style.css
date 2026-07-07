@@ -300,6 +300,21 @@ html[data-page="cards"] body {
   inset: 0;
 }
 
+.card-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+  outline: none;
+  touch-action: none;
+}
+
+.card-canvas:active {
+  cursor: grabbing;
+}
+
 .work-layer {
   pointer-events: none;
 }

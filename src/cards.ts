@@ -1,4 +1,5 @@
 import "./style.css";
+import * as THREE from "three";
 import {
   CARD_DEFS,
   CampCard,
@@ -12,19 +13,22 @@ import {
 
 document.documentElement.dataset.page = "cards";
 
-const CARD_SYMBOLS: Record<CardKind, string> = {
-  villager: "person",
-  berryBush: "bush",
-  tree: "tree",
-  stone: "stone",
-  berry: "berry",
-  wood: "wood",
-  campfire: "fire",
-  cookedBerry: "snack",
-  rain: "rain",
-  coldNight: "cold",
-  trader: "trade"
+const ICON_CELLS: Partial<Record<CardKind, { column: number; row: number }>> = {
+  villager: { column: 0, row: 0 },
+  berryBush: { column: 1, row: 0 },
+  tree: { column: 2, row: 0 },
+  stone: { column: 3, row: 0 },
+  berry: { column: 0, row: 1 },
+  wood: { column: 1, row: 1 },
+  campfire: { column: 2, row: 1 },
+  cookedBerry: { column: 3, row: 1 }
 };
+
+const PX_PER_UNIT = 100;
+const CARD_FACE_SIZE = 256;
+const CARD_FACE_RATIO = 1.28;
+const CARD_Y = 0.08;
+const DRAG_Y = 0.16;
 
 const table = document.querySelector<HTMLDivElement>("#card-table");
 const cardLayer = document.querySelector<HTMLDivElement>("#card-layer");
@@ -40,22 +44,45 @@ if (!table || !cardLayer || !workLayer || !message || !dayLabel || !foodLabel ||
 }
 
 const tableElement = table;
-const cardLayerElement = cardLayer;
-const workLayerElement = workLayer;
 const messageElement = message;
 const dayElement = dayLabel;
 const foodElement = foodLabel;
 const timerElement = timerLabel;
 const goalElement = goalLabel;
 
+cardLayer.hidden = true;
+workLayer.hidden = true;
+
 const state = createInitialState();
-const cardNodes = new Map<string, HTMLButtonElement>();
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 50);
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+const raycaster = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+const dragPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -DRAG_Y);
+const cardMeshes = new Map<string, CardView>();
+const workMeshes = new Map<string, THREE.Group>();
+const cardTextureCache = new Map<CardKind, THREE.CanvasTexture>();
+const iconImage = new Image();
+const tableTexture = new THREE.TextureLoader().load("/assets/card-camp/tabletop.jpg");
+const cardMaterialBase = new THREE.MeshStandardMaterial({ color: 0xe8cd96, roughness: 0.82, metalness: 0.02 });
+const warningMaterial = new THREE.MeshStandardMaterial({ color: 0xb65a4e, roughness: 0.7 });
+const routineMaterial = new THREE.MeshStandardMaterial({ color: 0x73c48d, roughness: 0.65 });
+
+type CardView = {
+  group: THREE.Group;
+  body: THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardMaterial>;
+  face: THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
+  ring: THREE.Mesh<THREE.RingGeometry, THREE.MeshBasicMaterial>;
+  routine: THREE.Mesh<THREE.BoxGeometry, THREE.MeshStandardMaterial>;
+};
+
 let active:
   | {
       card: CampCard;
       pointerId: number;
       offsetX: number;
-      offsetY: number;
+      offsetZ: number;
       moved: boolean;
     }
   | undefined;
@@ -63,145 +90,317 @@ let activeDropTargetId: string | undefined;
 let selectedCardId: string | undefined;
 let lastTime = performance.now();
 let didFitInitialLayout = false;
-let suppressClickUntil = 0;
+let boardWidth = 1;
+let boardHeight = 1;
 
-render();
-requestAnimationFrame(loop);
-window.addEventListener("resize", () => {
-  fitCardsInsideTable();
-  render();
+renderer.domElement.className = "card-canvas";
+renderer.domElement.setAttribute("aria-label", "3D Card Camp tabletop");
+tableElement.append(renderer.domElement);
+
+tableTexture.colorSpace = THREE.SRGBColorSpace;
+tableTexture.wrapS = THREE.RepeatWrapping;
+tableTexture.wrapT = THREE.RepeatWrapping;
+tableTexture.repeat.set(1.5, 1.2);
+
+const tableSurface = new THREE.Mesh(
+  new THREE.PlaneGeometry(1, 1),
+  new THREE.MeshStandardMaterial({
+    map: tableTexture,
+    color: 0x8a6239,
+    roughness: 0.88
+  })
+);
+tableSurface.rotation.x = -Math.PI / 2;
+tableSurface.position.y = -0.035;
+scene.add(tableSurface);
+
+const tableRim = new THREE.Mesh(
+  new THREE.BoxGeometry(1, 0.12, 1),
+  new THREE.MeshStandardMaterial({ color: 0x4f321f, roughness: 0.9 })
+);
+tableRim.position.y = -0.1;
+scene.add(tableRim);
+
+scene.add(new THREE.HemisphereLight(0xfff4cf, 0x302214, 2.2));
+const keyLight = new THREE.DirectionalLight(0xffdc8f, 2.8);
+keyLight.position.set(-3, 6, 4);
+scene.add(keyLight);
+
+iconImage.src = "/assets/card-camp/generated/card-camp-icons.png";
+iconImage.addEventListener("load", () => {
+  cardTextureCache.clear();
+  for (const card of state.cards) {
+    const view = cardMeshes.get(card.id);
+    if (view) {
+      view.face.material.map = cardTexture(card.kind);
+      view.face.material.needsUpdate = true;
+    }
+  }
 });
+
+renderer.domElement.addEventListener("pointerdown", onPointerDown);
+renderer.domElement.addEventListener("pointermove", onPointerMove);
+renderer.domElement.addEventListener("pointerup", onPointerUp);
+renderer.domElement.addEventListener("pointercancel", onPointerUp);
+window.addEventListener("resize", () => {
+  resizeRenderer();
+  fitCardsInsideTable();
+});
+
+resizeRenderer();
+renderHud();
+requestAnimationFrame(loop);
 
 function loop(now: number): void {
   const delta = Math.min((now - lastTime) / 1000, 0.1);
   lastTime = now;
-  tickCamp(state, delta);
-  render();
-  requestAnimationFrame(loop);
-}
-
-function render(): void {
   if (!didFitInitialLayout) {
     layoutInitialCards();
     didFitInitialLayout = true;
   }
+  tickCamp(state, delta);
   fitCardsInsideTable();
+  renderHud();
+  syncScene();
+  renderer.render(scene, camera);
+  requestAnimationFrame(loop);
+}
 
+function renderHud(): void {
   messageElement.textContent = state.eventMessage ? `${state.message} ${state.eventMessage}` : state.message;
   dayElement.textContent = `Day ${state.day}`;
   foodElement.textContent = `Food ${foodScore()}`;
   timerElement.textContent = `Dusk ${Math.ceil(state.dayRemaining)}s`;
   goalElement.textContent = state.goalMet ? "Goal Campfire lit" : "Goal Light campfire";
   goalElement.classList.toggle("is-met", state.goalMet);
+}
 
+function syncScene(): void {
   for (const card of state.cards) {
-    let node = cardNodes.get(card.id);
-    if (!node) {
-      node = document.createElement("button");
-      node.type = "button";
-      node.className = "camp-card";
-      node.dataset.cardId = card.id;
-      node.addEventListener("pointerdown", onPointerDown);
-      node.addEventListener("click", onCardClick);
-      cardLayerElement.append(node);
-      cardNodes.set(card.id, node);
-    }
+    const view = cardMeshes.get(card.id) ?? createCardView(card);
+    const size = cardSize();
+    const position = cardToWorld(card);
+    view.group.position.set(position.x, active?.card.id === card.id ? DRAG_Y : CARD_Y, position.z);
+    view.group.rotation.set(-0.04, 0, active?.card.id === card.id ? 0.07 : 0);
+    view.group.scale.set(size.width / 118, 1, size.height / 154);
 
-    const def = CARD_DEFS[card.kind];
     const isTarget = activeDropTargetId === card.id;
-    const isDragging = active?.card.id === card.id;
-    node.className = `camp-card camp-card-${card.kind} is-${card.state}${card.routineTargetId ? " has-routine" : ""}${selectedCardId === card.id ? " is-selected" : ""}${isTarget ? " is-drop-target" : ""}${isDragging ? " is-dragging" : ""}`;
-    node.style.transform = `translate(${card.x}px, ${card.y}px)`;
-    node.setAttribute("aria-label", `${def.label}, ${def.type}`);
-    node.disabled = card.state === "working";
-    node.innerHTML = `
-      <span class="camp-card-symbol" data-symbol="${CARD_SYMBOLS[card.kind]}"></span>
-    `;
+    const isSelected = selectedCardId === card.id;
+    view.ring.visible = isTarget || isSelected;
+    view.ring.material.color.set(isTarget ? 0x9debd9 : 0xf7df8a);
+    view.routine.visible = Boolean(card.routineTargetId);
+    view.body.material = card.state === "warning" || card.state === "hungry" ? warningMaterial : cardMaterialBase;
   }
 
-  for (const [id, node] of cardNodes) {
+  for (const [id, view] of cardMeshes) {
     if (!state.cards.some((card) => card.id === id)) {
-      node.remove();
-      cardNodes.delete(id);
+      view.group.removeFromParent();
+      cardMeshes.delete(id);
     }
   }
 
-  workLayerElement.replaceChildren(...state.workOrders.map((order) => {
-    const bar = document.createElement("div");
-    bar.className = "work-order";
-    bar.style.transform = `translate(${order.x - 12}px, ${order.y - 26}px)`;
-    bar.innerHTML = `
-      <strong>${CARD_DEFS[order.recipe.result].label}</strong>
-      <span style="width: ${100 - (order.remaining / order.total) * 100}%"></span>
-    `;
-    return bar;
-  }));
+  for (const order of state.workOrders) {
+    const group = workMeshes.get(order.id) ?? createWorkView(order.id);
+    const x = order.x / PX_PER_UNIT - boardWidth / 2;
+    const z = boardHeight / 2 - order.y / PX_PER_UNIT;
+    group.position.set(x, 0.19, z + 0.48);
+    const fill = group.children[1];
+    fill.scale.x = Math.max(0.03, 1 - order.remaining / order.total);
+    fill.position.x = -0.43 + fill.scale.x * 0.43;
+  }
+
+  for (const [id, group] of workMeshes) {
+    if (!state.workOrders.some((order) => order.id === id)) {
+      group.removeFromParent();
+      workMeshes.delete(id);
+    }
+  }
+}
+
+function createCardView(card: CampCard): CardView {
+  const size = cardSize();
+  const width = size.width / PX_PER_UNIT;
+  const height = size.height / PX_PER_UNIT;
+  const group = new THREE.Group();
+  group.userData.cardId = card.id;
+
+  const body = new THREE.Mesh(new THREE.BoxGeometry(width, 0.055, height), cardMaterialBase);
+  body.userData.cardId = card.id;
+  group.add(body);
+
+  const face = new THREE.Mesh(
+    new THREE.PlaneGeometry(width * 0.88, height * 0.88),
+    new THREE.MeshBasicMaterial({ map: cardTexture(card.kind), transparent: true })
+  );
+  face.rotation.x = -Math.PI / 2;
+  face.position.y = 0.031;
+  face.userData.cardId = card.id;
+  group.add(face);
+
+  const ring = new THREE.Mesh(
+    new THREE.RingGeometry(Math.min(width, height) * 0.48, Math.min(width, height) * 0.54, 48),
+    new THREE.MeshBasicMaterial({ color: 0x9debd9, transparent: true, opacity: 0.9, side: THREE.DoubleSide })
+  );
+  ring.rotation.x = -Math.PI / 2;
+  ring.position.y = 0.038;
+  ring.visible = false;
+  group.add(ring);
+
+  const routine = new THREE.Mesh(new THREE.BoxGeometry(width * 0.54, 0.024, 0.035), routineMaterial);
+  routine.position.set(0, 0.05, height * 0.4);
+  routine.visible = false;
+  group.add(routine);
+
+  scene.add(group);
+  const view = { group, body, face, ring, routine };
+  cardMeshes.set(card.id, view);
+  return view;
+}
+
+function createWorkView(id: string): THREE.Group {
+  const group = new THREE.Group();
+  const back = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.035, 0.08), new THREE.MeshStandardMaterial({ color: 0x19130d, roughness: 0.8 }));
+  const fill = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.042, 0.045), new THREE.MeshStandardMaterial({ color: 0x9debd9, emissive: 0x24534a, roughness: 0.45 }));
+  group.add(back, fill);
+  scene.add(group);
+  workMeshes.set(id, group);
+  return group;
+}
+
+function cardTexture(kind: CardKind): THREE.CanvasTexture {
+  const cached = cardTextureCache.get(kind);
+  if (cached) return cached;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = CARD_FACE_SIZE;
+  canvas.height = CARD_FACE_SIZE * CARD_FACE_RATIO;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas texture context is unavailable.");
+
+  drawRoundedRect(ctx, 8, 8, canvas.width - 16, canvas.height - 16, 22, "#f4dfaa");
+  drawRoundedRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 16, "#f9efce");
+  ctx.fillStyle = "rgba(78, 55, 31, 0.08)";
+  ctx.fillRect(42, canvas.height - 34, canvas.width - 84, 9);
+
+  const icon = ICON_CELLS[kind];
+  if (icon && iconImage.complete && iconImage.naturalWidth > 0) {
+    const cellWidth = iconImage.naturalWidth / 4;
+    const cellHeight = iconImage.naturalHeight / 2;
+    ctx.drawImage(
+      iconImage,
+      icon.column * cellWidth,
+      icon.row * cellHeight,
+      cellWidth,
+      cellHeight,
+      44,
+      58,
+      canvas.width - 88,
+      canvas.width - 88
+    );
+  } else {
+    drawEventIcon(ctx, kind, canvas.width / 2, canvas.height / 2 - 8);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  cardTextureCache.set(kind, texture);
+  return texture;
+}
+
+function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number, fill: string): void {
+  ctx.beginPath();
+  ctx.roundRect(x, y, width, height, radius);
+  ctx.fillStyle = fill;
+  ctx.fill();
+}
+
+function drawEventIcon(ctx: CanvasRenderingContext2D, kind: CardKind, x: number, y: number): void {
+  if (kind === "rain") {
+    ctx.fillStyle = "#9bb7c7";
+    ctx.beginPath();
+    ctx.roundRect(x - 56, y - 36, 112, 58, 28);
+    ctx.fill();
+    ctx.fillStyle = "#6fb8d5";
+    for (const offset of [-34, 0, 34]) {
+      ctx.beginPath();
+      ctx.roundRect(x + offset - 6, y + 35, 12, 46, 6);
+      ctx.fill();
+    }
+    return;
+  }
+
+  if (kind === "coldNight") {
+    ctx.fillStyle = "#dfeef4";
+    ctx.beginPath();
+    ctx.arc(x - 8, y, 50, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#8fb1c1";
+    ctx.beginPath();
+    ctx.arc(x + 12, y + 2, 42, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#f2d46b";
+    ctx.beginPath();
+    ctx.arc(x + 50, y - 48, 19, 0, Math.PI * 2);
+    ctx.fill();
+    return;
+  }
+
+  ctx.fillStyle = "#b77743";
+  ctx.beginPath();
+  ctx.roundRect(x - 56, y - 38, 112, 76, 16);
+  ctx.fill();
+  ctx.strokeStyle = "#6fae61";
+  ctx.lineWidth = 16;
+  ctx.beginPath();
+  ctx.arc(x, y, 34, 0.2, Math.PI * 1.7);
+  ctx.stroke();
 }
 
 function onPointerDown(event: PointerEvent): void {
-  const node = event.currentTarget as HTMLButtonElement;
-  const card = state.cards.find((candidate) => candidate.id === node.dataset.cardId);
-  if (!card || card.state === "working") return;
+  const hit = pickCard(event);
+  if (!hit || hit.state === "working") return;
+  const point = pointerToTable(event);
+  if (!point) return;
 
-  const tableRect = tableElement.getBoundingClientRect();
-  const nodeRect = node.getBoundingClientRect();
   active = {
-    card,
+    card: hit,
     pointerId: event.pointerId,
-    offsetX: event.clientX - nodeRect.left,
-    offsetY: event.clientY - nodeRect.top,
+    offsetX: point.x - cardToWorld(hit).x,
+    offsetZ: point.z - cardToWorld(hit).z,
     moved: false
   };
-
-  node.setPointerCapture(event.pointerId);
-  card.x = event.clientX - tableRect.left - active.offsetX;
-  card.y = event.clientY - tableRect.top - active.offsetY;
+  renderer.domElement.setPointerCapture(event.pointerId);
   activeDropTargetId = undefined;
-  render();
-
-  node.addEventListener("pointermove", onPointerMove);
-  node.addEventListener("pointerup", onPointerUp);
-  node.addEventListener("pointercancel", onPointerUp);
 }
 
 function onPointerMove(event: PointerEvent): void {
   if (!active || active.pointerId !== event.pointerId) return;
+  const point = pointerToTable(event);
+  if (!point) return;
 
-  const tableRect = tableElement.getBoundingClientRect();
   const size = cardSize();
-  active.card.x = clamp(event.clientX - tableRect.left - active.offsetX, 0, tableRect.width - size.width);
-  active.card.y = clamp(event.clientY - tableRect.top - active.offsetY, 0, tableRect.height - size.height);
+  const next = worldToCard(point.x - active.offsetX, point.z - active.offsetZ);
+  active.card.x = clamp(next.x, 0, Math.max(0, tableElement.clientWidth - size.width));
+  active.card.y = clamp(next.y, 0, Math.max(0, tableElement.clientHeight - size.height));
   activeDropTargetId = findDropTarget(active.card, true)?.id;
   active.moved = true;
-  render();
 }
 
 function onPointerUp(event: PointerEvent): void {
-  const node = event.currentTarget as HTMLButtonElement;
-  node.removeEventListener("pointermove", onPointerMove);
-  node.removeEventListener("pointerup", onPointerUp);
-  node.removeEventListener("pointercancel", onPointerUp);
-
   if (!active || active.pointerId !== event.pointerId) return;
-
   const dropped = active.card;
   const moved = active.moved;
   active = undefined;
   activeDropTargetId = undefined;
 
   if (!moved) {
-    render();
+    handleCardTap(dropped);
     return;
   }
-  suppressClickUntil = performance.now() + 350;
-  const target = findDropTarget(dropped, false);
 
+  const target = findDropTarget(dropped, false);
   if (!target) {
-    if (setNearbyRoutine(dropped)) {
-      render();
-      return;
-    }
-    render();
+    setNearbyRoutine(dropped);
     return;
   }
 
@@ -211,63 +410,65 @@ function onPointerUp(event: PointerEvent): void {
     nudgeAwayFrom(dropped, target);
     window.setTimeout(() => {
       dropped.state = "idle";
-      render();
     }, 320);
-    render();
     return;
   }
 
   alignForCraft(dropped, target);
   startRecipe(state, recipe, [dropped, target]);
-  render();
 }
 
-function onCardClick(event: MouseEvent): void {
-  if (performance.now() < suppressClickUntil) {
-    event.preventDefault();
-    return;
-  }
-
-  const node = event.currentTarget as HTMLButtonElement;
-  const card = state.cards.find((candidate) => candidate.id === node.dataset.cardId);
-  if (!card || card.state === "working") return;
+function handleCardTap(card: CampCard): void {
+  if (card.state === "working") return;
 
   if (!selectedCardId) {
     selectedCardId = card.id;
     state.message = `${CARD_DEFS[card.kind].label} selected. Choose a target.`;
-    render();
     return;
   }
 
   if (selectedCardId === card.id) {
     selectedCardId = undefined;
     state.message = "Selection cleared.";
-    render();
     return;
   }
 
   const selected = state.cards.find((candidate) => candidate.id === selectedCardId);
   selectedCardId = undefined;
-
-  if (!selected || selected.state === "working") {
-    render();
-    return;
-  }
+  if (!selected || selected.state === "working") return;
 
   const recipe = findRecipe([selected.kind, card.kind]);
   if (!recipe) {
     cancelInvalidStack(state, selected);
     window.setTimeout(() => {
       selected.state = "idle";
-      render();
     }, 320);
-    render();
     return;
   }
 
   alignForCraft(selected, card);
   startRecipe(state, recipe, [selected, card]);
-  render();
+}
+
+function pickCard(event: PointerEvent): CampCard | undefined {
+  setPointer(event);
+  const meshes = [...cardMeshes.values()].flatMap((view) => [view.body, view.face]);
+  const hit = raycaster.intersectObjects(meshes, false)[0];
+  const id = hit?.object.userData.cardId;
+  return state.cards.find((card) => card.id === id);
+}
+
+function pointerToTable(event: PointerEvent): THREE.Vector3 | undefined {
+  setPointer(event);
+  const point = new THREE.Vector3();
+  return raycaster.ray.intersectPlane(dragPlane, point) ?? undefined;
+}
+
+function setPointer(event: PointerEvent): void {
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+  pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(pointer, camera);
 }
 
 function findDropTarget(card: CampCard, validOnly: boolean): CampCard | undefined {
@@ -326,6 +527,23 @@ function layoutInitialCards(): void {
   });
 }
 
+function resizeRenderer(): void {
+  const width = tableElement.clientWidth;
+  const height = tableElement.clientHeight;
+  boardWidth = width / PX_PER_UNIT;
+  boardHeight = height / PX_PER_UNIT;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(width, height, false);
+
+  camera.aspect = width / height;
+  camera.position.set(0, Math.max(5.8, boardHeight * 1.05), Math.max(5.4, boardHeight * 0.9));
+  camera.lookAt(0, 0, 0);
+  camera.updateProjectionMatrix();
+
+  tableSurface.scale.set(boardWidth, boardHeight, 1);
+  tableRim.scale.set(boardWidth + 0.18, 1, boardHeight + 0.18);
+}
+
 function fitCardsInsideTable(): void {
   const size = cardSize();
   const tableRect = tableElement.getBoundingClientRect();
@@ -340,6 +558,22 @@ function cardSize(): { width: number; height: number } {
   if (tableRect.width <= 380) return { width: 88, height: 118 };
   if (tableRect.width <= 620) return { width: 96, height: 128 };
   return { width: 118, height: 154 };
+}
+
+function cardToWorld(card: CampCard): { x: number; z: number } {
+  const size = cardSize();
+  return {
+    x: (card.x + size.width / 2) / PX_PER_UNIT - boardWidth / 2,
+    z: boardHeight / 2 - (card.y + size.height / 2) / PX_PER_UNIT
+  };
+}
+
+function worldToCard(x: number, z: number): { x: number; y: number } {
+  const size = cardSize();
+  return {
+    x: (x + boardWidth / 2) * PX_PER_UNIT - size.width / 2,
+    y: (boardHeight / 2 - z) * PX_PER_UNIT - size.height / 2
+  };
 }
 
 function overlapRatio(a: CampCard, b: CampCard): number {
