@@ -9,6 +9,7 @@ Three.js tabletop, Stacklands-inspired card survival prototype for Tacode Arcade
 3. Useful card proximity starts world rules like cooking by a fire.
 4. Worker routines repeat when the camp layout supports them.
 5. Dusk event cards change the pressure of the next day.
+6. Survive through Day 5 with a Campfire built to stabilize the camp.
 
 ## First Playable Scope
 
@@ -20,12 +21,13 @@ Three.js tabletop, Stacklands-inspired card survival prototype for Tacode Arcade
   - `Wood + Stone -> Campfire`
   - `Campfire + Berry -> Cooked Berry`
 - Pressure:
-  - Villager eats food every day cycle
+  - Villager eats food every day cycle: `Berry = 1`, `Cooked Berry = 2`
   - Dusk adds one event card
-  - `Cold Night` increases food demand
+  - `Cold Night` increases food demand to 2
   - `Rain` slows fire recipes
   - `Trader` can exchange nearby wood for supplies
-- Missing food creates a warning state first, not instant failure
+- Missing food creates a warning state first; two warnings fail the camp
+- Win: reach the next dusk after Day 5 while Campfire exists
 
 ## Current Build
 
@@ -36,7 +38,10 @@ Three.js tabletop, Stacklands-inspired card survival prototype for Tacode Arcade
 - Implemented `Wood + Stone -> Campfire`
 - Implemented `Campfire + Berry -> Cooked Berry`
 - Implemented day timer and food consumption
-- Implemented image-generated card icon sprite, minimal event symbols, and tabletop surface
+- Implemented explicit `playing`, `won`, and `lost` camp status
+- Implemented Day 5 Campfire win condition and two-warning loss condition
+- Implemented food values with `Berry = 1`, `Cooked Berry = 2`, and `Cold Night = 2` demand
+- Implemented image-generated hand-drawn card icon sprite, minimal event symbols, and tabletop surface
 - Implemented full-viewport Three.js tabletop renderer with 3D card slabs and work bars
 - Implemented proximity cooking near campfire
 - Implemented Villager routines for repeated source work
@@ -58,7 +63,8 @@ Three.js tabletop, Stacklands-inspired card survival prototype for Tacode Arcade
 
 - Warm tabletop, small paper cards, soft shadows, tactile edges.
 - The whole play surface is rendered as a full-viewport Three.js scene, not an inner DOM board.
-- Cards should read clearly at phone width with simple casual generated symbols.
+- Cards should read clearly at phone width with loose pencil outlines, soft watercolor fills, and a field-notebook texture.
+- Generated item art uses transparent-background sprites cut from a flat chroma-key source.
 - Card faces should not show item names; labels live in accessible names and game messages.
 - Status should be shown on the card surface before adding side panels.
 

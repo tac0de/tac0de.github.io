@@ -65,9 +65,9 @@ const workMeshes = new Map<string, THREE.Group>();
 const cardTextureCache = new Map<CardKind, THREE.CanvasTexture>();
 const iconImage = new Image();
 const tableTexture = new THREE.TextureLoader().load("/assets/card-camp/tabletop.jpg");
-const cardMaterialBase = new THREE.MeshStandardMaterial({ color: 0xe8cd96, roughness: 0.82, metalness: 0.02 });
-const warningMaterial = new THREE.MeshStandardMaterial({ color: 0xb65a4e, roughness: 0.7 });
-const routineMaterial = new THREE.MeshStandardMaterial({ color: 0x73c48d, roughness: 0.65 });
+const cardMaterialBase = new THREE.MeshStandardMaterial({ color: 0xdcc991, roughness: 0.94, metalness: 0 });
+const warningMaterial = new THREE.MeshStandardMaterial({ color: 0xb86c57, roughness: 0.88, metalness: 0 });
+const routineMaterial = new THREE.MeshStandardMaterial({ color: 0x7ea06c, roughness: 0.9, metalness: 0 });
 
 type CardView = {
   group: THREE.Group;
@@ -170,9 +170,15 @@ function renderHud(): void {
   messageElement.textContent = state.eventMessage ? `${state.message} ${state.eventMessage}` : state.message;
   dayElement.textContent = `Day ${state.day}`;
   foodElement.textContent = `Food ${foodScore()}`;
-  timerElement.textContent = `Dusk ${Math.ceil(state.dayRemaining)}s`;
-  goalElement.textContent = state.goalMet ? "Goal Campfire lit" : "Goal Light campfire";
-  goalElement.classList.toggle("is-met", state.goalMet);
+  timerElement.textContent = state.status === "playing" ? `Dusk ${Math.ceil(state.dayRemaining)}s` : state.status.toUpperCase();
+  goalElement.textContent = state.status === "won"
+    ? "Camp Stable"
+    : state.status === "lost"
+      ? "Camp Failed"
+      : state.goalMet
+        ? "Goal Survive Day 5"
+        : "Goal Light campfire";
+  goalElement.classList.toggle("is-met", state.goalMet || state.status === "won");
 }
 
 function syncScene(): void {
@@ -259,8 +265,8 @@ function createCardView(card: CampCard): CardView {
 
 function createWorkView(id: string): THREE.Group {
   const group = new THREE.Group();
-  const back = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.035, 0.08), new THREE.MeshStandardMaterial({ color: 0x19130d, roughness: 0.8 }));
-  const fill = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.042, 0.045), new THREE.MeshStandardMaterial({ color: 0x9debd9, emissive: 0x24534a, roughness: 0.45 }));
+  const back = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.035, 0.08), new THREE.MeshStandardMaterial({ color: 0x2a2118, roughness: 0.92 }));
+  const fill = new THREE.Mesh(new THREE.BoxGeometry(0.86, 0.042, 0.045), new THREE.MeshStandardMaterial({ color: 0x98b980, roughness: 0.78 }));
   group.add(back, fill);
   scene.add(group);
   workMeshes.set(id, group);
@@ -277,10 +283,7 @@ function cardTexture(kind: CardKind): THREE.CanvasTexture {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas texture context is unavailable.");
 
-  drawRoundedRect(ctx, 8, 8, canvas.width - 16, canvas.height - 16, 22, "#f4dfaa");
-  drawRoundedRect(ctx, 20, 20, canvas.width - 40, canvas.height - 40, 16, "#f9efce");
-  ctx.fillStyle = "rgba(78, 55, 31, 0.08)";
-  ctx.fillRect(42, canvas.height - 34, canvas.width - 84, 9);
+  drawPaperCard(ctx, canvas.width, canvas.height);
 
   const icon = ICON_CELLS[kind];
   if (icon && iconImage.complete && iconImage.naturalWidth > 0) {
@@ -292,10 +295,10 @@ function cardTexture(kind: CardKind): THREE.CanvasTexture {
       icon.row * cellHeight,
       cellWidth,
       cellHeight,
-      44,
-      58,
-      canvas.width - 88,
-      canvas.width - 88
+      38,
+      52,
+      canvas.width - 76,
+      canvas.width - 76
     );
   } else {
     drawEventIcon(ctx, kind, canvas.width / 2, canvas.height / 2 - 8);
@@ -307,6 +310,16 @@ function cardTexture(kind: CardKind): THREE.CanvasTexture {
   return texture;
 }
 
+function drawPaperCard(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+  drawRoundedRect(ctx, 8, 8, width - 16, height - 16, 20, "#dfc987");
+  drawRoundedRect(ctx, 18, 18, width - 36, height - 36, 15, "#f5e7bc");
+  drawNoisyPaper(ctx, width, height);
+  drawSketchRect(ctx, 26, 28, width - 52, height - 58, 14, "#6d5434");
+  drawSketchRect(ctx, 40, 44, width - 80, height - 96, 10, "rgba(109, 84, 52, 0.35)");
+  ctx.fillStyle = "rgba(92, 70, 43, 0.1)";
+  ctx.fillRect(50, height - 36, width - 100, 7);
+}
+
 function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number, fill: string): void {
   ctx.beginPath();
   ctx.roundRect(x, y, width, height, radius);
@@ -314,12 +327,38 @@ function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, wi
   ctx.fill();
 }
 
+function drawNoisyPaper(ctx: CanvasRenderingContext2D, width: number, height: number): void {
+  for (let i = 0; i < 220; i += 1) {
+    const x = (i * 47) % width;
+    const y = (i * 83) % height;
+    const alpha = 0.018 + (i % 5) * 0.006;
+    ctx.fillStyle = `rgba(92, 70, 43, ${alpha})`;
+    ctx.fillRect(x, y, 1 + (i % 3), 1);
+  }
+}
+
+function drawSketchRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number, stroke: string): void {
+  ctx.strokeStyle = stroke;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let pass = 0; pass < 2; pass += 1) {
+    const wobble = pass * 1.5;
+    ctx.roundRect(x + wobble, y - wobble, width - wobble * 2, height + wobble, radius);
+  }
+  ctx.stroke();
+}
+
 function drawEventIcon(ctx: CanvasRenderingContext2D, kind: CardKind, x: number, y: number): void {
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
   if (kind === "rain") {
-    ctx.fillStyle = "#9bb7c7";
+    ctx.fillStyle = "#a4b8bd";
     ctx.beginPath();
     ctx.roundRect(x - 56, y - 36, 112, 58, 28);
     ctx.fill();
+    ctx.strokeStyle = "#4f5d5d";
+    ctx.lineWidth = 4;
+    ctx.stroke();
     ctx.fillStyle = "#6fb8d5";
     for (const offset of [-34, 0, 34]) {
       ctx.beginPath();
@@ -330,11 +369,14 @@ function drawEventIcon(ctx: CanvasRenderingContext2D, kind: CardKind, x: number,
   }
 
   if (kind === "coldNight") {
-    ctx.fillStyle = "#dfeef4";
+    ctx.fillStyle = "#e2e5d6";
     ctx.beginPath();
     ctx.arc(x - 8, y, 50, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = "#8fb1c1";
+    ctx.strokeStyle = "#56666a";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.fillStyle = "#9aaeb1";
     ctx.beginPath();
     ctx.arc(x + 12, y + 2, 42, 0, Math.PI * 2);
     ctx.fill();
@@ -345,11 +387,14 @@ function drawEventIcon(ctx: CanvasRenderingContext2D, kind: CardKind, x: number,
     return;
   }
 
-  ctx.fillStyle = "#b77743";
+  ctx.fillStyle = "#b17a4f";
   ctx.beginPath();
   ctx.roundRect(x - 56, y - 38, 112, 76, 16);
   ctx.fill();
-  ctx.strokeStyle = "#6fae61";
+  ctx.strokeStyle = "#5a3f2a";
+  ctx.lineWidth = 4;
+  ctx.stroke();
+  ctx.strokeStyle = "#758a52";
   ctx.lineWidth = 16;
   ctx.beginPath();
   ctx.arc(x, y, 34, 0.2, Math.PI * 1.7);
@@ -357,6 +402,8 @@ function drawEventIcon(ctx: CanvasRenderingContext2D, kind: CardKind, x: number,
 }
 
 function onPointerDown(event: PointerEvent): void {
+  if (state.status !== "playing") return;
+
   const hit = pickCard(event);
   if (!hit || hit.state === "working") return;
   const point = pointerToTable(event);
@@ -374,6 +421,8 @@ function onPointerDown(event: PointerEvent): void {
 }
 
 function onPointerMove(event: PointerEvent): void {
+  if (state.status !== "playing") return;
+
   if (!active || active.pointerId !== event.pointerId) return;
   const point = pointerToTable(event);
   if (!point) return;
@@ -387,6 +436,8 @@ function onPointerMove(event: PointerEvent): void {
 }
 
 function onPointerUp(event: PointerEvent): void {
+  if (state.status !== "playing") return;
+
   if (!active || active.pointerId !== event.pointerId) return;
   const dropped = active.card;
   const moved = active.moved;
@@ -419,6 +470,7 @@ function onPointerUp(event: PointerEvent): void {
 }
 
 function handleCardTap(card: CampCard): void {
+  if (state.status !== "playing") return;
   if (card.state === "working") return;
 
   if (!selectedCardId) {
@@ -517,7 +569,7 @@ function layoutInitialCards(): void {
   const columns = tableRect.width < 620 ? 2 : 4;
   const gap = tableRect.width < 620 ? 14 : 26;
   const startX = Math.max(10, (tableRect.width - columns * size.width - (columns - 1) * gap) / 2);
-  const startY = tableRect.width < 620 ? 18 : 56;
+  const startY = tableRect.width < 620 ? 178 : 176;
 
   state.cards.forEach((card, index) => {
     const column = index % columns;
