@@ -185,25 +185,32 @@ body {
 
 html[data-page="cards"],
 html[data-page="cards"] body {
+  width: 100%;
+  height: 100%;
   min-height: 100%;
-  height: auto;
-  overflow: auto;
-  touch-action: manipulation;
+  overflow: hidden;
+  touch-action: none;
 }
 
 .cards-shell {
-  min-height: 100vh;
-  padding: 52px 14px 32px;
+  position: fixed;
+  inset: 0;
+  min-height: 100svh;
+  overflow: hidden;
   background:
-    linear-gradient(to bottom, rgba(29, 17, 8, 0.5), rgba(14, 9, 4, 0.78)),
+    linear-gradient(to bottom, rgba(29, 17, 8, 0.22), rgba(14, 9, 4, 0.58)),
     url("/assets/card-camp/tabletop.jpg");
   background-size: cover;
   background-position: center;
 }
 
 .cards-board {
-  width: min(980px, 100%);
-  margin: 0 auto;
+  position: fixed;
+  z-index: 2;
+  top: max(18px, env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  width: min(720px, calc(100vw - 28px));
+  pointer-events: none;
 }
 
 .cards-board h1 {
@@ -219,8 +226,8 @@ html[data-page="cards"] body {
 
 .cards-copy {
   max-width: 620px;
-  min-height: 44px;
-  margin: 0 0 12px;
+  min-height: 28px;
+  margin: 0 0 10px;
   color: rgba(243, 231, 189, 0.78);
   font-size: 17px;
   line-height: 1.55;
@@ -230,7 +237,6 @@ html[data-page="cards"] body {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 12px;
 }
 
 .camp-readout span {
@@ -276,22 +282,22 @@ html[data-page="cards"] body {
 }
 
 .card-table {
-  height: min(590px, 68vh);
-  min-height: 430px;
-  position: relative;
+  position: fixed;
+  z-index: 1;
+  inset: 0;
+  width: 100vw;
+  height: 100svh;
+  min-height: 0;
   overflow: hidden;
-  border: 1px solid rgba(243, 231, 189, 0.2);
-  border-radius: 8px;
+  border: 0;
+  border-radius: 0;
   touch-action: none;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.06), transparent),
-    linear-gradient(to bottom, rgba(31, 19, 8, 0.14), rgba(22, 12, 4, 0.38)),
+    linear-gradient(to bottom, rgba(30, 17, 8, 0.18), rgba(9, 6, 3, 0.38)),
     url("/assets/card-camp/tabletop.jpg");
   background-size: cover;
   background-position: center;
-  box-shadow:
-    inset 0 0 42px rgba(0, 0, 0, 0.5),
-    0 22px 56px rgba(0, 0, 0, 0.34);
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.58);
 }
 
 .card-layer,
@@ -905,17 +911,20 @@ html[data-page="cards"] body {
     font-size: 11px;
   }
 
-  .cards-shell {
-    padding: 44px 10px 24px;
+  .cards-board {
+    top: max(14px, env(safe-area-inset-top));
+    left: max(10px, env(safe-area-inset-left));
+    width: min(370px, calc(100vw - 20px));
   }
 
   .cards-board h1 {
-    font-size: clamp(42px, 16vw, 72px);
+    font-size: clamp(34px, 14vw, 58px);
   }
 
   .cards-copy {
-    min-height: 48px;
+    min-height: 24px;
     font-size: 14px;
+    line-height: 1.35;
   }
 
   .camp-readout {
@@ -924,8 +933,9 @@ html[data-page="cards"] body {
   }
 
   .card-table {
-    height: min(600px, 62vh);
-    min-height: 480px;
+    width: 100vw;
+    height: 100svh;
+    min-height: 0;
   }
 
   .camp-card {

@@ -6,6 +6,7 @@
     "src/**",
     "tests/**",
     "public/**",
+    "games/**",
     "scripts/**",
     "docs/**",
     "README.md",

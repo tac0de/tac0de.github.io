@@ -37,7 +37,7 @@ Three.js tabletop, Stacklands-inspired card survival prototype for Tacode Arcade
 - Implemented `Campfire + Berry -> Cooked Berry`
 - Implemented day timer and food consumption
 - Implemented image-generated card icon sprite, minimal event symbols, and tabletop surface
-- Implemented Three.js tabletop renderer with 3D card slabs and work bars
+- Implemented full-viewport Three.js tabletop renderer with 3D card slabs and work bars
 - Implemented proximity cooking near campfire
 - Implemented Villager routines for repeated source work
 - Implemented dusk event cards
@@ -57,7 +57,7 @@ Three.js tabletop, Stacklands-inspired card survival prototype for Tacode Arcade
 ## Visual Direction
 
 - Warm tabletop, small paper cards, soft shadows, tactile edges.
-- The card table is rendered as a Three.js scene, not DOM card elements.
+- The whole play surface is rendered as a full-viewport Three.js scene, not an inner DOM board.
 - Cards should read clearly at phone width with simple casual generated symbols.
 - Card faces should not show item names; labels live in accessible names and game messages.
 - Status should be shown on the card surface before adding side panels.
