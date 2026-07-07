@@ -1,5 +1,5 @@
 export type CardKind =
-  | "villager"
+  | "survivor"
   | "berryBush"
   | "tree"
   | "stone"
@@ -7,11 +7,17 @@ export type CardKind =
   | "wood"
   | "campfire"
   | "cookedBerry"
+  | "spear"
+  | "armedSurvivor"
+  | "wolf"
+  | "alphaWolf"
+  | "meat"
+  | "hide"
   | "rain"
   | "coldNight"
   | "trader";
 
-export type CardState = "idle" | "working" | "hungry" | "warning";
+export type CardState = "idle" | "working" | "hungry" | "warning" | "wounded";
 export type CampStatus = "playing" | "won" | "lost";
 
 export type CampCard = {
@@ -30,6 +36,9 @@ export type Recipe = {
   result: CardKind;
   seconds: number;
   reusable: CardKind[];
+  bonusResults?: CardKind[];
+  threatDelta?: number;
+  winOnComplete?: boolean;
 };
 
 export type WorkOrder = {
@@ -49,6 +58,7 @@ export type CampState = {
   dayLength: number;
   day: number;
   warnings: number;
+  threat: number;
   eventCount: number;
   eventMessage?: string;
   message: string;
@@ -57,9 +67,11 @@ export type CampState = {
 };
 
 const EVENT_KINDS = new Set<CardKind>(["rain", "coldNight", "trader"]);
+const ENEMY_KINDS = new Set<CardKind>(["wolf", "alphaWolf"]);
+const SOURCE_KINDS = new Set<CardKind>(["berryBush", "tree"]);
 
 export const CARD_DEFS: Record<CardKind, { label: string; type: string }> = {
-  villager: { label: "Villager", type: "worker" },
+  survivor: { label: "Survivor", type: "worker" },
   berryBush: { label: "Berry Bush", type: "source" },
   tree: { label: "Tree", type: "source" },
   stone: { label: "Stone", type: "resource" },
@@ -67,6 +79,12 @@ export const CARD_DEFS: Record<CardKind, { label: string; type: string }> = {
   wood: { label: "Wood", type: "resource" },
   campfire: { label: "Campfire", type: "craft" },
   cookedBerry: { label: "Cooked Berry", type: "food" },
+  spear: { label: "Spear", type: "gear" },
+  armedSurvivor: { label: "Armed Survivor", type: "fighter" },
+  wolf: { label: "Wolf", type: "enemy" },
+  alphaWolf: { label: "Alpha Wolf", type: "enemy" },
+  meat: { label: "Meat", type: "food" },
+  hide: { label: "Hide", type: "resource" },
   rain: { label: "Rain", type: "event" },
   coldNight: { label: "Cold Night", type: "event" },
   trader: { label: "Trader", type: "event" }
@@ -75,17 +93,17 @@ export const CARD_DEFS: Record<CardKind, { label: string; type: string }> = {
 export const RECIPES: Recipe[] = [
   {
     id: "forage-berry",
-    inputs: ["villager", "berryBush"],
+    inputs: ["survivor", "berryBush"],
     result: "berry",
     seconds: 3,
-    reusable: ["villager", "berryBush"]
+    reusable: ["survivor", "berryBush"]
   },
   {
     id: "chop-wood",
-    inputs: ["villager", "tree"],
+    inputs: ["survivor", "tree"],
     result: "wood",
     seconds: 4,
-    reusable: ["villager", "tree"]
+    reusable: ["survivor", "tree"]
   },
   {
     id: "build-campfire",
@@ -95,11 +113,44 @@ export const RECIPES: Recipe[] = [
     reusable: []
   },
   {
+    id: "carve-spear",
+    inputs: ["survivor", "wood"],
+    result: "spear",
+    seconds: 4,
+    reusable: ["survivor"]
+  },
+  {
     id: "cook-berry",
     inputs: ["campfire", "berry"],
     result: "cookedBerry",
     seconds: 4,
     reusable: ["campfire"]
+  },
+  {
+    id: "arm-survivor",
+    inputs: ["survivor", "spear"],
+    result: "armedSurvivor",
+    seconds: 3,
+    reusable: []
+  },
+  {
+    id: "hunt-wolf",
+    inputs: ["armedSurvivor", "wolf"],
+    result: "meat",
+    seconds: 5,
+    reusable: ["armedSurvivor"],
+    bonusResults: ["hide"],
+    threatDelta: -2
+  },
+  {
+    id: "break-alpha",
+    inputs: ["armedSurvivor", "alphaWolf"],
+    result: "hide",
+    seconds: 7,
+    reusable: ["armedSurvivor"],
+    bonusResults: ["meat"],
+    threatDelta: -5,
+    winOnComplete: true
   }
 ];
 
@@ -109,7 +160,7 @@ export function createInitialState(): CampState {
   nextId = 1;
   return {
     cards: [
-      createCard("villager", 88, 96),
+      createCard("survivor", 88, 96),
       createCard("berryBush", 306, 88),
       createCard("tree", 536, 110),
       createCard("stone", 736, 132)
@@ -119,8 +170,9 @@ export function createInitialState(): CampState {
     dayLength: 42,
     day: 1,
     warnings: 0,
+    threat: 1,
     eventCount: 0,
-    message: "Place Villager near a source to start a routine.",
+    message: "Keep the survivor fed, armed, and ready for threats.",
     goalMet: false,
     status: "playing"
   };
@@ -148,6 +200,7 @@ export function tickCamp(state: CampState, delta: number): void {
 
   if (state.dayRemaining <= 0) {
     resolveDay(state);
+    if (state.status !== "playing") return;
   }
 
   for (const order of state.workOrders) {
@@ -163,7 +216,7 @@ export function tickCamp(state: CampState, delta: number): void {
 
   startRoutineWork(state);
   resolveNearbyWorldRules(state);
-  state.goalMet = state.goalMet || state.cards.some((card) => card.kind === "campfire");
+  state.goalMet = state.goalMet || state.cards.some((card) => card.kind === "alphaWolf");
 }
 
 export function startRecipe(state: CampState, recipe: Recipe, cards: CampCard[]): void {
@@ -177,8 +230,8 @@ export function startRecipe(state: CampState, recipe: Recipe, cards: CampCard[])
   cards.forEach((card, index) => {
     card.state = "working";
     card.stackId = orderId;
-    if (card.kind === "villager") {
-      const target = cards.find((candidate) => candidate.id !== card.id && recipe.reusable.includes(candidate.kind));
+    if (card.kind === "survivor") {
+      const target = cards.find((candidate) => candidate.id !== card.id && SOURCE_KINDS.has(candidate.kind));
       card.routineTargetId = target?.id;
     }
     card.x = x + (index - (cards.length - 1) / 2) * 18;
@@ -203,7 +256,7 @@ export function cancelInvalidStack(state: CampState, card: CampCard): void {
   if (state.status !== "playing") return;
 
   card.state = "warning";
-  state.message = "Those cards do not make anything yet.";
+  state.message = "That stack does not solve the camp's next problem.";
 }
 
 function completeWorkOrder(state: CampState, order: WorkOrder): void {
@@ -222,37 +275,48 @@ function completeWorkOrder(state: CampState, order: WorkOrder): void {
     if (used.has(card.id)) {
       card.state = "idle";
       card.stackId = undefined;
-      const isRoutineWorker = card.kind === "villager" && card.routineTargetId;
-      card.x = order.x + (isRoutineWorker ? -54 : card.kind === "villager" ? -128 : 112);
+      const isRoutineWorker = card.kind === "survivor" && card.routineTargetId;
+      card.x = order.x + (isRoutineWorker ? -54 : card.kind === "survivor" || card.kind === "armedSurvivor" ? -128 : 112);
       card.y = order.y + 18;
     }
   }
 
-  state.cards.push(createCard(order.recipe.result, order.x + 128, order.y + 22));
-  state.message = `${CARD_DEFS[order.recipe.result].label} produced.`;
-  state.goalMet = state.goalMet || order.recipe.result === "campfire";
+  const results = [order.recipe.result, ...(order.recipe.bonusResults ?? [])];
+  results.forEach((kind, index) => {
+    state.cards.push(createCard(kind, order.x + 124 + index * 42, order.y + 22 + index * 12));
+  });
+
+  if (order.recipe.threatDelta) {
+    state.threat = Math.max(0, state.threat + order.recipe.threatDelta);
+  }
+
+  if (order.recipe.winOnComplete) {
+    winCamp(state);
+    return;
+  }
+
+  state.message = results.length > 1
+    ? `${results.map((kind) => CARD_DEFS[kind].label).join(" + ")} recovered.`
+    : `${CARD_DEFS[order.recipe.result].label} produced.`;
 }
 
 function resolveDay(state: CampState): void {
-  const completedDay = state.day;
   state.day += 1;
   state.dayRemaining = state.dayLength;
+  state.threat = Math.min(6, state.threat + 1);
 
   const foodNeeded = state.cards.some((card) => card.kind === "coldNight") ? 2 : 1;
   const consumedFood = selectFoodForNeed(state.cards, foodNeeded);
   const hasEnoughFood = consumedFood.reduce((sum, card) => sum + foodValue(card), 0) >= foodNeeded;
+
   if (hasEnoughFood) {
     const consumedIds = new Set(consumedFood.map((card) => card.id));
     state.cards = state.cards.filter((card) => !consumedIds.has(card.id));
-    state.message = foodNeeded > 1 ? "Cold night. Villager ate enough food." : `Villager ate one ${CARD_DEFS[consumedFood[0].kind].label}.`;
+    state.message = foodNeeded > 1 ? "Cold night. Enough food was consumed." : `${CARD_DEFS[consumedFood[0].kind].label} consumed.`;
     clearResolvedEvents(state);
-    if (completedDay >= 5 && (state.goalMet || state.cards.some((card) => card.kind === "campfire"))) {
-      winCamp(state);
-      return;
-    }
-    addNightEvent(state);
+    addNightPressure(state);
     for (const card of state.cards) {
-      if (card.kind === "villager") card.state = "idle";
+      if (card.kind === "survivor" || card.kind === "armedSurvivor") card.state = "idle";
     }
     return;
   }
@@ -260,31 +324,27 @@ function resolveDay(state: CampState): void {
   if (consumedFood.length > 0) {
     const consumedIds = new Set(consumedFood.map((card) => card.id));
     state.cards = state.cards.filter((card) => !consumedIds.has(card.id));
-    state.message = "Not enough food. Villager is still hungry.";
+    state.message = "Food ran short. The survivor is exposed.";
     state.warnings += 1;
     clearResolvedEvents(state);
     if (state.warnings >= 2) {
       loseCamp(state);
       return;
     }
-    addNightEvent(state);
-    for (const card of state.cards) {
-      if (card.kind === "villager") card.state = "hungry";
-    }
+    addNightPressure(state);
+    markSurvivorsHungry(state);
     return;
   }
 
   state.warnings += 1;
-  state.message = "No food. Villager is hungry.";
+  state.message = "No food. The camp takes a warning.";
   clearResolvedEvents(state);
   if (state.warnings >= 2) {
     loseCamp(state);
     return;
   }
-  addNightEvent(state);
-  for (const card of state.cards) {
-    if (card.kind === "villager") card.state = "hungry";
-  }
+  addNightPressure(state);
+  markSurvivorsHungry(state);
 }
 
 function recipeLabel(recipe: Recipe): string {
@@ -295,19 +355,19 @@ function startRoutineWork(state: CampState): void {
   if (state.status !== "playing") return;
 
   const activeCardIds = new Set(state.workOrders.flatMap((order) => order.cardIds));
-  for (const villager of state.cards) {
-    if (villager.kind !== "villager" || villager.state !== "idle" || activeCardIds.has(villager.id)) continue;
-    if (!villager.routineTargetId) continue;
+  for (const survivor of state.cards) {
+    if (survivor.kind !== "survivor" || survivor.state !== "idle" || activeCardIds.has(survivor.id)) continue;
+    if (!survivor.routineTargetId) continue;
 
-    const target = state.cards.find((card) => card.id === villager.routineTargetId && card.state === "idle");
-    if (!target || distance(villager, target) > 112) {
-      villager.routineTargetId = undefined;
+    const target = state.cards.find((card) => card.id === survivor.routineTargetId && card.state === "idle" && SOURCE_KINDS.has(card.kind));
+    if (!target || distance(survivor, target) > 112) {
+      survivor.routineTargetId = undefined;
       continue;
     }
 
-    const recipe = findRecipe([villager.kind, target.kind]);
+    const recipe = findRecipe([survivor.kind, target.kind]);
     if (recipe) {
-      startRecipe(state, recipe, [villager, target]);
+      startRecipe(state, recipe, [survivor, target]);
       state.message = `${CARD_DEFS[target.kind].label} routine continues.`;
       return;
     }
@@ -331,28 +391,41 @@ function resolveNearbyWorldRules(state: CampState): void {
     const recipe = findRecipe(["campfire", "berry"]);
     if (recipe) {
       startRecipe(state, recipe, [campfire, berry]);
-      state.message = "Berry warms by the fire.";
+      state.message = "Berry cooks over the fire.";
       return;
     }
   }
 
   const trader = state.cards.find((card) => card.kind === "trader");
   if (!trader) return;
-  const wood = state.cards.find((card) => card.kind === "wood" && distance(card, trader) <= 108);
-  if (!wood) return;
-  state.cards = state.cards.filter((card) => card.id !== trader.id && card.id !== wood.id);
+  const tradeGood = state.cards.find((card) => (card.kind === "wood" || card.kind === "hide") && distance(card, trader) <= 108);
+  if (!tradeGood) return;
+  state.cards = state.cards.filter((card) => card.id !== trader.id && card.id !== tradeGood.id);
   state.cards.push(createCard("berry", trader.x + 32, trader.y + 8));
   state.cards.push(createCard("stone", trader.x - 32, trader.y + 14));
-  state.message = "Trader swapped wood for supplies.";
+  state.message = `Trader swapped ${CARD_DEFS[tradeGood.kind].label} for supplies.`;
 }
 
-function addNightEvent(state: CampState): void {
+function addNightPressure(state: CampState): void {
   if (state.status !== "playing") return;
+
+  if (state.threat >= 5 && !state.cards.some((card) => card.kind === "alphaWolf")) {
+    state.cards.push(createCard("alphaWolf", 28, 204));
+    state.goalMet = true;
+    state.eventMessage = "Alpha Wolf is hunting the camp.";
+    return;
+  }
+
+  if (state.threat >= 3 && !state.cards.some((card) => ENEMY_KINDS.has(card.kind))) {
+    state.cards.push(createCard("wolf", 28, 204));
+    state.eventMessage = "Wolf pressure reached the camp.";
+    return;
+  }
 
   const events: CardKind[] = ["rain", "coldNight", "trader"];
   const kind = events[state.eventCount % events.length];
   state.eventCount += 1;
-  state.cards.push(createCard(kind, 24 + (state.eventCount % 3) * 72, 188));
+  state.cards.push(createCard(kind, 24 + (state.eventCount % 3) * 72, 204));
   state.eventMessage = `${CARD_DEFS[kind].label} arrived at dusk.`;
 }
 
@@ -382,33 +455,41 @@ function distance(a: CampCard, b: CampCard): number {
 
 function selectFoodForNeed(cards: CampCard[], need: number): CampCard[] {
   const berries = cards.filter((card) => card.kind === "berry");
-  const cooked = cards.filter((card) => card.kind === "cookedBerry");
+  const richFood = cards.filter((card) => card.kind === "cookedBerry" || card.kind === "meat");
   if (need <= 1) {
-    return berries[0] ? [berries[0]] : cooked.slice(0, 1);
+    return berries[0] ? [berries[0]] : richFood.slice(0, 1);
   }
-  if (cooked[0]) return [cooked[0]];
+  if (richFood[0]) return [richFood[0]];
   return berries.slice(0, need);
 }
 
 function foodValue(card: CampCard): number {
-  if (card.kind === "cookedBerry") return 2;
+  if (card.kind === "cookedBerry" || card.kind === "meat") return 2;
   if (card.kind === "berry") return 1;
   return 0;
 }
 
+function markSurvivorsHungry(state: CampState): void {
+  for (const card of state.cards) {
+    if (card.kind === "survivor" || card.kind === "armedSurvivor") card.state = "hungry";
+  }
+}
+
 function winCamp(state: CampState): void {
   state.status = "won";
+  state.goalMet = true;
   state.eventMessage = undefined;
   state.workOrders = [];
-  state.message = "Camp stabilized through Day 5.";
+  state.cards = state.cards.filter((card) => card.kind !== "alphaWolf");
+  state.message = "Alpha Wolf defeated. The camp can push deeper.";
 }
 
 function loseCamp(state: CampState): void {
   state.status = "lost";
   state.eventMessage = undefined;
   state.workOrders = [];
-  state.message = "The camp failed after too many hungry nights.";
+  state.message = "The camp collapsed under hunger and threat.";
   for (const card of state.cards) {
-    if (card.kind === "villager") card.state = "hungry";
+    if (card.kind === "survivor" || card.kind === "armedSurvivor") card.state = "wounded";
   }
 }

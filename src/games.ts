@@ -29,10 +29,10 @@ export const games: GameEntry[] = [
     title: "Card Camp",
     status: "Playable",
     route: "./games/cards/",
-    description: "Arrange a tiny 3D tabletop camp, automate routines, and survive dusk.",
+    description: "Feed a survivor, craft weapons, and clear threats on a 3D tabletop.",
     tags: ["Three.js", "Cards", "Simulation"],
     tileClass: "game-tile-cards",
     playable: true,
-    demonstrates: "Three.js tabletop cards, mobile dragging, proximity crafting, worker routines, dusk events."
+    demonstrates: "Three.js tabletop cards, mobile dragging, proximity crafting, survivor routines, threat escalation."
   }
 ];

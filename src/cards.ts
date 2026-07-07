@@ -14,14 +14,23 @@ import {
 document.documentElement.dataset.page = "cards";
 
 const ICON_CELLS: Partial<Record<CardKind, { column: number; row: number }>> = {
-  villager: { column: 0, row: 0 },
+  survivor: { column: 0, row: 0 },
   berryBush: { column: 1, row: 0 },
   tree: { column: 2, row: 0 },
   stone: { column: 3, row: 0 },
   berry: { column: 0, row: 1 },
   wood: { column: 1, row: 1 },
   campfire: { column: 2, row: 1 },
-  cookedBerry: { column: 3, row: 1 }
+  cookedBerry: { column: 0, row: 1 },
+  spear: { column: 3, row: 1 }
+};
+
+const COMBAT_ICON_CELLS: Partial<Record<CardKind, { column: number; row: number }>> = {
+  armedSurvivor: { column: 0, row: 0 },
+  wolf: { column: 1, row: 0 },
+  meat: { column: 2, row: 0 },
+  hide: { column: 3, row: 0 },
+  alphaWolf: { column: 3, row: 1 }
 };
 
 const PX_PER_UNIT = 100;
@@ -36,10 +45,11 @@ const workLayer = document.querySelector<HTMLDivElement>("#work-layer");
 const message = document.querySelector<HTMLParagraphElement>("#camp-message");
 const dayLabel = document.querySelector<HTMLSpanElement>("#camp-day");
 const foodLabel = document.querySelector<HTMLSpanElement>("#camp-food");
+const threatLabel = document.querySelector<HTMLSpanElement>("#camp-threat");
 const timerLabel = document.querySelector<HTMLSpanElement>("#camp-timer");
 const goalLabel = document.querySelector<HTMLSpanElement>("#camp-goal");
 
-if (!table || !cardLayer || !workLayer || !message || !dayLabel || !foodLabel || !timerLabel || !goalLabel) {
+if (!table || !cardLayer || !workLayer || !message || !dayLabel || !foodLabel || !threatLabel || !timerLabel || !goalLabel) {
   throw new Error("Card camp shell is missing required DOM nodes.");
 }
 
@@ -47,6 +57,7 @@ const tableElement = table;
 const messageElement = message;
 const dayElement = dayLabel;
 const foodElement = foodLabel;
+const threatElement = threatLabel;
 const timerElement = timerLabel;
 const goalElement = goalLabel;
 
@@ -64,10 +75,13 @@ const cardMeshes = new Map<string, CardView>();
 const workMeshes = new Map<string, THREE.Group>();
 const cardTextureCache = new Map<CardKind, THREE.CanvasTexture>();
 const iconImage = new Image();
+const combatIconImage = new Image();
 const tableTexture = new THREE.TextureLoader().load("/assets/card-camp/tabletop.jpg");
-const cardMaterialBase = new THREE.MeshStandardMaterial({ color: 0xdcc991, roughness: 0.94, metalness: 0 });
-const warningMaterial = new THREE.MeshStandardMaterial({ color: 0xb86c57, roughness: 0.88, metalness: 0 });
-const routineMaterial = new THREE.MeshStandardMaterial({ color: 0x7ea06c, roughness: 0.9, metalness: 0 });
+const cardMaterialBase = new THREE.MeshStandardMaterial({ color: 0xd8c89f, roughness: 0.96, metalness: 0 });
+const gearMaterial = new THREE.MeshStandardMaterial({ color: 0x87918b, roughness: 0.9, metalness: 0 });
+const enemyMaterial = new THREE.MeshStandardMaterial({ color: 0x3b3027, roughness: 0.94, metalness: 0 });
+const warningMaterial = new THREE.MeshStandardMaterial({ color: 0x9d4f43, roughness: 0.9, metalness: 0 });
+const routineMaterial = new THREE.MeshStandardMaterial({ color: 0x6c7f5d, roughness: 0.92, metalness: 0 });
 
 type CardView = {
   group: THREE.Group;
@@ -127,7 +141,9 @@ keyLight.position.set(-3, 6, 4);
 scene.add(keyLight);
 
 iconImage.src = "/assets/card-camp/generated/card-camp-icons.png";
-iconImage.addEventListener("load", () => {
+combatIconImage.src = "/assets/card-camp/generated/card-camp-combat-icons.png";
+
+function refreshCardTextures(): void {
   cardTextureCache.clear();
   for (const card of state.cards) {
     const view = cardMeshes.get(card.id);
@@ -136,7 +152,10 @@ iconImage.addEventListener("load", () => {
       view.face.material.needsUpdate = true;
     }
   }
-});
+}
+
+iconImage.addEventListener("load", refreshCardTextures);
+combatIconImage.addEventListener("load", refreshCardTextures);
 
 renderer.domElement.addEventListener("pointerdown", onPointerDown);
 renderer.domElement.addEventListener("pointermove", onPointerMove);
@@ -170,14 +189,15 @@ function renderHud(): void {
   messageElement.textContent = state.eventMessage ? `${state.message} ${state.eventMessage}` : state.message;
   dayElement.textContent = `Day ${state.day}`;
   foodElement.textContent = `Food ${foodScore()}`;
+  threatElement.textContent = `Threat ${state.threat}`;
   timerElement.textContent = state.status === "playing" ? `Dusk ${Math.ceil(state.dayRemaining)}s` : state.status.toUpperCase();
   goalElement.textContent = state.status === "won"
-    ? "Camp Stable"
+    ? "Alpha Defeated"
     : state.status === "lost"
       ? "Camp Failed"
       : state.goalMet
-        ? "Goal Survive Day 5"
-        : "Goal Light campfire";
+        ? "Goal Kill alpha"
+        : "Goal Arm survivor";
   goalElement.classList.toggle("is-met", state.goalMet || state.status === "won");
 }
 
@@ -195,7 +215,7 @@ function syncScene(): void {
     view.ring.visible = isTarget || isSelected;
     view.ring.material.color.set(isTarget ? 0x9debd9 : 0xf7df8a);
     view.routine.visible = Boolean(card.routineTargetId);
-    view.body.material = card.state === "warning" || card.state === "hungry" ? warningMaterial : cardMaterialBase;
+    view.body.material = cardMaterial(card);
   }
 
   for (const [id, view] of cardMeshes) {
@@ -283,16 +303,16 @@ function cardTexture(kind: CardKind): THREE.CanvasTexture {
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas texture context is unavailable.");
 
-  drawPaperCard(ctx, canvas.width, canvas.height);
+  drawPaperCard(ctx, canvas.width, canvas.height, kind);
 
-  const icon = ICON_CELLS[kind];
-  if (icon && iconImage.complete && iconImage.naturalWidth > 0) {
-    const cellWidth = iconImage.naturalWidth / 4;
-    const cellHeight = iconImage.naturalHeight / 2;
+  const source = iconSource(kind);
+  if (source && source.image.complete && source.image.naturalWidth > 0) {
+    const cellWidth = source.image.naturalWidth / 4;
+    const cellHeight = source.image.naturalHeight / 2;
     ctx.drawImage(
-      iconImage,
-      icon.column * cellWidth,
-      icon.row * cellHeight,
+      source.image,
+      source.cell.column * cellWidth,
+      source.cell.row * cellHeight,
       cellWidth,
       cellHeight,
       38,
@@ -310,14 +330,26 @@ function cardTexture(kind: CardKind): THREE.CanvasTexture {
   return texture;
 }
 
-function drawPaperCard(ctx: CanvasRenderingContext2D, width: number, height: number): void {
-  drawRoundedRect(ctx, 8, 8, width - 16, height - 16, 20, "#dfc987");
-  drawRoundedRect(ctx, 18, 18, width - 36, height - 36, 15, "#f5e7bc");
+function iconSource(kind: CardKind): { image: HTMLImageElement; cell: { column: number; row: number } } | undefined {
+  const core = ICON_CELLS[kind];
+  if (core) return { image: iconImage, cell: core };
+  const combat = COMBAT_ICON_CELLS[kind];
+  if (combat) return { image: combatIconImage, cell: combat };
+  return undefined;
+}
+
+function drawPaperCard(ctx: CanvasRenderingContext2D, width: number, height: number, kind: CardKind): void {
+  const type = CARD_DEFS[kind].type;
+  const fill = type === "enemy" ? "#332a22" : type === "gear" || type === "fighter" ? "#d6d7c5" : "#eee0b7";
+  const inner = type === "enemy" ? "#4a382d" : type === "food" ? "#f0dfb6" : "#f5e7bc";
+  const stroke = type === "enemy" ? "#b75a43" : type === "gear" || type === "fighter" ? "#4f5a55" : "#3c3528";
+  drawRoundedRect(ctx, 8, 8, width - 16, height - 16, 16, stroke);
+  drawRoundedRect(ctx, 18, 18, width - 36, height - 36, 10, fill);
+  drawRoundedRect(ctx, 32, 34, width - 64, height - 76, 6, inner);
   drawNoisyPaper(ctx, width, height);
-  drawSketchRect(ctx, 26, 28, width - 52, height - 58, 14, "#6d5434");
-  drawSketchRect(ctx, 40, 44, width - 80, height - 96, 10, "rgba(109, 84, 52, 0.35)");
-  ctx.fillStyle = "rgba(92, 70, 43, 0.1)";
-  ctx.fillRect(50, height - 36, width - 100, 7);
+  drawSketchRect(ctx, 26, 28, width - 52, height - 58, 9, stroke);
+  ctx.fillStyle = type === "enemy" ? "rgba(183, 90, 67, 0.45)" : "rgba(60, 53, 40, 0.18)";
+  ctx.fillRect(50, height - 38, width - 100, 8);
 }
 
 function drawRoundedRect(ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, radius: number, fill: string): void {
@@ -399,6 +431,14 @@ function drawEventIcon(ctx: CanvasRenderingContext2D, kind: CardKind, x: number,
   ctx.beginPath();
   ctx.arc(x, y, 34, 0.2, Math.PI * 1.7);
   ctx.stroke();
+}
+
+function cardMaterial(card: CampCard): THREE.MeshStandardMaterial {
+  if (card.state === "warning" || card.state === "hungry" || card.state === "wounded") return warningMaterial;
+  const type = CARD_DEFS[card.kind].type;
+  if (type === "enemy") return enemyMaterial;
+  if (type === "gear" || type === "fighter") return gearMaterial;
+  return cardMaterialBase;
 }
 
 function onPointerDown(event: PointerEvent): void {
@@ -542,7 +582,7 @@ function findDropTarget(card: CampCard, validOnly: boolean): CampCard | undefine
 }
 
 function setNearbyRoutine(card: CampCard): boolean {
-  if (card.kind !== "villager") return false;
+  if (card.kind !== "survivor") return false;
   const target = findRoutineTarget(card);
   if (!target) return false;
   card.routineTargetId = target.id;
@@ -554,6 +594,7 @@ function findRoutineTarget(card: CampCard): CampCard | undefined {
   let best: { card: CampCard; distance: number } | undefined;
   for (const candidate of state.cards) {
     if (candidate.id === card.id || candidate.state === "working") continue;
+    if (CARD_DEFS[candidate.kind].type !== "source") continue;
     if (!findRecipe([card.kind, candidate.kind])) continue;
     const distance = centerDistance(card, candidate);
     if (distance <= cardSize().height * 1.08 && (!best || distance < best.distance)) {
@@ -672,6 +713,7 @@ function nudgeAwayFrom(card: CampCard, target: CampCard): void {
 
 function foodScore(): number {
   return state.cards.reduce((score, card) => {
+    if (card.kind === "meat") return score + 2;
     if (card.kind === "cookedBerry") return score + 2;
     if (card.kind === "berry") return score + 1;
     return score;
