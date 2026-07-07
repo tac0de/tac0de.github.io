@@ -1,0 +1,54 @@
+{
+  "$schema": "./schemas/dtp.config.schema.json",
+  "project": "gh-portfolio-backrooms",
+  "verify": "node scripts/verify.mjs",
+  "allowed_paths": [
+    "src/**",
+    "tests/**",
+    "public/**",
+    "scripts/**",
+    "docs/**",
+    "README.md",
+    "AGENTS.md",
+    "dtp.config.json",
+    "evals/**",
+    "traces/**"
+  ],
+  "blocked_paths": [
+    ".env",
+    ".env.*",
+    "node_modules/**",
+    "dist/**",
+    "build/**",
+    ".next/**"
+  ],
+  "approval_required": [
+    "package.json",
+    ".github/**",
+    "firebase/**",
+    "vite.config.*",
+    "next.config.*"
+  ],
+  "product": {
+    "stage": "prototype",
+    "decision_policy": "aggressive_when_product_better",
+    "compare_options": 3,
+    "criteria": [
+      "maintainability",
+      "speed",
+      "user_experience",
+      "extensibility"
+    ],
+    "require_conservative_and_aggressive_options": true,
+    "allow_rewrite": true,
+    "verification": {
+      "prefer_static_checks": true,
+      "require_smallest_relevant_command": true,
+      "require_breakage_review": true
+    }
+  },
+  "trace_dir": "traces",
+  "eval_cases": "evals/cases.json",
+  "max_files_changed_without_review": 14,
+  "max_repair_attempts": 2
+}

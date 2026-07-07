@@ -6,7 +6,10 @@ export type CardKind =
   | "berry"
   | "wood"
   | "campfire"
-  | "cookedBerry";
+  | "cookedBerry"
+  | "rain"
+  | "coldNight"
+  | "trader";
 
 export type CardState = "idle" | "working" | "hungry" | "warning";
 
@@ -16,6 +19,7 @@ export type CampCard = {
   x: number;
   y: number;
   stackId?: string;
+  routineTargetId?: string;
   state: CardState;
 };
 
@@ -44,9 +48,13 @@ export type CampState = {
   dayLength: number;
   day: number;
   warnings: number;
+  eventCount: number;
+  eventMessage?: string;
   message: string;
   goalMet: boolean;
 };
+
+const EVENT_KINDS = new Set<CardKind>(["rain", "coldNight", "trader"]);
 
 export const CARD_DEFS: Record<CardKind, { label: string; type: string }> = {
   villager: { label: "Villager", type: "worker" },
@@ -56,7 +64,10 @@ export const CARD_DEFS: Record<CardKind, { label: string; type: string }> = {
   berry: { label: "Berry", type: "food" },
   wood: { label: "Wood", type: "resource" },
   campfire: { label: "Campfire", type: "craft" },
-  cookedBerry: { label: "Cooked Berry", type: "food" }
+  cookedBerry: { label: "Cooked Berry", type: "food" },
+  rain: { label: "Rain", type: "event" },
+  coldNight: { label: "Cold Night", type: "event" },
+  trader: { label: "Trader", type: "event" }
 };
 
 export const RECIPES: Recipe[] = [
@@ -106,7 +117,8 @@ export function createInitialState(): CampState {
     dayLength: 42,
     day: 1,
     warnings: 0,
-    message: "Drag Villager onto Berry Bush to produce food.",
+    eventCount: 0,
+    message: "Place Villager near a source to start a routine.",
     goalMet: false
   };
 }
@@ -144,6 +156,8 @@ export function tickCamp(state: CampState, delta: number): void {
     completeWorkOrder(state, order);
   }
 
+  startRoutineWork(state);
+  resolveNearbyWorldRules(state);
   state.goalMet = state.goalMet || state.cards.some((card) => card.kind === "campfire");
 }
 
@@ -151,10 +165,15 @@ export function startRecipe(state: CampState, recipe: Recipe, cards: CampCard[])
   const x = cards.reduce((sum, card) => sum + card.x, 0) / cards.length;
   const y = cards.reduce((sum, card) => sum + card.y, 0) / cards.length;
   const orderId = `work-${nextId++}`;
+  const duration = adjustedRecipeSeconds(state, recipe);
 
   cards.forEach((card, index) => {
     card.state = "working";
     card.stackId = orderId;
+    if (card.kind === "villager") {
+      const target = cards.find((candidate) => candidate.id !== card.id && recipe.reusable.includes(candidate.kind));
+      card.routineTargetId = target?.id;
+    }
     card.x = x + (index - (cards.length - 1) / 2) * 18;
     card.y = y + index * 10;
   });
@@ -165,10 +184,12 @@ export function startRecipe(state: CampState, recipe: Recipe, cards: CampCard[])
     cardIds: cards.map((card) => card.id),
     x,
     y,
-    remaining: recipe.seconds,
-    total: recipe.seconds
+    remaining: duration,
+    total: duration
   });
-  state.message = `${recipeLabel(recipe)} started.`;
+  state.message = state.cards.some((card) => card.kind === "rain") && isFireRecipe(recipe)
+    ? `${recipeLabel(recipe)} slowed by rain.`
+    : `${recipeLabel(recipe)} started.`;
 }
 
 export function cancelInvalidStack(state: CampState, card: CampCard): void {
@@ -192,7 +213,8 @@ function completeWorkOrder(state: CampState, order: WorkOrder): void {
     if (used.has(card.id)) {
       card.state = "idle";
       card.stackId = undefined;
-      card.x = order.x + (card.kind === "villager" ? -128 : 112);
+      const isRoutineWorker = card.kind === "villager" && card.routineTargetId;
+      card.x = order.x + (isRoutineWorker ? -54 : card.kind === "villager" ? -128 : 112);
       card.y = order.y + 18;
     }
   }
@@ -205,8 +227,28 @@ function completeWorkOrder(state: CampState, order: WorkOrder): void {
 function resolveDay(state: CampState): void {
   state.day += 1;
   state.dayRemaining = state.dayLength;
+  clearResolvedEvents(state);
+  addNightEvent(state);
 
-  const food = state.cards.find((card) => card.kind === "cookedBerry") ?? state.cards.find((card) => card.kind === "berry");
+  const foodNeeded = state.cards.some((card) => card.kind === "coldNight") ? 2 : 1;
+  const foodCards = state.cards.filter((card) => card.kind === "cookedBerry" || card.kind === "berry");
+  if (foodCards.length >= foodNeeded) {
+    let eaten = 0;
+    state.cards = state.cards.filter((card) => {
+      if ((card.kind === "cookedBerry" || card.kind === "berry") && eaten < foodNeeded) {
+        eaten += 1;
+        return false;
+      }
+      return true;
+    });
+    state.message = foodNeeded > 1 ? "Cold night. Villager ate extra food." : `Villager ate one ${CARD_DEFS[foodCards[0].kind].label}.`;
+    for (const card of state.cards) {
+      if (card.kind === "villager") card.state = "idle";
+    }
+    return;
+  }
+
+  const food = foodCards[0];
   if (food) {
     state.cards = state.cards.filter((card) => card.id !== food.id);
     state.message = `Villager ate one ${CARD_DEFS[food.kind].label}.`;
@@ -225,4 +267,87 @@ function resolveDay(state: CampState): void {
 
 function recipeLabel(recipe: Recipe): string {
   return recipe.inputs.map((kind) => CARD_DEFS[kind].label).join(" + ");
+}
+
+function startRoutineWork(state: CampState): void {
+  const activeCardIds = new Set(state.workOrders.flatMap((order) => order.cardIds));
+  for (const villager of state.cards) {
+    if (villager.kind !== "villager" || villager.state !== "idle" || activeCardIds.has(villager.id)) continue;
+    if (!villager.routineTargetId) continue;
+
+    const target = state.cards.find((card) => card.id === villager.routineTargetId && card.state === "idle");
+    if (!target || distance(villager, target) > 112) {
+      villager.routineTargetId = undefined;
+      continue;
+    }
+
+    const recipe = findRecipe([villager.kind, target.kind]);
+    if (recipe) {
+      startRecipe(state, recipe, [villager, target]);
+      state.message = `${CARD_DEFS[target.kind].label} routine continues.`;
+      return;
+    }
+  }
+}
+
+function resolveNearbyWorldRules(state: CampState): void {
+  const activeCardIds = new Set(state.workOrders.flatMap((order) => order.cardIds));
+  if (state.cards.some((card) => card.kind === "rain")) {
+    for (const campfire of state.cards) {
+      if (campfire.kind === "campfire") campfire.state = "warning";
+    }
+  }
+
+  for (const campfire of state.cards) {
+    if (campfire.kind !== "campfire" || activeCardIds.has(campfire.id)) continue;
+    const berry = state.cards.find((card) => card.kind === "berry" && card.state === "idle" && !activeCardIds.has(card.id) && distance(card, campfire) <= 104);
+    if (!berry) continue;
+    const recipe = findRecipe(["campfire", "berry"]);
+    if (recipe) {
+      startRecipe(state, recipe, [campfire, berry]);
+      state.message = "Berry warms by the fire.";
+      return;
+    }
+  }
+
+  const trader = state.cards.find((card) => card.kind === "trader");
+  if (!trader) return;
+  const wood = state.cards.find((card) => card.kind === "wood" && distance(card, trader) <= 108);
+  if (!wood) return;
+  state.cards = state.cards.filter((card) => card.id !== trader.id && card.id !== wood.id);
+  state.cards.push(createCard("berry", trader.x + 32, trader.y + 8));
+  state.cards.push(createCard("stone", trader.x - 32, trader.y + 14));
+  state.message = "Trader swapped wood for supplies.";
+}
+
+function addNightEvent(state: CampState): void {
+  const events: CardKind[] = ["rain", "coldNight", "trader"];
+  const kind = events[state.eventCount % events.length];
+  state.eventCount += 1;
+  state.cards.push(createCard(kind, 22 + (state.eventCount % 3) * 72, 22));
+  state.eventMessage = `${CARD_DEFS[kind].label} arrived at dusk.`;
+}
+
+function clearResolvedEvents(state: CampState): void {
+  state.cards = state.cards.filter((card) => !EVENT_KINDS.has(card.kind));
+  for (const card of state.cards) {
+    if (card.kind === "campfire" && card.state === "warning") {
+      card.state = "idle";
+    }
+  }
+}
+
+function adjustedRecipeSeconds(state: CampState, recipe: Recipe): number {
+  if (state.cards.some((card) => card.kind === "rain") && isFireRecipe(recipe)) {
+    return recipe.seconds * 1.75;
+  }
+  return recipe.seconds;
+}
+
+function isFireRecipe(recipe: Recipe): boolean {
+  return recipe.result === "campfire" || recipe.inputs.includes("campfire");
+}
+
+function distance(a: CampCard, b: CampCard): number {
+  return Math.hypot(a.x - b.x, a.y - b.y);
 }

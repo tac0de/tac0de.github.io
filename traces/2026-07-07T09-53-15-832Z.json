@@ -1,0 +1,64 @@
+{
+  "run_id": "2026-07-07T09-53-15-832Z",
+  "repo": "gh-portfolio-backrooms",
+  "input": "Run DTP verification",
+  "normalized_task": {
+    "type": "unknown",
+    "risk": "low",
+    "input": "Run DTP verification",
+    "allowed_files": [
+      "src/**",
+      "tests/**",
+      "public/**",
+      "scripts/**",
+      "docs/**",
+      "README.md",
+      "AGENTS.md",
+      "dtp.config.json",
+      "evals/**",
+      "traces/**"
+    ],
+    "blocked_files": [
+      ".env",
+      ".env.*",
+      "node_modules/**",
+      "dist/**",
+      "build/**",
+      ".next/**"
+    ],
+    "done_when": [
+      "node scripts/verify.mjs"
+    ],
+    "human_gate": [
+      "package.json",
+      ".github/**",
+      "firebase/**",
+      "vite.config.*",
+      "next.config.*"
+    ]
+  },
+  "changed_files": [
+    "README.md",
+    "docs/card-camp-mvp.md",
+    "src/card-camp/model.ts",
+    "src/cards.ts",
+    "src/style.css",
+    "AGENTS.md",
+    "dtp.config.json",
+    "evals/cases.json",
+    "public/assets/card-camp/generated/card-camp-icons.png",
+    "scripts/verify.mjs",
+    "traces/.gitkeep"
+  ],
+  "commands": [
+    {
+      "command": "node scripts/verify.mjs",
+      "exit_code": 0,
+      "stdout_tail": "\n> gh-portfolio-backrooms@0.1.0 build\n> tsc && vite build\n\nvite v8.1.3 building client environment for production...\n\u001b[2K\rtransforming...✓ 16 modules transformed.\nrendering chunks...\ncomputing gzip size...\ndist/index.html                      1.57 kB │ gzip:   0.69 kB\ndist/games/backrooms/index.html      1.64 kB │ gzip:   0.74 kB\ndist/games/cards/index.html          2.07 kB │ gzip:   0.84 kB\ndist/assets/style-59GnjOrG.css      15.23 kB │ gzip:   4.15 kB\ndist/assets/style-CgLYY7Tm.js        0.69 kB │ gzip:   0.39 kB\ndist/assets/main-CH2ILW2h.js         1.38 kB │ gzip:   0.71 kB\ndist/assets/cards-DZjmULFT.js       11.29 kB │ gzip:   4.11 kB\ndist/assets/backrooms-DPpAqltB.js  500.23 kB │ gzip: 127.78 kB\n\n✓ built in 94ms\n",
+      "stderr_tail": ""
+    }
+  ],
+  "status": "pass",
+  "remaining_risks": [],
+  "violations": []
+}

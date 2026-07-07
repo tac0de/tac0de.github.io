@@ -2,6 +2,7 @@ import "./style.css";
 import {
   CARD_DEFS,
   CampCard,
+  CardKind,
   createInitialState,
   findRecipe,
   startRecipe,
@@ -11,15 +12,18 @@ import {
 
 document.documentElement.dataset.page = "cards";
 
-const CARD_ART: Record<CampCard["kind"], string> = {
-  villager: "/assets/card-camp/villager.jpg",
-  berryBush: "/assets/card-camp/berry-bush.jpg",
-  tree: "/assets/card-camp/tree.jpg",
-  stone: "/assets/card-camp/stone.jpg",
-  berry: "/assets/card-camp/berry.jpg",
-  wood: "/assets/card-camp/wood.jpg",
-  campfire: "/assets/card-camp/campfire.jpg",
-  cookedBerry: "/assets/card-camp/cooked-berry.jpg"
+const CARD_SYMBOLS: Record<CardKind, string> = {
+  villager: "person",
+  berryBush: "bush",
+  tree: "tree",
+  stone: "stone",
+  berry: "berry",
+  wood: "wood",
+  campfire: "fire",
+  cookedBerry: "snack",
+  rain: "rain",
+  coldNight: "cold",
+  trader: "trade"
 };
 
 const table = document.querySelector<HTMLDivElement>("#card-table");
@@ -52,8 +56,6 @@ let active:
       pointerId: number;
       offsetX: number;
       offsetY: number;
-      originX: number;
-      originY: number;
       moved: boolean;
     }
   | undefined;
@@ -85,7 +87,7 @@ function render(): void {
   }
   fitCardsInsideTable();
 
-  messageElement.textContent = state.message;
+  messageElement.textContent = state.eventMessage ? `${state.message} ${state.eventMessage}` : state.message;
   dayElement.textContent = `Day ${state.day}`;
   foodElement.textContent = `Food ${foodScore()}`;
   timerElement.textContent = `Dusk ${Math.ceil(state.dayRemaining)}s`;
@@ -108,13 +110,12 @@ function render(): void {
     const def = CARD_DEFS[card.kind];
     const isTarget = activeDropTargetId === card.id;
     const isDragging = active?.card.id === card.id;
-    node.className = `camp-card camp-card-${card.kind} is-${card.state}${selectedCardId === card.id ? " is-selected" : ""}${isTarget ? " is-drop-target" : ""}${isDragging ? " is-dragging" : ""}`;
-    node.style.setProperty("--card-art", `url("${CARD_ART[card.kind]}")`);
+    node.className = `camp-card camp-card-${card.kind} is-${card.state}${card.routineTargetId ? " has-routine" : ""}${selectedCardId === card.id ? " is-selected" : ""}${isTarget ? " is-drop-target" : ""}${isDragging ? " is-dragging" : ""}`;
     node.style.transform = `translate(${card.x}px, ${card.y}px)`;
+    node.setAttribute("aria-label", `${def.label}, ${def.type}`);
     node.disabled = card.state === "working";
     node.innerHTML = `
-      <span class="camp-card-type">${def.type}</span>
-      <span class="camp-card-name">${def.label}</span>
+      <span class="camp-card-symbol" data-symbol="${CARD_SYMBOLS[card.kind]}"></span>
     `;
   }
 
@@ -149,8 +150,6 @@ function onPointerDown(event: PointerEvent): void {
     pointerId: event.pointerId,
     offsetX: event.clientX - nodeRect.left,
     offsetY: event.clientY - nodeRect.top,
-    originX: card.x,
-    originY: card.y,
     moved: false
   };
 
@@ -172,7 +171,7 @@ function onPointerMove(event: PointerEvent): void {
   const size = cardSize();
   active.card.x = clamp(event.clientX - tableRect.left - active.offsetX, 0, tableRect.width - size.width);
   active.card.y = clamp(event.clientY - tableRect.top - active.offsetY, 0, tableRect.height - size.height);
-  activeDropTargetId = findDropTarget(active.card)?.id;
+  activeDropTargetId = findDropTarget(active.card, true)?.id;
   active.moved = true;
   render();
 }
@@ -187,8 +186,6 @@ function onPointerUp(event: PointerEvent): void {
 
   const dropped = active.card;
   const moved = active.moved;
-  const originX = active.originX;
-  const originY = active.originY;
   active = undefined;
   activeDropTargetId = undefined;
 
@@ -197,10 +194,13 @@ function onPointerUp(event: PointerEvent): void {
     return;
   }
   suppressClickUntil = performance.now() + 350;
-  const target = findDropTarget(dropped);
+  const target = findDropTarget(dropped, false);
 
   if (!target) {
-    returnCardToOrigin(dropped, originX, originY);
+    if (setNearbyRoutine(dropped)) {
+      render();
+      return;
+    }
     render();
     return;
   }
@@ -208,7 +208,11 @@ function onPointerUp(event: PointerEvent): void {
   const recipe = findRecipe([dropped.kind, target.kind]);
   if (!recipe) {
     cancelInvalidStack(state, dropped);
-    returnCardToOrigin(dropped, originX, originY, 320);
+    nudgeAwayFrom(dropped, target);
+    window.setTimeout(() => {
+      dropped.state = "idle";
+      render();
+    }, 320);
     render();
     return;
   }
@@ -266,15 +270,41 @@ function onCardClick(event: MouseEvent): void {
   render();
 }
 
-function findDropTarget(card: CampCard): CampCard | undefined {
-  let best: { card: CampCard; overlap: number } | undefined;
+function findDropTarget(card: CampCard, validOnly: boolean): CampCard | undefined {
+  let best: { card: CampCard; score: number } | undefined;
+  for (const candidate of state.cards) {
+    if (candidate.id === card.id || candidate.state === "working") continue;
+    const isRecipe = Boolean(findRecipe([card.kind, candidate.kind]));
+    if (validOnly && !isRecipe) continue;
+
+    const overlap = overlapRatio(card, candidate);
+    const distanceScore = centerDistanceScore(card, candidate);
+    const score = Math.max(overlap, distanceScore);
+    const threshold = isRecipe ? 0.2 : 0.34;
+    if (score >= threshold && (!best || score > best.score)) {
+      best = { card: candidate, score };
+    }
+  }
+  return best?.card;
+}
+
+function setNearbyRoutine(card: CampCard): boolean {
+  if (card.kind !== "villager") return false;
+  const target = findRoutineTarget(card);
+  if (!target) return false;
+  card.routineTargetId = target.id;
+  state.message = `${CARD_DEFS[target.kind].label} routine set.`;
+  return true;
+}
+
+function findRoutineTarget(card: CampCard): CampCard | undefined {
+  let best: { card: CampCard; distance: number } | undefined;
   for (const candidate of state.cards) {
     if (candidate.id === card.id || candidate.state === "working") continue;
     if (!findRecipe([card.kind, candidate.kind])) continue;
-
-    const overlap = overlapRatio(card, candidate);
-    if (overlap >= 0.28 && (!best || overlap > best.overlap)) {
-      best = { card: candidate, overlap };
+    const distance = centerDistance(card, candidate);
+    if (distance <= cardSize().height * 1.08 && (!best || distance < best.distance)) {
+      best = { card: candidate, distance };
     }
   }
   return best?.card;
@@ -307,9 +337,9 @@ function fitCardsInsideTable(): void {
 
 function cardSize(): { width: number; height: number } {
   const tableRect = tableElement.getBoundingClientRect();
-  if (tableRect.width <= 380) return { width: 104, height: 136 };
-  if (tableRect.width <= 620) return { width: 116, height: 152 };
-  return { width: 132, height: 172 };
+  if (tableRect.width <= 380) return { width: 88, height: 118 };
+  if (tableRect.width <= 620) return { width: 96, height: 128 };
+  return { width: 118, height: 154 };
 }
 
 function overlapRatio(a: CampCard, b: CampCard): number {
@@ -317,6 +347,22 @@ function overlapRatio(a: CampCard, b: CampCard): number {
   const xOverlap = Math.max(0, Math.min(a.x + size.width, b.x + size.width) - Math.max(a.x, b.x));
   const yOverlap = Math.max(0, Math.min(a.y + size.height, b.y + size.height) - Math.max(a.y, b.y));
   return (xOverlap * yOverlap) / (size.width * size.height);
+}
+
+function centerDistanceScore(a: CampCard, b: CampCard): number {
+  const size = cardSize();
+  const distance = centerDistance(a, b);
+  const reach = Math.max(size.width, size.height) * 0.58;
+  return clamp(1 - distance / reach, 0, 1);
+}
+
+function centerDistance(a: CampCard, b: CampCard): number {
+  const size = cardSize();
+  const aX = a.x + size.width / 2;
+  const aY = a.y + size.height / 2;
+  const bX = b.x + size.width / 2;
+  const bY = b.y + size.height / 2;
+  return Math.hypot(aX - bX, aY - bY);
 }
 
 function alignForCraft(a: CampCard, b: CampCard): void {
@@ -330,13 +376,12 @@ function alignForCraft(a: CampCard, b: CampCard): void {
   b.y = clamp(centerY - 8, 0, Math.max(0, tableRect.height - size.height));
 }
 
-function returnCardToOrigin(card: CampCard, x: number, y: number, delay = 0): void {
-  card.x = x;
-  card.y = y;
-  window.setTimeout(() => {
-    card.state = "idle";
-    render();
-  }, delay);
+function nudgeAwayFrom(card: CampCard, target: CampCard): void {
+  const size = cardSize();
+  const tableRect = tableElement.getBoundingClientRect();
+  const direction = card.x + size.width / 2 < target.x + size.width / 2 ? -1 : 1;
+  card.x = clamp(card.x + direction * Math.round(size.width * 0.42), 0, Math.max(0, tableRect.width - size.width));
+  card.y = clamp(card.y + 10, 0, Math.max(0, tableRect.height - size.height));
 }
 
 function foodScore(): number {
