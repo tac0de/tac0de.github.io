@@ -40,6 +40,14 @@ const ASSET_PATHS = {
   ceiling: "/assets/ceiling.png",
   signalBeacon: "/assets/signal-beacon.png",
   warningSign: "/assets/warning-sign.png",
+  glyphs: [
+    "/assets/generated/backrooms-glyph-eye.png",
+    "/assets/generated/backrooms-glyph-arrow.png",
+    "/assets/generated/backrooms-glyph-spiral.png",
+    "/assets/generated/backrooms-glyph-tally.png",
+    "/assets/generated/backrooms-glyph-warning.png",
+    "/assets/generated/backrooms-glyph-door.png"
+  ],
   vhsOverlay: "/assets/vhs-overlay.png"
 };
 
@@ -261,6 +269,7 @@ const floorTexture = loadGameTexture(ASSET_PATHS.carpet, 2, 2);
 const ceilingTexture = loadGameTexture(ASSET_PATHS.ceiling, 2, 2);
 const signalTexture = loadGameTexture(ASSET_PATHS.signalBeacon, 1, 1);
 const warningSignTexture = loadGameTexture(ASSET_PATHS.warningSign, 1, 1);
+const glyphTextures = ASSET_PATHS.glyphs.map((path) => loadDecalTexture(path));
 const vhsOverlayTexture = loadGameTexture(ASSET_PATHS.vhsOverlay, 1, 1);
 
 const renderer = new THREE.WebGLRenderer({
@@ -407,6 +416,9 @@ const landmarkLightMaterial = new THREE.MeshBasicMaterial({
 });
 const echoSpriteMaterial = makeChromaKeyMaterial(signalTexture, 1.45, 0.95);
 const warningSignMaterial = makeChromaKeyMaterial(warningSignTexture, 1.0, 0.88);
+const glyphMaterials = glyphTextures.map((texture) => makeGlyphMaterial(texture));
+const introGlyphMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.55, 1.62), glyphMaterials[0]);
+introGlyphMesh.position.set(0, 1.72, -TILE * 0.43);
 
 const wallMesh = new THREE.InstancedMesh(
   new THREE.BoxGeometry(TILE, WALL_HEIGHT, 0.18),
@@ -463,7 +475,24 @@ const warningSignMesh = new THREE.InstancedMesh(
   warningSignMaterial,
   MAX_PROPS
 );
-scene.add(wallMesh, floorMesh, ceilingMesh, exitMesh, lampMesh, stainMesh, echoMesh, landmarkMesh, landmarkPanelMesh, landmarkLightMesh, warningSignMesh);
+const glyphMeshes = glyphMaterials.map(
+  (material) => new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), material, MAX_PROPS)
+);
+scene.add(
+  wallMesh,
+  floorMesh,
+  ceilingMesh,
+  exitMesh,
+  lampMesh,
+  stainMesh,
+  echoMesh,
+  landmarkMesh,
+  landmarkPanelMesh,
+  landmarkLightMesh,
+  warningSignMesh,
+  introGlyphMesh,
+  ...glyphMeshes
+);
 
 const chunks = new Map<string, Chunk>();
 const openCells = new Set<string>();
@@ -669,6 +698,7 @@ function rebuildInstances(): void {
   let landmarkPanelCount = 0;
   let landmarkLightCount = 0;
   let warningSignCount = 0;
+  const glyphCounts = glyphMeshes.map(() => 0);
 
   for (const cell of cells) {
     if (!cell.open) continue;
@@ -761,6 +791,28 @@ function rebuildInstances(): void {
         );
         warningSignCount += 1;
       }
+
+      const glyphIndex = Math.floor(noise(cell.x * 11 + levelIndex * 5, cell.z * 11 - levelIndex * 3) * glyphMeshes.length);
+      const glyphMesh = glyphMeshes[glyphIndex];
+      const glyphCount = glyphCounts[glyphIndex];
+      if (glyphMesh && glyphCount < MAX_PROPS) {
+        const wideGlyph = glyphIndex === 0 || glyphIndex === 1;
+        const tallGlyph = glyphIndex === 4 || glyphIndex === 5;
+        setTransform(
+          glyphMesh,
+          glyphCount,
+          wx + (faceNorth ? 0 : TILE * 0.41),
+          tallGlyph ? 1.55 : 1.72,
+          wz + (faceNorth ? -TILE * 0.41 : 0),
+          wideGlyph ? 2.2 : 1.65,
+          tallGlyph ? 2.05 : 1.55,
+          1,
+          0,
+          faceNorth ? 0 : Math.PI / 2,
+          0
+        );
+        glyphCounts[glyphIndex] += 1;
+      }
     }
 
     wallCount = addBoundaryWall(cell.x, cell.z, 0, -1, wx, wz - TILE / 2, 0, wallCount);
@@ -780,6 +832,9 @@ function rebuildInstances(): void {
   landmarkPanelMesh.count = landmarkPanelCount;
   landmarkLightMesh.count = landmarkLightCount;
   warningSignMesh.count = warningSignCount;
+  glyphMeshes.forEach((mesh, index) => {
+    mesh.count = glyphCounts[index];
+  });
   wallMesh.instanceMatrix.needsUpdate = true;
   floorMesh.instanceMatrix.needsUpdate = true;
   ceilingMesh.instanceMatrix.needsUpdate = true;
@@ -791,6 +846,9 @@ function rebuildInstances(): void {
   landmarkPanelMesh.instanceMatrix.needsUpdate = true;
   landmarkLightMesh.instanceMatrix.needsUpdate = true;
   warningSignMesh.instanceMatrix.needsUpdate = true;
+  glyphMeshes.forEach((mesh) => {
+    mesh.instanceMatrix.needsUpdate = true;
+  });
 }
 
 function addBoundaryWall(
@@ -1179,6 +1237,29 @@ function loadGameTexture(path: string, repeatX: number, repeatY: number): THREE.
   loadedTexture.generateMipmaps = true;
   loadedTexture.anisotropy = 2;
   return loadedTexture;
+}
+
+function loadDecalTexture(path: string): THREE.Texture {
+  const loadedTexture = textureLoader.load(path);
+  loadedTexture.colorSpace = THREE.SRGBColorSpace;
+  loadedTexture.wrapS = THREE.ClampToEdgeWrapping;
+  loadedTexture.wrapT = THREE.ClampToEdgeWrapping;
+  loadedTexture.magFilter = THREE.LinearFilter;
+  loadedTexture.minFilter = THREE.LinearMipmapLinearFilter;
+  loadedTexture.generateMipmaps = true;
+  loadedTexture.anisotropy = 2;
+  return loadedTexture;
+}
+
+function makeGlyphMaterial(map: THREE.Texture): THREE.MeshBasicMaterial {
+  return new THREE.MeshBasicMaterial({
+    map,
+    transparent: true,
+    alphaTest: 0.08,
+    opacity: 0.94,
+    depthWrite: false,
+    side: THREE.DoubleSide
+  });
 }
 
 function makeChromaKeyMaterial(source: THREE.Texture, glow: number, opacity: number): THREE.ShaderMaterial {

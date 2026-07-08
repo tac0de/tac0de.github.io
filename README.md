@@ -18,6 +18,7 @@
 - `AudioDirector` 기반 저역 hum, 전기 노이즈, 발소리, 불협화음, 짧은 drop-out
 - Level 0과 Lost Time의 맵 패턴, 색감, 신호 안정성 차별화
 - `InstancedMesh` 기반 천장등, 바닥 얼룩, echo, 큰 랜드마크 패널/조명 props
+- 생성형 에셋 기반 감시/신호/경고 글리프 데칼과 시작 지점 시그니처 글리프
 - GitHub Pages Actions 배포
 
 ## 다음 고도화
