@@ -12,12 +12,12 @@
 - 플레이어 주변 청크만 렌더링하는 절차적 백룸
 - `InstancedMesh` 기반 벽, 바닥, 천장 렌더링
 - 단순 grid 충돌
-- 저해상도 render target 업스케일, 8-bit 팔레트 양자화, VHS식 노이즈
+- 상태 기반 render target 선명도, 신호/전환 반응형 VHS 노이즈
 - 신호를 따라 exit에 도달하면 암전 후 다음 상태로 전환
 - echo 3개를 수집해야 exit 신호가 열리는 짧은 세션 루프
 - `AudioDirector` 기반 저역 hum, 전기 노이즈, 발소리, 불협화음, 짧은 drop-out
 - Level 0과 Lost Time의 맵 패턴, 색감, 신호 안정성 차별화
-- `InstancedMesh` 기반 천장등, 바닥 얼룩, echo, 랜드마크 props
+- `InstancedMesh` 기반 천장등, 바닥 얼룩, echo, 큰 랜드마크 패널/조명 props
 - GitHub Pages Actions 배포
 
 ## 다음 고도화
@@ -53,7 +53,6 @@
 ### 비주얼
 
 - 문틀, 표지판, 파이프, 젖은 바닥 같은 저비용 반복 props
-- 저해상도 render target, VHS tearing, 색수차 강도 조절
 - exit 근처에서 공간이 접히거나 벽 UV가 밀리는 왜곡
 - 레벨별 랜드마크 방과 기억 가능한 공간
 

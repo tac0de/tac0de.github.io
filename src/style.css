@@ -291,8 +291,7 @@ html[data-page="rpg"] body {
   display: block;
   width: 100vw;
   height: 100vh;
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+  image-rendering: auto;
 }
 
 .back-link {

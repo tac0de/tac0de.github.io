@@ -25,11 +25,11 @@ const TILE = 4;
 const WALL_HEIGHT = 3.1;
 const CHUNK_SIZE = 8;
 const CHUNK_RADIUS = 2;
-const MAX_INSTANCES = 960;
+const MAX_INSTANCES = 3200;
 const PLAYER_RADIUS = 0.42;
 const WALK_SPEED = 4.15;
 const LOOK_SENSITIVITY = 0.0032;
-const LOFI_RENDER_SCALE = 0.42;
+const LOFI_RENDER_SCALE = 0.72;
 const EXIT_RADIUS = 1.45;
 const MAX_PROPS = 520;
 const FIRST_PLAY_HELP_SECONDS = 10;
@@ -60,11 +60,11 @@ const LEVEL_THEMES = [
     label: "LEVEL 0",
     hint: "Find the humming exit",
     fogColor: 0x17140b,
-    fogDensity: 0.036,
-    palette: 7,
+    fogDensity: 0.026,
+    palette: 10,
     blackoutStart: 0.28,
     wallColor: 0xd9c766,
-    floorColor: 0x6f6440,
+    floorColor: 0x83764a,
     ceilingColor: 0xbba956,
     lampColor: 0xf7df8a,
     exitCell: { x: 7, z: 0 },
@@ -79,11 +79,11 @@ const LEVEL_THEMES = [
     label: "LOST TIME",
     hint: "Follow the wrong signal",
     fogColor: 0x11171a,
-    fogDensity: 0.033,
-    palette: 6,
+    fogDensity: 0.024,
+    palette: 9,
     blackoutStart: 0.34,
     wallColor: 0x81928a,
-    floorColor: 0x303d3c,
+    floorColor: 0x3f514f,
     ceilingColor: 0x52645d,
     lampColor: 0x9cc9c0,
     exitCell: { x: 7, z: 7 },
@@ -250,7 +250,7 @@ class AudioDirector {
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x17140b);
-scene.fog = new THREE.FogExp2(0x17140b, 0.036);
+scene.fog = new THREE.FogExp2(0x17140b, 0.026);
 
 const camera = new THREE.PerspectiveCamera(67, window.innerWidth / window.innerHeight, 0.05, 82);
 camera.position.set(0, 1.55, 0);
@@ -265,12 +265,12 @@ const vhsOverlayTexture = loadGameTexture(ASSET_PATHS.vhsOverlay, 1, 1);
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
-  antialias: false,
+  antialias: true,
   powerPreference: "high-performance"
 });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.86;
+renderer.toneMappingExposure = 1.08;
 
 const postScene = new THREE.Scene();
 const postCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -284,6 +284,7 @@ const postMaterial = new THREE.ShaderMaterial({
     uBlackout: { value: 0 },
     uPalette: { value: 7.0 },
     uOverlayMix: { value: 0.16 },
+    uCorruption: { value: 0 },
     tOverlay: { value: vhsOverlayTexture }
   },
   vertexShader: `
@@ -301,6 +302,7 @@ const postMaterial = new THREE.ShaderMaterial({
     uniform float uBlackout;
     uniform float uPalette;
     uniform float uOverlayMix;
+    uniform float uCorruption;
     uniform sampler2D tOverlay;
     varying vec2 vUv;
 
@@ -311,14 +313,15 @@ const postMaterial = new THREE.ShaderMaterial({
     void main() {
       vec2 uv = vUv;
       float scan = floor(uv.y * uResolution.y);
-      float tear = step(0.985, hash(vec2(floor(uTime * 9.0), scan * 0.07)));
-      uv.x += sin(uv.y * 75.0 + uTime * 8.0) * 0.0025;
-      uv.x += tear * sin(uTime * 40.0) * 0.035;
+      float tear = step(mix(1.01, 0.982, uCorruption), hash(vec2(floor(uTime * 9.0), scan * 0.07)));
+      uv.x += sin(uv.y * 75.0 + uTime * 8.0) * 0.0008 * (0.25 + uCorruption);
+      uv.x += tear * sin(uTime * 40.0) * 0.034 * uCorruption;
 
       vec3 color;
-      color.r = texture2D(tDiffuse, uv + vec2(0.0022, 0.0)).r;
+      float chroma = 0.0005 + 0.0022 * uCorruption;
+      color.r = texture2D(tDiffuse, uv + vec2(chroma, 0.0)).r;
       color.g = texture2D(tDiffuse, uv).g;
-      color.b = texture2D(tDiffuse, uv - vec2(0.0022, 0.0)).b;
+      color.b = texture2D(tDiffuse, uv - vec2(chroma, 0.0)).b;
 
       float n = hash(floor(uv * uResolution.xy) + floor(uTime * 24.0));
       color += (n - 0.5) * uNoise;
@@ -328,8 +331,9 @@ const postMaterial = new THREE.ShaderMaterial({
       float overlayAlpha = smoothstep(0.10, 0.42, overlayKey) * uOverlayMix;
       color = mix(color, color + (overlay - vec3(0.0, 0.55, 0.0)) * 0.45, overlayAlpha);
 
-      color *= 0.86 + 0.14 * sin(scan * 3.14159);
-      color = floor(max(color, vec3(0.0)) * uPalette) / uPalette;
+      color *= 0.98 + 0.02 * sin(scan * 3.14159);
+      vec3 quantized = floor(max(color, vec3(0.0)) * uPalette) / uPalette;
+      color = mix(color, quantized, 0.18 + uCorruption * 0.55);
       color *= 1.0 - smoothstep(0.3, 1.05, uBlackout);
       gl_FragColor = vec4(color, 1.0);
     }
@@ -339,10 +343,10 @@ const postMaterial = new THREE.ShaderMaterial({
 });
 postScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), postMaterial));
 
-const ambient = new THREE.HemisphereLight(0xf1dd92, 0x19140a, 1.45);
+const ambient = new THREE.HemisphereLight(0xf1dd92, 0x19140a, 1.82);
 scene.add(ambient);
 
-const playerLamp = new THREE.PointLight(0xffe7a6, 1.85, 12, 2.4);
+const playerLamp = new THREE.PointLight(0xffe7a6, 3.05, 17, 2.1);
 playerLamp.position.copy(camera.position);
 scene.add(playerLamp);
 
@@ -354,7 +358,7 @@ const wallMaterial = new THREE.MeshStandardMaterial({
 });
 const floorMaterial = new THREE.MeshStandardMaterial({
   map: floorTexture,
-  color: 0x6f6440,
+  color: 0x83764a,
   roughness: 0.96,
   metalness: 0
 });
@@ -390,6 +394,16 @@ const landmarkMaterial = new THREE.MeshStandardMaterial({
   color: 0x3d3520,
   roughness: 0.9,
   metalness: 0
+});
+const landmarkPanelMaterial = new THREE.MeshStandardMaterial({
+  color: 0x5a3b2d,
+  emissive: 0x3d0d0a,
+  emissiveIntensity: 0.72,
+  roughness: 0.72,
+  metalness: 0
+});
+const landmarkLightMaterial = new THREE.MeshBasicMaterial({
+  color: 0xe45b43
 });
 const echoSpriteMaterial = makeChromaKeyMaterial(signalTexture, 1.45, 0.95);
 const warningSignMaterial = makeChromaKeyMaterial(warningSignTexture, 1.0, 0.88);
@@ -434,12 +448,22 @@ const landmarkMesh = new THREE.InstancedMesh(
   landmarkMaterial,
   MAX_PROPS
 );
+const landmarkPanelMesh = new THREE.InstancedMesh(
+  new THREE.BoxGeometry(TILE * 0.68, WALL_HEIGHT * 0.62, 0.12),
+  landmarkPanelMaterial,
+  MAX_PROPS
+);
+const landmarkLightMesh = new THREE.InstancedMesh(
+  new THREE.BoxGeometry(TILE * 0.48, 0.08, 0.08),
+  landmarkLightMaterial,
+  MAX_PROPS
+);
 const warningSignMesh = new THREE.InstancedMesh(
-  new THREE.PlaneGeometry(1.28, 2.18),
+  new THREE.PlaneGeometry(1.72, 2.52),
   warningSignMaterial,
   MAX_PROPS
 );
-scene.add(wallMesh, floorMesh, ceilingMesh, exitMesh, lampMesh, stainMesh, echoMesh, landmarkMesh, warningSignMesh);
+scene.add(wallMesh, floorMesh, ceilingMesh, exitMesh, lampMesh, stainMesh, echoMesh, landmarkMesh, landmarkPanelMesh, landmarkLightMesh, warningSignMesh);
 
 const chunks = new Map<string, Chunk>();
 const openCells = new Set<string>();
@@ -562,8 +586,8 @@ function updateCamera(delta: number): void {
 
   playerLamp.position.copy(camera.position);
   const danger = signal / 100;
-  playerLamp.intensity = 1.55 + introHelp * 0.75 + Math.sin(clock.elapsedTime * 17.0) * (0.08 + danger * 0.35);
-  ambient.intensity = 1.38 + introHelp * 0.38 - danger * 0.22;
+  playerLamp.intensity = 2.55 + introHelp * 0.85 + Math.sin(clock.elapsedTime * 17.0) * (0.04 + danger * 0.16);
+  ambient.intensity = 1.74 + introHelp * 0.32 - danger * 0.12;
   wallTexture.offset.x = Math.sin(clock.elapsedTime * 2.0) * 0.003 + danger * Math.sin(clock.elapsedTime * 13.0) * 0.01;
 
   signal = THREE.MathUtils.damp(signal, nearestSignal(), 2.6, delta);
@@ -642,6 +666,8 @@ function rebuildInstances(): void {
   let stainCount = 0;
   let echoCount = 0;
   let landmarkCount = 0;
+  let landmarkPanelCount = 0;
+  let landmarkLightCount = 0;
   let warningSignCount = 0;
 
   for (const cell of cells) {
@@ -684,8 +710,42 @@ function rebuildInstances(): void {
       setBox(landmarkMesh, landmarkCount + 3, wx + inset, WALL_HEIGHT * 0.45, wz + inset, 1, 1, 1, 0);
       landmarkCount += 4;
 
+      const faceNorth = noise(cell.x * 2, cell.z * 2) > 0.5;
+      if (landmarkPanelCount < MAX_PROPS) {
+        setTransform(
+          landmarkPanelMesh,
+          landmarkPanelCount,
+          wx + (faceNorth ? 0 : TILE * 0.49),
+          WALL_HEIGHT * 0.48,
+          wz + (faceNorth ? -TILE * 0.49 : 0),
+          1,
+          1,
+          1,
+          0,
+          faceNorth ? 0 : Math.PI / 2,
+          0
+        );
+        landmarkPanelCount += 1;
+      }
+
+      if (landmarkLightCount < MAX_PROPS) {
+        setTransform(
+          landmarkLightMesh,
+          landmarkLightCount,
+          wx + (faceNorth ? 0 : TILE * 0.42),
+          WALL_HEIGHT - 0.34,
+          wz + (faceNorth ? -TILE * 0.42 : 0),
+          1,
+          1,
+          1,
+          0,
+          faceNorth ? 0 : Math.PI / 2,
+          0
+        );
+        landmarkLightCount += 1;
+      }
+
       if (warningSignCount < MAX_PROPS) {
-        const faceNorth = noise(cell.x * 2, cell.z * 2) > 0.5;
         setTransform(
           warningSignMesh,
           warningSignCount,
@@ -717,6 +777,8 @@ function rebuildInstances(): void {
   stainMesh.count = stainCount;
   echoMesh.count = echoCount;
   landmarkMesh.count = landmarkCount;
+  landmarkPanelMesh.count = landmarkPanelCount;
+  landmarkLightMesh.count = landmarkLightCount;
   warningSignMesh.count = warningSignCount;
   wallMesh.instanceMatrix.needsUpdate = true;
   floorMesh.instanceMatrix.needsUpdate = true;
@@ -726,6 +788,8 @@ function rebuildInstances(): void {
   stainMesh.instanceMatrix.needsUpdate = true;
   echoMesh.instanceMatrix.needsUpdate = true;
   landmarkMesh.instanceMatrix.needsUpdate = true;
+  landmarkPanelMesh.instanceMatrix.needsUpdate = true;
+  landmarkLightMesh.instanceMatrix.needsUpdate = true;
   warningSignMesh.instanceMatrix.needsUpdate = true;
 }
 
@@ -777,7 +841,7 @@ function generateChunk(cx: number, cz: number): Chunk {
       const open = !voidPocket && (corridor || room || connectsToEdge(x, z));
       const guaranteedExit = cx === 0 && cz === 0 && gx === theme.exitCell.x && gz === theme.exitCell.z;
       const echo = cx === 0 && cz === 0 && theme.echoCells.some((cell) => cell.x === gx && cell.z === gz);
-      const landmark = open && !guaranteedExit && !echo && noise(gx * 7 + levelIndex, gz * 7 - levelIndex) > (lostTime ? 0.93 : 0.96);
+      const landmark = open && !guaranteedExit && !echo && noise(gx * 7 + levelIndex, gz * 7 - levelIndex) > (lostTime ? 0.88 : 0.91);
       const exit = guaranteedExit || (open && Math.abs(gx) + Math.abs(gz) > 22 && noise(gx * 3 + 7 + levelIndex * 11, gz * 3 - 11) > 0.965);
 
       cells.push({ x: gx, z: gz, open: open || guaranteedExit || echo, exit, echo, landmark });
@@ -901,6 +965,9 @@ function applyTheme(theme: (typeof LEVEL_THEMES)[number]): void {
   stainMaterial.color.setHex(theme.fogColor);
   echoMaterial.emissive.setHex(theme.lampColor);
   landmarkMaterial.color.setHex(theme.floorColor);
+  landmarkPanelMaterial.color.setHex(levelIndex % 2 === 0 ? 0x5a3b2d : 0x263c3c);
+  landmarkPanelMaterial.emissive.setHex(levelIndex % 2 === 0 ? 0x3d0d0a : 0x0b3132);
+  landmarkLightMaterial.color.setHex(levelIndex % 2 === 0 ? 0xe45b43 : 0x9debd9);
 }
 
 function updateBeacon(): void {
@@ -957,12 +1024,14 @@ function updatePost(delta: number, time: number): void {
   }
 
   const danger = signal / 100;
+  const corruption = THREE.MathUtils.clamp(Math.pow(danger, 3) * 0.5 + blackout * 0.86 + (isTransitioning ? 0.55 : 0), 0, 1);
   postMaterial.uniforms.uTime.value = time;
   const introHelp = levelIndex === 0 ? 1 - THREE.MathUtils.smoothstep(clock.elapsedTime, 0, FIRST_PLAY_HELP_SECONDS) : 0;
-  postMaterial.uniforms.uNoise.value = 0.14 + danger * 0.22 + blackout * 0.55 - introHelp * 0.06;
+  postMaterial.uniforms.uNoise.value = Math.max(0.01, 0.018 + corruption * 0.12 - introHelp * 0.01);
   postMaterial.uniforms.uBlackout.value = blackout;
   postMaterial.uniforms.uPalette.value = LEVEL_THEMES[levelIndex % LEVEL_THEMES.length].palette;
-  postMaterial.uniforms.uOverlayMix.value = 0.1 + danger * 0.08 + blackout * 0.18 - introHelp * 0.04;
+  postMaterial.uniforms.uOverlayMix.value = Math.max(0.004, 0.01 + corruption * 0.08 - introHelp * 0.006);
+  postMaterial.uniforms.uCorruption.value = corruption;
 }
 
 function setBox(
@@ -1072,7 +1141,7 @@ function resize(): void {
   const height = window.innerHeight;
   const longSide = Math.max(width, height);
   quality = longSide > 1100 ? 0.9 : 1;
-  const pixelRatio = Math.min(window.devicePixelRatio, 1.2) * quality;
+  const pixelRatio = Math.min(window.devicePixelRatio, 1.45) * quality;
   const targetWidth = Math.max(160, Math.floor(width * LOFI_RENDER_SCALE));
   const targetHeight = Math.max(90, Math.floor(height * LOFI_RENDER_SCALE));
 
