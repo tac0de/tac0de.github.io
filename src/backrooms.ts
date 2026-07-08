@@ -6,10 +6,26 @@ const stickNode = document.querySelector<HTMLDivElement>("#stick");
 const stickKnobNode = document.querySelector<HTMLDivElement>("#stick-knob");
 const signalLabelNode = document.querySelector<HTMLSpanElement>("#signal");
 const zoneLabelNode = document.querySelector<HTMLSpanElement>("#zone");
+const saveStateNode = document.querySelector<HTMLSpanElement>("#save-state");
 const beaconNode = document.querySelector<HTMLDivElement>("#beacon");
 const statusNode = document.querySelector<HTMLDivElement>("#status");
+const normalChoiceNode = document.querySelector<HTMLButtonElement>("#normal-choice");
+const anomalyChoiceNode = document.querySelector<HTMLButtonElement>("#anomaly-choice");
+const resetRunNode = document.querySelector<HTMLButtonElement>("#reset-run");
 
-if (!canvasNode || !stickNode || !stickKnobNode || !signalLabelNode || !zoneLabelNode || !beaconNode || !statusNode) {
+if (
+  !canvasNode ||
+  !stickNode ||
+  !stickKnobNode ||
+  !signalLabelNode ||
+  !zoneLabelNode ||
+  !saveStateNode ||
+  !beaconNode ||
+  !statusNode ||
+  !normalChoiceNode ||
+  !anomalyChoiceNode ||
+  !resetRunNode
+) {
   throw new Error("Game shell is missing required DOM nodes.");
 }
 
@@ -18,8 +34,12 @@ const stick = stickNode;
 const stickKnob = stickKnobNode;
 const signalLabel = signalLabelNode;
 const zoneLabel = zoneLabelNode;
+const saveStateLabel = saveStateNode;
 const beacon = beaconNode;
 const statusText = statusNode;
+const normalChoice = normalChoiceNode;
+const anomalyChoice = anomalyChoiceNode;
+const resetRun = resetRunNode;
 
 const TILE = 4;
 const WALL_HEIGHT = 3.1;
@@ -33,6 +53,8 @@ const LOFI_RENDER_SCALE = 0.72;
 const EXIT_RADIUS = 1.45;
 const MAX_PROPS = 520;
 const FIRST_PLAY_HELP_SECONDS = 10;
+const TARGET_EXITS = 8;
+const SAVE_KEY = "backrooms-drift.anomaly-save.v1";
 
 const ASSET_PATHS = {
   wallpaper: "/assets/wallpaper.png",
@@ -65,8 +87,8 @@ const AUDIO_PROFILE = {
 
 const LEVEL_THEMES = [
   {
-    label: "LEVEL 0",
-    hint: "Find the humming exit",
+    label: "EXIT 0/8",
+    hint: "복도를 읽고 정상인지 이상인지 판정하세요",
     fogColor: 0x17140b,
     fogDensity: 0.026,
     palette: 10,
@@ -76,16 +98,12 @@ const LEVEL_THEMES = [
     ceilingColor: 0xbba956,
     lampColor: 0xf7df8a,
     exitCell: { x: 7, z: 0 },
-    echoCells: [
-      { x: 2, z: 0 },
-      { x: 4, z: 4 },
-      { x: 0, z: 6 }
-    ],
+    echoCells: [],
     signalNoise: 0.05
   },
   {
-    label: "LOST TIME",
-    hint: "Follow the wrong signal",
+    label: "DRIFT",
+    hint: "틀렸습니다. 복도가 처음으로 돌아갑니다",
     fogColor: 0x11171a,
     fogDensity: 0.024,
     palette: 9,
@@ -94,12 +112,8 @@ const LEVEL_THEMES = [
     floorColor: 0x3f514f,
     ceilingColor: 0x52645d,
     lampColor: 0x9cc9c0,
-    exitCell: { x: 7, z: 7 },
-    echoCells: [
-      { x: 2, z: 2 },
-      { x: 5, z: 1 },
-      { x: 1, z: 6 }
-    ],
+    exitCell: { x: 7, z: 0 },
+    echoCells: [],
     signalNoise: 0.22
   }
 ];
@@ -121,6 +135,44 @@ type Chunk = {
 };
 
 type TouchRole = "move" | "look";
+
+type AnomalyId =
+  | "extraDoor"
+  | "redWarning"
+  | "wrongArrow"
+  | "missingLamp"
+  | "tallHall"
+  | "watchingWall"
+  | "wetFloor"
+  | "falseExit";
+
+type Anomaly = {
+  id: AnomalyId;
+  title: string;
+  missText: string;
+};
+
+type SaveState = {
+  loop: number;
+  best: number;
+  failures: number;
+  clears: number;
+  seen: AnomalyId[];
+  lastPlayedAt: number;
+};
+
+type TransitionMode = "next" | "fail" | "win" | null;
+
+const ANOMALIES: Anomaly[] = [
+  { id: "extraDoor", title: "문이 하나 더 있습니다", missText: "없는 문을 지나쳤습니다" },
+  { id: "redWarning", title: "경고 표지가 붉게 켜졌습니다", missText: "표지가 색을 바꿨습니다" },
+  { id: "wrongArrow", title: "화살표가 반대로 돌아갔습니다", missText: "방향이 거짓말을 했습니다" },
+  { id: "missingLamp", title: "천장등 하나가 사라졌습니다", missText: "불빛의 간격이 달라졌습니다" },
+  { id: "tallHall", title: "복도가 조금 길어졌습니다", missText: "거리감이 늘어났습니다" },
+  { id: "watchingWall", title: "벽지가 눈처럼 보입니다", missText: "벽이 보고 있었습니다" },
+  { id: "wetFloor", title: "카펫에 젖은 얼룩이 생겼습니다", missText: "발밑이 달라졌습니다" },
+  { id: "falseExit", title: "출구 문틀이 두 겹입니다", missText: "출구가 한 번 더 접혔습니다" }
+];
 
 class AudioDirector {
   private ctx: AudioContext;
@@ -525,8 +577,14 @@ let nearestExit = new THREE.Vector3();
 let signalTarget = new THREE.Vector3();
 let audio: AudioDirector | null = null;
 let movementAmount = 0;
+let saveState = loadSaveState();
+let currentAnomaly: Anomaly | null = chooseAnomaly(saveState.loop, saveState.failures);
+let decisionLocked = false;
+let transitionMode: TransitionMode = null;
+let endingShown = false;
 
 applyTheme(LEVEL_THEMES[0]);
+syncHud();
 resize();
 ensureChunks();
 rebuildInstances();
@@ -549,6 +607,9 @@ window.addEventListener("blur", () => {
   velocity.set(0, 0);
   updateStick(0, 0);
 });
+normalChoice.addEventListener("click", () => handleDecision(false));
+anomalyChoice.addEventListener("click", () => handleDecision(true));
+resetRun.addEventListener("click", resetRunState);
 
 renderer.setAnimationLoop(loop);
 
@@ -620,10 +681,7 @@ function updateCamera(delta: number): void {
   wallTexture.offset.x = Math.sin(clock.elapsedTime * 2.0) * 0.003 + danger * Math.sin(clock.elapsedTime * 13.0) * 0.01;
 
   signal = THREE.MathUtils.damp(signal, nearestSignal(), 2.6, delta);
-  const echoesLeft = LEVEL_THEMES[levelIndex % LEVEL_THEMES.length].echoCells.length - collectedEchoes.size;
-  signalLabel.textContent = echoesLeft > 0
-    ? `ECHO ${collectedEchoes.size}/3 · ${Math.round(signal).toString().padStart(2, "0")}%`
-    : `EXIT · ${Math.round(signal).toString().padStart(2, "0")}%`;
+  signalLabel.textContent = `SIGNAL ${Math.round(signal).toString().padStart(2, "0")}%`;
   updateSignalStatus();
   updateBeacon();
 }
@@ -712,12 +770,14 @@ function rebuildInstances(): void {
     setBox(ceilingMesh, ceilingCount, wx, WALL_HEIGHT, wz, 1, 1, 1, 0);
     ceilingCount += 1;
 
-    if ((cell.x + cell.z + levelIndex) % 3 === 0 && lampCount < MAX_PROPS) {
+    const lampMissing = currentAnomaly?.id === "missingLamp" && cell.x === 4 && cell.z === 0;
+    if (!lampMissing && (cell.x + cell.z + levelIndex) % 3 === 0 && lampCount < MAX_PROPS) {
       setBox(lampMesh, lampCount, wx, WALL_HEIGHT - 0.09, wz, 1, 1, 1, (cell.x % 2) * Math.PI / 2);
       lampCount += 1;
     }
 
-    if (noise(cell.x * 5 + levelIndex * 17, cell.z * 5 - 3) > (levelIndex % 2 === 0 ? 0.72 : 0.55) && stainCount < MAX_PROPS) {
+    const forcedWetFloor = currentAnomaly?.id === "wetFloor" && cell.x === 3 && cell.z === 0;
+    if ((forcedWetFloor || noise(cell.x * 5 + levelIndex * 17, cell.z * 5 - 3) > (levelIndex % 2 === 0 ? 0.72 : 0.55)) && stainCount < MAX_PROPS) {
       setTransform(stainMesh, stainCount, wx + (noise(cell.x, cell.z) - 0.5) * 1.6, 0.012, wz + (noise(cell.z, cell.x) - 0.5) * 1.6, 1, 1, 1, -Math.PI / 2, 0, noise(cell.x + 9, cell.z - 4) * Math.PI);
       stainCount += 1;
     }
@@ -725,6 +785,10 @@ function rebuildInstances(): void {
     if (cell.exit && exitCount < 24) {
       setBox(exitMesh, exitCount, wx, 1.22, wz - TILE * 0.46, 1, 1, 1, 0);
       exitCount += 1;
+      if (currentAnomaly?.id === "falseExit" && exitCount < 24) {
+        setBox(exitMesh, exitCount, wx, 1.22, wz - TILE * 0.58, 1.22, 1.04, 1, 0);
+        exitCount += 1;
+      }
     }
 
     if (cell.echo && !collectedEchoes.has(echoKey(cell.x, cell.z)) && echoCount < 12) {
@@ -776,14 +840,15 @@ function rebuildInstances(): void {
       }
 
       if (warningSignCount < MAX_PROPS) {
+        const isRedWarning = currentAnomaly?.id === "redWarning" && cell.x === 3 && cell.z === 0;
         setTransform(
           warningSignMesh,
           warningSignCount,
           wx + (faceNorth ? 0 : TILE * 0.42),
-          1.38,
+          isRedWarning ? 1.65 : 1.38,
           wz + (faceNorth ? -TILE * 0.42 : 0),
-          1,
-          1,
+          isRedWarning ? 1.26 : 1,
+          isRedWarning ? 1.26 : 1,
           1,
           0,
           faceNorth ? 0 : Math.PI / 2,
@@ -792,7 +857,12 @@ function rebuildInstances(): void {
         warningSignCount += 1;
       }
 
-      const glyphIndex = Math.floor(noise(cell.x * 11 + levelIndex * 5, cell.z * 11 - levelIndex * 3) * glyphMeshes.length);
+      const anomalyGlyph = currentAnomaly?.id === "watchingWall" && cell.x === 5 && cell.z === 0
+        ? 0
+        : currentAnomaly?.id === "wrongArrow" && cell.x === 2 && cell.z === 0
+          ? 1
+          : null;
+      const glyphIndex = anomalyGlyph ?? Math.floor(noise(cell.x * 11 + levelIndex * 5, cell.z * 11 - levelIndex * 3) * glyphMeshes.length);
       const glyphMesh = glyphMeshes[glyphIndex];
       const glyphCount = glyphCounts[glyphIndex];
       if (glyphMesh && glyphCount < MAX_PROPS) {
@@ -809,7 +879,7 @@ function rebuildInstances(): void {
           1,
           0,
           faceNorth ? 0 : Math.PI / 2,
-          0
+          currentAnomaly?.id === "wrongArrow" && cell.x === 2 && cell.z === 0 ? Math.PI : 0
         );
         glyphCounts[glyphIndex] += 1;
       }
@@ -883,26 +953,24 @@ function generateChunk(cx: number, cz: number): Chunk {
   const cells: Cell[] = [];
   const startX = cx * CHUNK_SIZE;
   const startZ = cz * CHUNK_SIZE;
+  const longHallBonus = currentAnomaly?.id === "tallHall" ? 2 : 0;
 
   for (let z = 0; z < CHUNK_SIZE; z += 1) {
     for (let x = 0; x < CHUNK_SIZE; x += 1) {
       const gx = startX + x;
       const gz = startZ + z;
       const n = noise(gx + levelIndex * 19, gz - levelIndex * 23);
-      const corridor = lostTime
-        ? gx === 0 || gz === 0 || Math.abs(gx + gz) % 5 === 0 || Math.abs(gx - gz) % 6 === 0
-        : gx === 0 || gz === 0 || gx % 4 === 0 || gz % 5 === 0;
-      const room = lostTime
-        ? n > 0.28 && n < 0.82 && ((gx * 2 + gz) % 4 !== 0)
-        : n > 0.36 && n < 0.74 && ((gx + gz) % 3 !== 0);
-      const voidPocket = n > (lostTime ? 0.94 : 0.9) && gx !== 0 && gz !== 0;
-      const open = !voidPocket && (corridor || room || connectsToEdge(x, z));
-      const guaranteedExit = cx === 0 && cz === 0 && gx === theme.exitCell.x && gz === theme.exitCell.z;
-      const echo = cx === 0 && cz === 0 && theme.echoCells.some((cell) => cell.x === gx && cell.z === gz);
-      const landmark = open && !guaranteedExit && !echo && noise(gx * 7 + levelIndex, gz * 7 - levelIndex) > (lostTime ? 0.88 : 0.91);
-      const exit = guaranteedExit || (open && Math.abs(gx) + Math.abs(gz) > 22 && noise(gx * 3 + 7 + levelIndex * 11, gz * 3 - 11) > 0.965);
+      const mainHall = gz === 0 && gx >= -1 && gx <= theme.exitCell.x + longHallBonus;
+      const sidePocket = !lostTime && ((gx === 2 && Math.abs(gz) <= 1) || (gx === 5 && gz >= -1 && gz <= 1));
+      const driftPocket = lostTime && (Math.abs(gx + gz) % 5 === 0 || (gx === 3 && Math.abs(gz) <= 2));
+      const anomalyPocket = currentAnomaly?.id === "extraDoor" && gx === 4 && gz === -1;
+      const open = mainHall || sidePocket || driftPocket || anomalyPocket || connectsToEdge(x, z);
+      const guaranteedExit = cz === 0 && gx === theme.exitCell.x + longHallBonus && gz === theme.exitCell.z;
+      const echo = false;
+      const landmark = open && !guaranteedExit && (gx === 2 || gx === 4 || gx === 6 || n > (lostTime ? 0.88 : 0.94));
+      const exit = guaranteedExit;
 
-      cells.push({ x: gx, z: gz, open: open || guaranteedExit || echo, exit, echo, landmark });
+      cells.push({ x: gx, z: gz, open, exit, echo, landmark });
     }
   }
 
@@ -918,7 +986,9 @@ function generateChunk(cx: number, cz: number): Chunk {
 }
 
 function connectsToEdge(x: number, z: number): boolean {
-  return x === 0 || z === 0 || x === CHUNK_SIZE - 1 || z === CHUNK_SIZE - 1;
+  void x;
+  void z;
+  return false;
 }
 
 function nearestSignal(): number {
@@ -944,27 +1014,51 @@ function nearestSignal(): number {
   return THREE.MathUtils.clamp(100 - nearest * (levelIndex % 2 === 0 ? 3.2 : 2.7) + drift + introHelp * 12, 0, 100);
 }
 
-function updateGameState(delta: number): void {
-  for (const echo of echoPositions) {
-    if (Math.hypot(player.x - echo.x, player.z - echo.z) < 1.15) {
-      collectedEchoes.add(echoKey(Math.round(echo.x / TILE), Math.round(echo.z / TILE)));
-      statusText.textContent = collectedEchoes.size >= LEVEL_THEMES[levelIndex % LEVEL_THEMES.length].echoCells.length
-        ? "Exit signal unlocked"
-        : "Echo recorded";
-      needsMapRefresh = true;
-      triggerDropout(0.16);
-      break;
+function handleDecision(markedAnomaly: boolean): void {
+  if (decisionLocked || isTransitioning || endingShown) return;
+
+  startAudio();
+  decisionLocked = true;
+  normalChoice.disabled = true;
+  anomalyChoice.disabled = true;
+
+  const wasCorrect = markedAnomaly === Boolean(currentAnomaly);
+  if (wasCorrect) {
+    const nextLoop = saveState.loop + 1;
+    saveState.loop = nextLoop;
+    saveState.best = Math.max(saveState.best, nextLoop);
+    if (currentAnomaly && !saveState.seen.includes(currentAnomaly.id)) {
+      saveState.seen.push(currentAnomaly.id);
     }
+
+    if (nextLoop >= TARGET_EXITS) {
+      saveState.clears += 1;
+      saveState.loop = 0;
+      persistSaveState();
+      transitionMode = "win";
+      statusText.textContent = "8번째 출구가 열렸습니다";
+    } else {
+      persistSaveState();
+      transitionMode = "next";
+      statusText.textContent = markedAnomaly ? "이상 기록. 다음 복도로 이동합니다" : "정상 통과. 다음 복도로 이동합니다";
+    }
+  } else {
+    saveState.failures += 1;
+    saveState.loop = 0;
+    persistSaveState();
+    transitionMode = "fail";
+    statusText.textContent = currentAnomaly?.missText ?? "정상이었지만 의심했습니다";
   }
 
-  const exitUnlocked = collectedEchoes.size >= LEVEL_THEMES[levelIndex % LEVEL_THEMES.length].echoCells.length;
-  const exitDistance = exitUnlocked ? nearestExitDistance() : Infinity;
+  syncHud();
+  isTransitioning = true;
+  transitionTimer = 0;
+  triggerDropout(wasCorrect ? 0.4 : 0.9);
+}
 
-  if (!isTransitioning && exitDistance < EXIT_RADIUS) {
-    isTransitioning = true;
-    transitionTimer = 0;
-    statusText.textContent = "The room forgets you";
-    triggerDropout(0.85);
+function updateGameState(delta: number): void {
+  if (!isTransitioning && !decisionLocked && nearestExitDistance() < EXIT_RADIUS) {
+    statusText.textContent = "출구 앞입니다. 정상인지 이상인지 판정하세요";
   }
 
   if (!isTransitioning) return;
@@ -973,14 +1067,29 @@ function updateGameState(delta: number): void {
   blackout = THREE.MathUtils.damp(blackout, 1, 5.8, delta);
 
   if (transitionTimer > 1.45) {
-    advanceLevel();
+    resolveTransition();
   }
 }
 
-function advanceLevel(): void {
-  levelIndex += 1;
+function resolveTransition(): void {
+  if (transitionMode === "win") {
+    isTransitioning = false;
+    transitionTimer = 0;
+    blackout = 0.64;
+    endingShown = true;
+    decisionLocked = true;
+    normalChoice.disabled = true;
+    anomalyChoice.disabled = true;
+    statusText.textContent = "탈출 기록 저장됨. RESET으로 다시 시작할 수 있습니다";
+    syncHud();
+    return;
+  }
+
+  const wasFail = transitionMode === "fail";
+  levelIndex = wasFail ? 1 : 0;
   const theme = LEVEL_THEMES[levelIndex % LEVEL_THEMES.length];
   isTransitioning = false;
+  transitionMode = null;
   transitionTimer = 0;
   blackout = theme.blackoutStart;
   player.set(0, 1.55, 0);
@@ -995,9 +1104,13 @@ function advanceLevel(): void {
   wallRects.length = 0;
   lastChunkKey = "";
   needsMapRefresh = true;
+  decisionLocked = false;
+  normalChoice.disabled = false;
+  anomalyChoice.disabled = false;
+  currentAnomaly = chooseAnomaly(saveState.loop, saveState.failures);
   applyTheme(theme);
-  zoneLabel.textContent = levelIndex > 1 && levelIndex % 2 === 0 ? `LEVEL ${levelIndex}` : theme.label;
-  statusText.textContent = theme.hint;
+  statusText.textContent = wasFail ? theme.hint : getRoundPrompt();
+  syncHud();
   ensureChunks();
   rebuildInstances();
   triggerDropout(0.28);
@@ -1045,34 +1158,21 @@ function updateBeacon(): void {
 }
 
 function updateSignalStatus(): void {
-  if (isTransitioning) return;
-  const totalEchoes = LEVEL_THEMES[levelIndex % LEVEL_THEMES.length].echoCells.length;
-  const echoesLeft = totalEchoes - collectedEchoes.size;
+  if (isTransitioning || decisionLocked || endingShown) return;
 
-  if (echoesLeft > 0) {
-    if (levelIndex === 0 && clock.elapsedTime < FIRST_PLAY_HELP_SECONDS) {
-      statusText.textContent = "Follow the arrow and record 3 echoes";
-      return;
-    }
-
-    if (signal > 80) {
-      statusText.textContent = levelIndex % 2 === 0 ? "Echo is close" : "Echo changed position";
-    } else if (signal > 44) {
-      statusText.textContent = "Tune the hum";
-    } else {
-      statusText.textContent = `Record ${echoesLeft} echo${echoesLeft === 1 ? "" : "es"}`;
-    }
+  if (levelIndex === 0 && clock.elapsedTime < FIRST_PLAY_HELP_SECONDS && saveState.loop === 0) {
+    statusText.textContent = "반복되는 복도를 기억하세요. 달라진 점이 있으면 이상입니다";
     return;
   }
 
   if (signal > 86) {
-    statusText.textContent = levelIndex % 2 === 0 ? "Exit is in the room" : "It is looking back";
+    statusText.textContent = "출구 앞에서 판정하세요";
   } else if (signal > 62) {
-    statusText.textContent = levelIndex % 2 === 0 ? "Signal locked" : "Signal is lying";
+    statusText.textContent = currentAnomaly ? "무언가 달라졌을 수 있습니다" : "이번 복도는 조용합니다";
   } else if (signal > 34) {
-    statusText.textContent = "Follow the hum";
+    statusText.textContent = "복도를 읽으면서 앞으로 가세요";
   } else {
-    statusText.textContent = LEVEL_THEMES[levelIndex % LEVEL_THEMES.length].hint;
+    statusText.textContent = getRoundPrompt();
   }
 }
 
@@ -1131,6 +1231,10 @@ function setTransform(
 }
 
 function onPointerDown(event: PointerEvent): void {
+  if (event.target instanceof Element && event.target.closest("button, a")) {
+    return;
+  }
+
   event.preventDefault();
   startAudio();
 
@@ -1299,6 +1403,98 @@ function makeChromaKeyMaterial(source: THREE.Texture, glow: number, opacity: num
     depthWrite: false,
     side: THREE.DoubleSide
   });
+}
+
+function chooseAnomaly(loop: number, failures: number): Anomaly | null {
+  const chance = THREE.MathUtils.clamp(0.42 + loop * 0.05 + Math.min(failures, 4) * 0.03, 0.42, 0.78);
+  const roll = noise(loop * 17 + failures * 29 + Date.now() * 0.00001, failures * 13 + loop);
+  if (loop === 0 && failures === 0 && roll < 0.5) return null;
+  if (roll > chance) return null;
+  const index = Math.floor(noise(loop * 37 + failures * 11 + performance.now() * 0.001, loop * 5 - failures) * ANOMALIES.length);
+  return ANOMALIES[Math.min(ANOMALIES.length - 1, index)];
+}
+
+function getRoundPrompt(): string {
+  const exit = saveState.loop + 1;
+  if (endingShown) return "탈출 기록 저장됨. RESET으로 다시 시작할 수 있습니다";
+  if (levelIndex % 2 === 1) return "틀렸습니다. 백룸이 복도를 다시 만들고 있습니다";
+  return `${exit}번째 출구. 같은 복도인지 확인하세요`;
+}
+
+function syncHud(): void {
+  zoneLabel.textContent = endingShown ? "CLEARED" : `EXIT ${saveState.loop}/${TARGET_EXITS}`;
+  saveStateLabel.textContent = `BEST ${saveState.best} · FAIL ${saveState.failures}`;
+}
+
+function loadSaveState(): SaveState {
+  const fallback: SaveState = {
+    loop: 0,
+    best: 0,
+    failures: 0,
+    clears: 0,
+    seen: [],
+    lastPlayedAt: Date.now()
+  };
+
+  try {
+    const raw = window.localStorage.getItem(SAVE_KEY);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw) as Partial<SaveState>;
+    return {
+      loop: clampInteger(parsed.loop, 0, TARGET_EXITS - 1),
+      best: clampInteger(parsed.best, 0, TARGET_EXITS),
+      failures: clampInteger(parsed.failures, 0, 999),
+      clears: clampInteger(parsed.clears, 0, 999),
+      seen: Array.isArray(parsed.seen)
+        ? parsed.seen.filter((id): id is AnomalyId => ANOMALIES.some((anomaly) => anomaly.id === id))
+        : [],
+      lastPlayedAt: typeof parsed.lastPlayedAt === "number" ? parsed.lastPlayedAt : Date.now()
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+function persistSaveState(): void {
+  saveState.lastPlayedAt = Date.now();
+  window.localStorage.setItem(SAVE_KEY, JSON.stringify(saveState));
+}
+
+function resetRunState(): void {
+  startAudio();
+  saveState.loop = 0;
+  endingShown = false;
+  decisionLocked = false;
+  transitionMode = null;
+  isTransitioning = false;
+  transitionTimer = 0;
+  blackout = 0.4;
+  normalChoice.disabled = false;
+  anomalyChoice.disabled = false;
+  player.set(0, 1.55, 0);
+  yaw = 0;
+  pitch = 0;
+  levelIndex = 0;
+  currentAnomaly = chooseAnomaly(saveState.loop, saveState.failures);
+  chunks.clear();
+  openCells.clear();
+  exitCells.clear();
+  exitPositions.length = 0;
+  echoPositions.length = 0;
+  wallRects.length = 0;
+  lastChunkKey = "";
+  needsMapRefresh = true;
+  persistSaveState();
+  syncHud();
+  applyTheme(LEVEL_THEMES[0]);
+  ensureChunks();
+  rebuildInstances();
+  statusText.textContent = getRoundPrompt();
+}
+
+function clampInteger(value: unknown, min: number, max: number): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return min;
+  return Math.max(min, Math.min(max, Math.floor(value)));
 }
 
 function startAudio(): void {

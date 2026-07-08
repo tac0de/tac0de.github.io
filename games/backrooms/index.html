@@ -24,15 +24,21 @@
     <canvas id="game"></canvas>
     <div id="hud" aria-hidden="true">
       <div class="readout">
-        <span id="zone">LEVEL 0</span>
+        <span id="zone">EXIT 0/8</span>
         <span id="signal">SIGNAL 00%</span>
+        <span id="save-state">BEST 0</span>
       </div>
       <div id="beacon">▲</div>
       <div id="reticle"></div>
       <div id="stick">
         <div id="stick-knob"></div>
       </div>
-      <div id="status" class="hint">Find the humming exit</div>
+      <div id="status" class="hint">복도를 읽고 정상인지 이상인지 판정하세요</div>
+      <div class="judgement-panel">
+        <button id="normal-choice" type="button">정상</button>
+        <button id="anomaly-choice" type="button">이상</button>
+        <button id="reset-run" type="button" aria-label="Reset run">RESET</button>
+      </div>
     </div>
     <script type="module" src="/src/backrooms.ts"></script>
   </body>

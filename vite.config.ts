@@ -14,8 +14,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
-        backrooms: resolve(__dirname, "games/backrooms/index.html"),
-        rpg: resolve(__dirname, "games/rpg/index.html")
+        backrooms: resolve(__dirname, "games/backrooms/index.html")
       }
     }
   }

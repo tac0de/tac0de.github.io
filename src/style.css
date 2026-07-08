@@ -440,13 +440,51 @@ html[data-page="rpg"] body {
 .hint {
   position: absolute;
   right: max(18px, env(safe-area-inset-right));
-  bottom: max(30px, env(safe-area-inset-bottom));
-  max-width: min(260px, 46vw);
+  bottom: calc(max(30px, env(safe-area-inset-bottom)) + 68px);
+  max-width: min(340px, 58vw);
   font-size: 12px;
   line-height: 1.35;
   color: rgba(243, 231, 189, 0.76);
   text-align: right;
   text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
+}
+
+.judgement-panel {
+  position: absolute;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 92px 92px 64px;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.judgement-panel button {
+  min-height: 46px;
+  border: 1px solid rgba(243, 231, 189, 0.28);
+  border-radius: 4px;
+  color: #f3e7bd;
+  background: rgba(15, 14, 9, 0.66);
+  backdrop-filter: blur(8px);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0;
+  cursor: pointer;
+  text-transform: uppercase;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.86);
+}
+
+.judgement-panel button:hover,
+.judgement-panel button:focus-visible {
+  border-color: rgba(157, 235, 217, 0.78);
+  outline: none;
+}
+
+.judgement-panel button:disabled {
+  color: rgba(243, 231, 189, 0.34);
+  border-color: rgba(243, 231, 189, 0.12);
+  cursor: default;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -487,6 +525,36 @@ html[data-page="rpg"] body {
   }
 
   .tile-demonstrates {
+    font-size: 11px;
+  }
+
+  .readout {
+    right: max(10px, env(safe-area-inset-right));
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .readout span {
+    padding: 6px 7px;
+    font-size: 10px;
+  }
+
+  .hint {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: calc(max(18px, env(safe-area-inset-bottom)) + 62px);
+    max-width: min(330px, calc(100vw - 150px));
+    font-size: 11px;
+  }
+
+  .judgement-panel {
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
+    grid-template-columns: 76px 76px 54px;
+    gap: 6px;
+  }
+
+  .judgement-panel button {
+    min-height: 42px;
     font-size: 11px;
   }
 

@@ -1,61 +1,41 @@
-# Tacode Arcade
+# Backrooms Drift
 
-플레이 가능한 웹 게임 실험 포트폴리오.
+정적 배포 가능한 1인칭 anomaly 판정 공포게임.
 
-## 현재 방향
+## 제품 방향
 
-- 루트는 게임 선택 화면
-- `/games/backrooms/`는 첫 번째 playable title인 Backrooms Drift
-- `/games/rpg/`는 Three.js 쿼터뷰 action RPG combat slice
-- RPG 게임은 click/touch movement, 자동 공격, 스킬 쿨다운, 적 웨이브, 드랍 회수, 엘리트 처치 루프 지원
-- 모바일 우선 1인칭 탐색
-- 플레이어 주변 청크만 렌더링하는 절차적 백룸
-- `InstancedMesh` 기반 벽, 바닥, 천장 렌더링
-- 단순 grid 충돌
-- 상태 기반 render target 선명도, 신호/전환 반응형 VHS 노이즈
-- 신호를 따라 exit에 도달하면 암전 후 다음 상태로 전환
-- echo 3개를 수집해야 exit 신호가 열리는 짧은 세션 루프
-- `AudioDirector` 기반 저역 hum, 전기 노이즈, 발소리, 불협화음, 짧은 drop-out
-- Level 0과 Lost Time의 맵 패턴, 색감, 신호 안정성 차별화
-- `InstancedMesh` 기반 천장등, 바닥 얼룩, echo, 큰 랜드마크 패널/조명 props
-- 생성형 에셋 기반 감시/신호/경고 글리프 데칼과 시작 지점 시그니처 글리프
+- 사이트 루트가 바로 공포게임을 실행한다.
+- 게임 선택 화면은 제거했다.
+- 플레이어는 반복되는 백룸 복도를 관찰하고 `정상` 또는 `이상`을 판정한다.
+- 정답이면 다음 출구로 진행하고, 오답이면 0번째 출구로 리셋된다.
+- 8번째 출구까지 맞히면 클리어 기록이 저장된다.
+- 진행도, 최고 기록, 실패 수, 발견한 anomaly는 `localStorage`에 저장된다.
+- 서버 없이 GitHub Pages에서 동작하는 정적 게임이다.
+
+## 현재 게임 루프
+
+- 같은 구조의 복도가 반복된다.
+- 매 루프마다 정상 복도이거나 하나의 anomaly가 섞인다.
+- anomaly 예시:
+  - 추가 문
+  - 붉어진 경고 표지
+  - 반대로 돌아간 화살표
+  - 사라진 천장등
+  - 길어진 복도
+  - 눈처럼 보이는 벽지
+  - 젖은 카펫 얼룩
+  - 이중 출구 문틀
+- WASD와 드래그로 이동/시야 조작을 지원한다.
+- 모바일에서는 왼쪽 가상 스틱과 드래그 시야 조작을 지원한다.
+
+## 기술
+
+- Vite
+- TypeScript
+- Three.js
+- WebAudio
+- `localStorage` save
 - GitHub Pages Actions 배포
-
-## 다음 고도화
-
-### 구현됨
-
-- WebAudio 사운드 디렉터 분리
-- 레벨별 hum, 노이즈, 필터, 불협화음 프로필
-- 플레이어 이동 속도 기반 발소리
-- signal 강도에 따른 stereo pan 흔들림, drop-out
-- Level 0과 Lost Time의 다른 색감, fog, 팔레트, 맵 패턴
-- 신호 강도별 HUD 상태 피드백
-- echo 수집 후 exit unlock
-- 모바일 성능을 유지하는 `InstancedMesh` 기반 반복 props
-- favicon/OG image SVG
-- GitHub Pages workflow
-
-### 사운드
-
-- 레벨별 리버브 프로필
-- 바닥 재질별 마찰음
-- exit 접근, 레벨 전환, Lost Time 진입용 이벤트 사운드 강화
-- 추후 커스텀 음원 파일을 `public/audio/`에서 로드하는 구조
-
-### 게임 플레이
-
-- 실패 조건, 세션 점수 또는 기록
-- exit 도달 조건, 클리어 판정, 다음 상태 전환 연출 정교화
-- Level 0과 Lost Time의 다른 위험 요소
-- 간단한 추격자보다 먼저 시야/소리/공간 왜곡 기반 위협
-- 3-5분 세션 기준의 시작, 긴장 상승, 탈출, 실패 루프
-
-### 비주얼
-
-- 문틀, 표지판, 파이프, 젖은 바닥 같은 저비용 반복 props
-- exit 근처에서 공간이 접히거나 벽 UV가 밀리는 왜곡
-- 레벨별 랜드마크 방과 기억 가능한 공간
 
 ## 실행
 

@@ -1,37 +1,44 @@
 <!doctype html>
-<html lang="ko" data-page="arcade">
+<html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#15130a" />
     <meta
       name="description"
-      content="A playable portfolio arcade of small web game experiments."
+      content="A static first-person backrooms horror game about reading anomalies in a repeating corridor."
     />
-    <meta property="og:title" content="Tacode Arcade" />
+    <meta property="og:title" content="Backrooms Drift" />
     <meta
       property="og:description"
-      content="Playable web game experiments in Three.js, WebAudio, and systems design."
+      content="Read the corridor. Mark anomalies. Reach the eighth exit before the backrooms resets you."
     />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <title>Tacode Arcade</title>
+    <title>Backrooms Drift</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   </head>
   <body>
-    <main class="arcade-shell">
-      <section class="arcade-hero" aria-labelledby="arcade-title">
-        <p class="arcade-kicker">Playable Experiments</p>
-        <h1 id="arcade-title">Tacode Arcade</h1>
-        <p class="arcade-copy">
-          Small browser games built as compact studies in atmosphere, systems,
-          interface, and performance.
-        </p>
-      </section>
-
-      <section id="game-grid" class="game-grid" aria-label="Game selection"></section>
-    </main>
-    <script type="module" src="/src/main.ts"></script>
+    <canvas id="game"></canvas>
+    <div id="hud" aria-hidden="true">
+      <div class="readout">
+        <span id="zone">EXIT 0/8</span>
+        <span id="signal">SIGNAL 00%</span>
+        <span id="save-state">BEST 0</span>
+      </div>
+      <div id="beacon">▲</div>
+      <div id="reticle"></div>
+      <div id="stick">
+        <div id="stick-knob"></div>
+      </div>
+      <div id="status" class="hint">복도를 읽고 정상인지 이상인지 판정하세요</div>
+      <div class="judgement-panel">
+        <button id="normal-choice" type="button">정상</button>
+        <button id="anomaly-choice" type="button">이상</button>
+        <button id="reset-run" type="button" aria-label="Reset run">RESET</button>
+      </div>
+    </div>
+    <script type="module" src="/src/backrooms.ts"></script>
   </body>
 </html>
