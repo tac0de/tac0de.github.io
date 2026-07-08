@@ -25,14 +25,14 @@ export const games: GameEntry[] = [
     demonstrates: "Lo-fi 3D atmosphere, mobile controls, procedural rooms, signal-driven play."
   },
   {
-    slug: "cards",
-    title: "Card Camp",
+    slug: "rpg",
+    title: "Riftblade Arena",
     status: "Playable",
-    route: "./games/cards/",
-    description: "Feed a survivor, craft weapons, and clear threats on a 3D tabletop.",
-    tags: ["Three.js", "Cards", "Simulation"],
-    tileClass: "game-tile-cards",
+    route: "./games/rpg/",
+    description: "Dash, cleave, and survive a compact dark-fantasy combat arena.",
+    tags: ["Three.js", "Action RPG", "Combat"],
+    tileClass: "game-tile-rpg",
     playable: true,
-    demonstrates: "Three.js tabletop cards, mobile dragging, proximity crafting, survivor routines, threat escalation."
+    demonstrates: "Quarter-view camera, click/touch movement, enemy waves, cooldown skills, hit feedback."
   }
 ];

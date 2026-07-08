@@ -6,8 +6,8 @@
 
 - 루트는 게임 선택 화면
 - `/games/backrooms/`는 첫 번째 playable title인 Backrooms Drift
-- `/games/cards/`는 Three.js tabletop 형태의 survival card management prototype
-- 카드 게임은 3D tabletop card dragging, proximity crafting, survivor routines, weapon crafting, threat escalation, dusk hunger loop 지원
+- `/games/rpg/`는 Three.js 쿼터뷰 action RPG combat slice
+- RPG 게임은 click/touch movement, 자동 공격, 스킬 쿨다운, 적 웨이브, 드랍 회수, 엘리트 처치 루프 지원
 - 모바일 우선 1인칭 탐색
 - 플레이어 주변 청크만 렌더링하는 절차적 백룸
 - `InstancedMesh` 기반 벽, 바닥, 천장 렌더링
