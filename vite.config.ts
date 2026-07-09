@@ -13,8 +13,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 700,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, "index.html"),
-        backrooms: resolve(__dirname, "games/backrooms/index.html")
+        main: resolve(__dirname, "index.html")
       }
     }
   }

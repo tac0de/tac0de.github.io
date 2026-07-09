@@ -1,44 +1,70 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#15130a" />
+    <meta name="theme-color" content="#151812" />
     <meta
       name="description"
-      content="A static first-person backrooms horror game about reading anomalies in a repeating corridor."
+      content="Outpost Miniature is a static browser colony simulation about tiny survivors, work priorities, resources, and daily incidents."
     />
-    <meta property="og:title" content="Backrooms Drift" />
+    <meta property="og:title" content="Outpost Miniature" />
     <meta
       property="og:description"
-      content="Read the corridor. Mark anomalies. Reach the eighth exit before the backrooms resets you."
+      content="Run a tiny static-web colony sim with three survivors, a tile map, resources, work priorities, and an emerging settlement log."
     />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="./og-image.png" />
     <meta name="twitter:card" content="summary_large_image" />
-    <title>Backrooms Drift</title>
+    <title>Outpost Miniature</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
   </head>
   <body>
-    <canvas id="game"></canvas>
-    <div id="hud" aria-hidden="true">
-      <div class="readout">
-        <span id="zone">EXIT 0/8</span>
-        <span id="signal">SIGNAL 00%</span>
-        <span id="save-state">BEST 0</span>
-      </div>
-      <div id="beacon">▲</div>
-      <div id="reticle"></div>
-      <div id="stick">
-        <div id="stick-knob"></div>
-      </div>
-      <div id="status" class="hint">복도를 읽고 정상인지 이상인지 판정하세요</div>
-      <div class="judgement-panel">
-        <button id="normal-choice" type="button">정상</button>
-        <button id="anomaly-choice" type="button">이상</button>
-        <button id="reset-run" type="button" aria-label="Reset run">RESET</button>
-      </div>
-    </div>
-    <script type="module" src="/src/backrooms.ts"></script>
+    <main class="app-shell">
+      <section class="map-shell" aria-label="Settlement map">
+        <canvas id="map"></canvas>
+      </section>
+      <aside class="side-panel" aria-label="Colony controls">
+        <header class="topbar">
+          <div>
+            <p>Outpost</p>
+            <h1>Miniature</h1>
+          </div>
+          <div class="clock">
+            <span id="day-label">Day 1</span>
+            <span id="time-label">07:00</span>
+            <span id="speed-label">1x</span>
+          </div>
+        </header>
+
+        <section class="toolbar" aria-label="Simulation controls">
+          <button id="pause" type="button">Pause</button>
+          <button id="speed" type="button">Speed</button>
+          <button id="save" type="button">Save</button>
+          <button id="reset" type="button">Reset</button>
+        </section>
+
+        <section>
+          <h2>Resources</h2>
+          <div id="resources" class="resource-grid"></div>
+        </section>
+
+        <section>
+          <h2>Colonists</h2>
+          <div id="colonists" class="colonist-list"></div>
+        </section>
+
+        <section>
+          <h2>Priority</h2>
+          <div id="task-panel" class="task-grid"></div>
+        </section>
+
+        <section class="log-section">
+          <h2>Settlement Log</h2>
+          <div id="log-panel" class="log-list"></div>
+        </section>
+      </aside>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

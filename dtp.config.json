@@ -1,6 +1,6 @@
 {
   "$schema": "./schemas/dtp.config.schema.json",
-  "project": "gh-portfolio-backrooms",
+  "project": "outpost-miniature",
   "verify": "node scripts/verify.mjs",
   "allowed_paths": [
     "src/**",

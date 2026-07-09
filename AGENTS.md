@@ -1,4 +1,4 @@
-# gh-portfolio-backrooms
+# outpost-miniature
 
 - Prefer project-local source of truth.
 - Use `dtp.config.json` before broad edits.

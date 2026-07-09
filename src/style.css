@@ -5,623 +5,297 @@
 html,
 body {
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   margin: 0;
-  overflow: hidden;
-  background: #0f0e09;
-  color: #f3e7bd;
+  background: #151812;
+  color: #ece5d1;
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  touch-action: none;
-  user-select: none;
-}
-
-html[data-page="arcade"],
-html[data-page="arcade"] body {
-  min-height: 100%;
-  height: auto;
-  overflow: auto;
-  touch-action: manipulation;
 }
 
 body {
-  background:
-    radial-gradient(circle at 18% 16%, rgba(46, 214, 189, 0.16), transparent 26rem),
-    radial-gradient(circle at 78% 4%, rgba(247, 223, 138, 0.11), transparent 30rem),
-    linear-gradient(135deg, #0f0e09 0%, #17140b 42%, #101719 100%);
+  overflow: hidden;
 }
 
-.arcade-shell {
-  width: min(1120px, calc(100% - 32px));
-  min-height: 100vh;
-  margin: 0 auto;
-  padding: 72px 0 56px;
+button {
+  font: inherit;
 }
 
-.arcade-hero {
-  max-width: 760px;
-  margin-bottom: 46px;
-}
-
-.arcade-kicker,
-.tile-status,
-.tile-tags {
-  margin: 0;
-  color: #9debd9;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.arcade-hero h1 {
-  margin: 8px 0 14px;
-  color: #f7df8a;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-size: clamp(56px, 11vw, 132px);
-  font-weight: 900;
-  line-height: 0.86;
-  letter-spacing: 0;
-  text-transform: uppercase;
-  text-shadow:
-    0 0 20px rgba(247, 223, 138, 0.2),
-    4px 4px 0 rgba(0, 0, 0, 0.55);
-}
-
-.arcade-copy {
-  max-width: 620px;
-  margin: 0;
-  color: rgba(243, 231, 189, 0.78);
-  font-size: 18px;
-  line-height: 1.55;
-}
-
-.game-grid {
+.app-shell {
+  width: 100vw;
+  height: 100svh;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.game-tile {
-  position: relative;
-  min-height: 320px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  gap: 10px;
-  padding: 24px;
-  overflow: hidden;
-  border: 1px solid rgba(243, 231, 189, 0.22);
-  border-radius: 8px;
-  color: #f3e7bd;
-  text-decoration: none;
+  grid-template-columns: minmax(0, 1fr) 390px;
   background:
-    linear-gradient(to top, rgba(8, 8, 5, 0.96), rgba(8, 8, 5, 0.38)),
-    var(--tile-bg);
-  background-size: cover;
-  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.32);
+    linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 32%),
+    #151812;
 }
 
-.game-tile::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(255, 238, 162, 0.08) 0,
-      rgba(255, 238, 162, 0.08) 1px,
-      transparent 1px,
-      transparent 5px
-    );
-  opacity: 0.4;
-  pointer-events: none;
+.map-shell {
+  min-width: 0;
+  min-height: 0;
+  padding: 16px;
 }
 
-.game-tile-live {
-  --tile-bg:
-    linear-gradient(110deg, rgba(17, 20, 13, 0.55), rgba(10, 12, 12, 0.2)),
-    url("/assets/wallpaper.png");
-}
-
-.game-tile-soon {
-  --tile-bg:
-    linear-gradient(135deg, rgba(50, 37, 18, 0.7), rgba(16, 23, 24, 0.72)),
-    repeating-linear-gradient(25deg, #6b4f25 0 22px, #293b34 22px 44px);
-}
-
-.game-tile-rpg {
-  --tile-bg:
-    radial-gradient(circle at 62% 32%, rgba(183, 90, 255, 0.34), transparent 18rem),
-    radial-gradient(circle at 38% 58%, rgba(217, 77, 69, 0.26), transparent 15rem),
-    linear-gradient(135deg, #211018 0%, #101317 48%, #2b1711 100%);
-}
-
-.tile-title,
-.tile-copy,
-.tile-tags,
-.tile-status,
-.tile-demonstrates {
-  position: relative;
-  z-index: 1;
-}
-
-.tile-title {
-  max-width: 520px;
-  color: #f7df8a;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-size: 42px;
-  line-height: 0.98;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.tile-copy {
-  max-width: 420px;
-  color: rgba(243, 231, 189, 0.82);
-  font-size: 15px;
-  line-height: 1.45;
-}
-
-.tile-demonstrates {
-  max-width: 480px;
-  margin-top: 10px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(243, 231, 189, 0.18);
-  color: rgba(243, 231, 189, 0.62);
-  font-size: 12px;
-  line-height: 1.45;
-}
-
-.game-tile-live:hover,
-.game-tile-rpg:hover {
-  border-color: rgba(157, 235, 217, 0.72);
-  transform: translateY(-2px);
-}
-
-.game-tile-soon {
-  opacity: 0.82;
-}
-
-html[data-page="rpg"],
-html[data-page="rpg"] body {
-  width: 100%;
-  height: 100%;
-  min-height: 100%;
-  overflow: hidden;
-  touch-action: none;
-}
-
-.rpg-shell {
-  position: fixed;
-  inset: 0;
-  min-height: 100svh;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at 50% 36%, rgba(183, 90, 255, 0.26), transparent 28rem),
-    linear-gradient(180deg, #120b13 0%, #08080b 100%);
-}
-
-#rpg-game {
-  position: absolute;
-  inset: 0;
+#map {
   width: 100%;
   height: 100%;
   display: block;
-  cursor: crosshair;
-  outline: none;
-  touch-action: none;
+  border: 1px solid rgba(236, 229, 209, 0.14);
+  background:
+    linear-gradient(135deg, rgba(49, 61, 43, 0.5), rgba(16, 18, 14, 0.8)),
+    #20261d;
 }
 
-.rpg-hud {
-  position: fixed;
-  z-index: 2;
-  top: max(18px, env(safe-area-inset-top));
-  left: max(16px, env(safe-area-inset-left));
-  width: min(680px, calc(100vw - 32px));
-  pointer-events: none;
+.side-panel {
+  min-width: 0;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto auto auto auto auto minmax(0, 1fr);
+  gap: 14px;
+  padding: 16px;
+  overflow: hidden;
+  border-left: 1px solid rgba(236, 229, 209, 0.14);
+  background: #202119;
 }
 
-.rpg-title h1 {
-  margin: 4px 0 8px;
-  color: #f7df8a;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-size: clamp(42px, 8vw, 92px);
-  line-height: 0.92;
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: start;
+}
+
+.topbar p,
+h1,
+h2 {
+  margin: 0;
+}
+
+.topbar p {
+  color: #9cb89f;
+  font-size: 11px;
+  font-weight: 900;
   letter-spacing: 0;
   text-transform: uppercase;
-  text-shadow: 0 2px 22px rgba(183, 90, 255, 0.32);
 }
 
-.rpg-title p:last-child {
-  max-width: 620px;
-  min-height: 25px;
-  margin: 0 0 10px;
-  color: rgba(243, 231, 189, 0.82);
-  font-size: 15px;
-  line-height: 1.45;
+h1 {
+  margin-top: 2px;
+  color: #f0d989;
+  font-size: 34px;
+  line-height: 0.95;
 }
 
-.rpg-bars {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+h2 {
+  margin-bottom: 8px;
+  color: rgba(236, 229, 209, 0.76);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
 }
 
-.rpg-bars span,
-.rpg-skills button {
-  min-height: 38px;
+.clock {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 6px;
+}
+
+.clock span,
+.resource-grid span,
+.toolbar button,
+.task-grid button {
+  min-height: 34px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 10px;
-  border: 1px solid rgba(243, 231, 189, 0.24);
-  color: #f3e7bd;
-  background: rgba(12, 10, 13, 0.72);
-  backdrop-filter: blur(8px);
-  font-size: 12px;
+  padding: 7px 9px;
+  border: 1px solid rgba(236, 229, 209, 0.16);
+  color: #ece5d1;
+  background: #171914;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0;
   text-transform: uppercase;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.78);
 }
 
-.rpg-skills {
-  position: fixed;
-  z-index: 3;
-  right: max(18px, env(safe-area-inset-right));
-  bottom: max(20px, env(safe-area-inset-bottom));
-  display: flex;
+.toolbar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
 }
 
-.rpg-skills button {
-  min-width: 94px;
+.toolbar button,
+.task-grid button,
+.colonist {
   cursor: pointer;
-  pointer-events: auto;
 }
 
-.rpg-skills button:disabled {
-  color: rgba(243, 231, 189, 0.48);
-  border-color: rgba(183, 90, 255, 0.24);
+.toolbar button:hover,
+.task-grid button:hover,
+.task-grid button.active,
+.colonist:hover,
+.colonist.selected {
+  border-color: rgba(240, 217, 137, 0.72);
 }
 
-#game {
-  display: block;
-  width: 100vw;
-  height: 100vh;
-  image-rendering: auto;
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
 }
 
-.back-link {
-  position: fixed;
-  z-index: 5;
-  top: max(16px, env(safe-area-inset-top));
-  right: max(16px, env(safe-area-inset-right));
-  padding: 7px 9px;
-  border: 1px solid rgba(157, 235, 217, 0.34);
-  color: rgba(157, 235, 217, 0.88);
-  background: rgba(15, 14, 9, 0.48);
-  backdrop-filter: blur(8px);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-decoration: none;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
+.resource-grid span {
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.back-link:hover {
-  border-color: rgba(157, 235, 217, 0.8);
+.resource-grid b {
+  color: #9cb89f;
 }
 
-#hud {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
+.colonist-list {
+  display: grid;
+  gap: 8px;
 }
 
-#hud::before,
-#hud::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  pointer-events: none;
+.colonist {
+  width: 100%;
+  min-height: 92px;
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid rgba(236, 229, 209, 0.14);
+  color: #ece5d1;
+  background: #181a15;
+  text-align: left;
 }
 
-#hud::before {
-  background:
-    repeating-linear-gradient(
-      to bottom,
-      rgba(255, 238, 162, 0.06) 0,
-      rgba(255, 238, 162, 0.06) 1px,
-      transparent 1px,
-      transparent 4px
-    ),
-    linear-gradient(
-      90deg,
-      rgba(255, 232, 128, 0.08),
-      transparent 14%,
-      transparent 86%,
-      rgba(63, 192, 176, 0.07)
-    );
-  mix-blend-mode: screen;
-  opacity: 0.52;
-}
-
-#hud::after {
-  background:
-    repeating-radial-gradient(
-      circle at 22% 31%,
-      rgba(255, 255, 255, 0.16) 0,
-      rgba(255, 255, 255, 0.16) 1px,
-      transparent 1px,
-      transparent 5px
-    );
-  opacity: 0.08;
-  animation: static-drift 180ms steps(2, end) infinite;
-}
-
-.readout {
-  position: absolute;
-  top: max(16px, env(safe-area-inset-top));
-  left: max(16px, env(safe-area-inset-left));
+.colonist span {
   display: flex;
+  justify-content: space-between;
   gap: 10px;
-  align-items: center;
+}
+
+.colonist b {
+  color: #f0d989;
+  font-size: 14px;
+}
+
+.colonist small,
+.colonist i,
+.colonist em {
+  color: rgba(236, 229, 209, 0.68);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: uppercase;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.7);
-}
-
-.readout span {
-  padding: 7px 9px;
-  border: 1px solid rgba(243, 231, 189, 0.28);
-  background: rgba(15, 14, 9, 0.42);
-  backdrop-filter: blur(8px);
-}
-
-#reticle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 10px;
-  height: 10px;
-  border-top: 1px solid rgba(243, 231, 189, 0.72);
-  border-left: 1px solid rgba(243, 231, 189, 0.72);
-  transform: translate(-50%, -50%) rotate(45deg);
-  opacity: 0.7;
-}
-
-#beacon {
-  position: absolute;
-  top: calc(50% - 82px);
-  left: 50%;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  color: rgba(164, 230, 212, 0.86);
-  font-size: 18px;
-  line-height: 1;
-  text-shadow:
-    0 0 10px rgba(67, 226, 196, 0.7),
-    0 1px 12px rgba(0, 0, 0, 0.85);
-  transform: translate(-50%, -50%);
-  transition: opacity 120ms linear;
-}
-
-#stick {
-  position: absolute;
-  left: max(24px, env(safe-area-inset-left));
-  bottom: max(28px, env(safe-area-inset-bottom));
-  width: 116px;
-  height: 116px;
-  border: 1px solid rgba(243, 231, 189, 0.2);
-  border-radius: 50%;
-  background: rgba(15, 14, 9, 0.34);
-  backdrop-filter: blur(8px);
-}
-
-#stick-knob {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 1px solid rgba(243, 231, 189, 0.38);
-  background: rgba(243, 231, 189, 0.22);
-  transform: translate(-50%, -50%);
-}
-
-.hint {
-  position: absolute;
-  right: max(18px, env(safe-area-inset-right));
-  bottom: calc(max(30px, env(safe-area-inset-bottom)) + 68px);
-  max-width: min(340px, 58vw);
-  font-size: 12px;
+  font-style: normal;
   line-height: 1.35;
-  color: rgba(243, 231, 189, 0.76);
-  text-align: right;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.8);
 }
 
-.judgement-panel {
-  position: absolute;
-  right: max(18px, env(safe-area-inset-right));
-  bottom: max(18px, env(safe-area-inset-bottom));
+.colonist i {
+  color: #9cb89f;
+  font-weight: 800;
+}
+
+.task-grid {
   display: grid;
-  grid-template-columns: 92px 92px 64px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
-  pointer-events: auto;
 }
 
-.judgement-panel button {
-  min-height: 46px;
-  border: 1px solid rgba(243, 231, 189, 0.28);
-  border-radius: 4px;
-  color: #f3e7bd;
-  background: rgba(15, 14, 9, 0.66);
-  backdrop-filter: blur(8px);
-  font: inherit;
+.task-grid button.active {
+  color: #151812;
+  background: #f0d989;
+}
+
+.log-section {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.log-list {
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding-right: 4px;
+}
+
+.log-list p {
+  margin: 0;
+  padding: 9px 10px;
+  border-left: 3px solid rgba(236, 229, 209, 0.18);
+  background: #181a15;
+  color: rgba(236, 229, 209, 0.82);
   font-size: 12px;
+  line-height: 1.42;
+}
+
+.log-list span {
+  display: block;
+  margin-bottom: 3px;
+  color: rgba(236, 229, 209, 0.46);
+  font-size: 10px;
   font-weight: 900;
-  letter-spacing: 0;
-  cursor: pointer;
   text-transform: uppercase;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.86);
 }
 
-.judgement-panel button:hover,
-.judgement-panel button:focus-visible {
-  border-color: rgba(157, 235, 217, 0.78);
-  outline: none;
+.log-list .event {
+  border-color: #7ea7d6;
 }
 
-.judgement-panel button:disabled {
-  color: rgba(243, 231, 189, 0.34);
-  border-color: rgba(243, 231, 189, 0.12);
-  cursor: default;
+.log-list .risk {
+  border-color: #d6755e;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  #stick {
-    display: none;
-  }
-
-  .hint::after {
-    content: " · WASD + drag";
-  }
+.log-list .work {
+  border-color: #9cb89f;
 }
 
-@media (max-width: 720px) {
-  .arcade-shell {
-    width: min(100% - 24px, 520px);
-    padding: 44px 0 36px;
+.log-list .quiet {
+  border-color: #f0d989;
+}
+
+@media (max-width: 860px) {
+  body {
+    overflow: auto;
   }
 
-  .arcade-hero {
-    margin-bottom: 28px;
-  }
-
-  .arcade-copy {
-    font-size: 15px;
-  }
-
-  .game-grid {
+  .app-shell {
+    height: auto;
+    min-height: 100svh;
     grid-template-columns: 1fr;
+    grid-template-rows: minmax(420px, 58svh) auto;
   }
 
-  .game-tile {
-    min-height: 250px;
-    padding: 18px;
+  .side-panel {
+    height: auto;
+    overflow: visible;
+    border-left: 0;
+    border-top: 1px solid rgba(236, 229, 209, 0.14);
   }
 
-  .tile-title {
-    font-size: 34px;
-  }
-
-  .tile-demonstrates {
-    font-size: 11px;
-  }
-
-  .readout {
-    right: max(10px, env(safe-area-inset-right));
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .readout span {
-    padding: 6px 7px;
-    font-size: 10px;
-  }
-
-  .hint {
-    right: max(12px, env(safe-area-inset-right));
-    bottom: calc(max(18px, env(safe-area-inset-bottom)) + 62px);
-    max-width: min(330px, calc(100vw - 150px));
-    font-size: 11px;
-  }
-
-  .judgement-panel {
-    right: max(12px, env(safe-area-inset-right));
-    bottom: max(12px, env(safe-area-inset-bottom));
-    grid-template-columns: 76px 76px 54px;
-    gap: 6px;
-  }
-
-  .judgement-panel button {
-    min-height: 42px;
-    font-size: 11px;
-  }
-
-  .rpg-hud {
-    top: max(14px, env(safe-area-inset-top));
-    left: max(10px, env(safe-area-inset-left));
-    width: min(370px, calc(100vw - 20px));
-  }
-
-  .rpg-title h1 {
-    max-width: calc(100vw - 92px);
-    font-size: clamp(31px, 11.5vw, 50px);
-  }
-
-  .rpg-title p:last-child {
-    max-width: 340px;
-    min-height: 24px;
-    font-size: 13px;
-    line-height: 1.35;
-  }
-
-  .rpg-bars {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .rpg-bars span,
-  .rpg-skills button {
-    min-height: 34px;
-    padding: 7px 8px;
-    font-size: 10px;
-  }
-
-  .rpg-skills {
-    right: max(12px, env(safe-area-inset-right));
-    bottom: max(14px, env(safe-area-inset-bottom));
-  }
-
-  .rpg-skills button {
-    min-width: 78px;
+  h1 {
+    font-size: 28px;
   }
 }
 
-@media (max-width: 380px) {
-  .rpg-bars {
+@media (max-width: 520px) {
+  .map-shell,
+  .side-panel {
+    padding: 10px;
+  }
+
+  .clock,
+  .toolbar,
+  .task-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-}
 
-@keyframes static-drift {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-
-  25% {
-    transform: translate3d(2px, -1px, 0);
-  }
-
-  50% {
-    transform: translate3d(-1px, 2px, 0);
-  }
-
-  75% {
-    transform: translate3d(1px, 1px, 0);
-  }
-
-  100% {
-    transform: translate3d(-2px, 0, 0);
+  .resource-grid {
+    grid-template-columns: 1fr;
   }
 }
