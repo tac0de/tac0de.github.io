@@ -16,7 +16,27 @@ const levels = JSON.parse(readFileSync('tests/levels.json','utf8'));
 assert.equal(levels.length,9);
 assert(!/style="[^"]*--turn:/.test(html),'Inline rotation must not override input-driven state');
 assert(!/<script\b|\son\w+\s*=|<canvas\b|<iframe\b/i.test(html),'Runtime must have no JavaScript or canvas');
-assert(!/(?:src|href)="https?:/i.test(html),'No external runtime resources');
+const canonical = '<link rel="canonical" href="https://tac0de.github.io/">';
+assert(html.includes(canonical),'Canonical URL');
+assert(!/(?:src|href)="https?:/i.test(html.replace(canonical,'')),'No external runtime resources');
+function checkSocial(markup, imagePath) {
+ const meta = key => markup.match(new RegExp(`<meta (?:property|name)="${key}" content="([^"]+)"`))?.[1];
+ assert.equal(meta('og:url'),'https://tac0de.github.io/');
+ assert.equal(meta('og:type'),'website');
+ assert.equal(meta('og:title'),meta('twitter:title'));
+ assert.equal(meta('og:description'),meta('description'));
+ assert.equal(meta('twitter:description'),meta('description'));
+ assert(meta('description')?.includes('No JavaScript.'));
+ assert.equal(meta('og:image'),'https://tac0de.github.io/css-arcade-og.png');
+ assert.equal(meta('og:image'),meta('twitter:image'));
+ assert.equal(meta('twitter:card'),'summary_large_image');
+ assert(meta('og:image:alt')?.length > 20);
+ const png=readFileSync(imagePath);
+ assert.equal(png.subarray(0,8).toString('hex'),'89504e470d0a1a0a');
+ assert.equal(png.readUInt32BE(16),1200);assert.equal(png.readUInt32BE(20),630);
+ assert.equal(meta('og:image:width'),'1200');assert.equal(meta('og:image:height'),'630');
+}
+checkSocial(html,'public/css-arcade-og.png');
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
 assert.equal(new Set(ids).size,ids.length,'Unique IDs');
 for (const [,id] of html.matchAll(/href="#([^"]+)"/g)) assert(ids.includes(id),`Broken anchor ${id}`);
@@ -103,6 +123,7 @@ if(process.argv[2]) {
  assert(!/<script\b|\son\w+\s*=/i.test(built),'No production runtime scripts');
  function files(path){return readdirSync(path,{withFileTypes:true}).flatMap(f=>f.isDirectory()?files(resolve(path,f.name)):[resolve(path,f.name)]);}
  assert(!files(dir).some(f=>/\.(?:m?js|wasm)$/.test(f)),'No shipped JS/WASM');
- for(const [,url] of built.matchAll(/(?:href|src)="([^"#][^"]*)"/g))if(!url.startsWith('data:'))assert(existsSync(resolve(dir,url)),`Missing built resource ${url}`);
+ checkSocial(built,resolve(dir,'css-arcade-og.png'));
+ for(const [,url] of built.replace(canonical,'').matchAll(/(?:href|src)="([^"#][^"]*)"/g))if(!url.startsWith('data:'))assert(existsSync(resolve(dir,url)),`Missing built resource ${url}`);
 }
 console.log(`PASS: 9 levels, ${states} exhaustive states, ${beams} visible ray segments; inputs, links, win/loss, rotation and gate outputs verified.`);

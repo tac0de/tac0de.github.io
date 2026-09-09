@@ -63,3 +63,10 @@ See `docs/kinetic-editorial.md` for accepted visual scope,
 All website copy and accessible labels are English. Preview artwork and game boards
 share per-game CSS theme tokens: vermilion Lumen, paper Glyph, and ink Relay.
 Lumen channels also carry matching numbers, so color is not the only cue.
+
+## Social sharing
+
+The deployed homepage supplies English Open Graph and Twitter summary metadata,
+a canonical URL and a 1200 × 630 PNG at `/css-arcade-og.png`. The image uses the
+same paper, ink and vermilion palette as the website. The verifier checks metadata
+consistency and image dimensions in both source and production output.
