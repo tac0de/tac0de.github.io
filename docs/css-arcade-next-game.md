@@ -107,16 +107,6 @@ Proceed with **Orbital** as the next prototype. Build one playable level first,
 verify the state model and fallback behavior, then expand to levels 2–3 only if
 the interaction is clear at 320px and with keyboard input.
 
-## Review outcome (2026-09-09)
-
-The first prototype was withdrawn from the public collection. Its controls
-read as a checkbox demo rather than a game: the board had no meaningful route
-visualization, no distinct failure feedback, and insufficiently differentiated
-level rules. The prototype remains in Git history as a reference, but must not
-be treated as a shipped game. A replacement needs a complete one-level loop,
-visible cause-and-effect, and an independently verified finite solution before
-being exposed from the home page.
-
 References: [CSS `@property`](https://developer.mozilla.org/en-US/docs/Web/CSS/%40property),
 [scroll-driven animations](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Scroll-driven_animations),
 [container queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Containment/Container_queries).
