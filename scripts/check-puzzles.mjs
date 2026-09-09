@@ -40,8 +40,8 @@ checkSocial(html,'public/css-arcade-og.png');
 const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]);
 assert.equal(new Set(ids).size,ids.length,'Unique IDs');
 for (const [,id] of html.matchAll(/href="#([^"]+)"/g)) assert(ids.includes(id),`Broken anchor ${id}`);
-assert.equal((html.match(/<form /g)||[]).length,12,'Nine original forms plus three Orbital forms');
-assert.equal((html.match(/type="reset"/g)||[]).length,12,'Nine original reset controls plus three Orbital controls');
+assert.equal((html.match(/<form /g)||[]).length,9);
+assert.equal((html.match(/type="reset"/g)||[]).length,9);
 for(const level of levels) { assert(html.includes(`class="skip-link game-skip skip-${level.id}" href="#${level.id}"`)); assert(style.includes(`body:has(#${level.id}:target) .skip-${level.id}`)); }
 assert(style.includes('prefers-reduced-motion:reduce'));
 assert(style.includes('input:focus-visible'));
