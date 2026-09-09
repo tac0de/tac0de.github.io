@@ -1,8 +1,8 @@
 {
-  "$schema": "./schemas/dtp.config.schema.json",
-  "project": "outpost-miniature",
+  "project": "the-power-of-css",
   "verify": "node scripts/verify.mjs",
   "allowed_paths": [
+    "index.html",
     "src/**",
     "tests/**",
     "public/**",
@@ -11,9 +11,7 @@
     "docs/**",
     "README.md",
     "AGENTS.md",
-    "dtp.config.json",
-    "evals/**",
-    "traces/**"
+    "dtp.config.json"
   ],
   "blocked_paths": [
     ".env",
@@ -48,8 +46,6 @@
       "require_breakage_review": true
     }
   },
-  "trace_dir": "traces",
-  "eval_cases": "evals/cases.json",
   "max_files_changed_without_review": 14,
   "max_repair_attempts": 2
 }

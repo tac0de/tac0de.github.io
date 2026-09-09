@@ -1,0 +1,299 @@
+[
+  {
+    "id": "lumen-1",
+    "mirrors": [
+      [
+        3,
+        4
+      ],
+      [
+        3,
+        1
+      ]
+    ],
+    "sources": [
+      [
+        0,
+        4,
+        1,
+        0
+      ]
+    ],
+    "receivers": [
+      [
+        10,
+        1
+      ]
+    ],
+    "kind": "lumen",
+    "solutions": [
+      1,
+      1
+    ]
+  },
+  {
+    "id": "lumen-2",
+    "mirrors": [
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        7,
+        1
+      ],
+      [
+        7,
+        4
+      ]
+    ],
+    "sources": [
+      [
+        0,
+        4,
+        1,
+        0
+      ]
+    ],
+    "receivers": [
+      [
+        10,
+        4
+      ]
+    ],
+    "kind": "lumen",
+    "solutions": [
+      1,
+      1,
+      0,
+      0
+    ]
+  },
+  {
+    "id": "lumen-3",
+    "mirrors": [
+      [
+        3,
+        2
+      ],
+      [
+        3,
+        1
+      ],
+      [
+        7,
+        4
+      ],
+      [
+        7,
+        5
+      ]
+    ],
+    "sources": [
+      [
+        0,
+        2,
+        1,
+        0
+      ],
+      [
+        10,
+        4,
+        -1,
+        0
+      ]
+    ],
+    "receivers": [
+      [
+        10,
+        1
+      ],
+      [
+        10,
+        5
+      ]
+    ],
+    "kind": "lumen",
+    "solutions": [
+      1,
+      1,
+      1,
+      0
+    ]
+  },
+  {
+    "id": "glyph-1",
+    "kind": "glyph",
+    "bases": [
+      90,
+      270
+    ],
+    "solutions": [
+      3,
+      1
+    ]
+  },
+  {
+    "id": "glyph-2",
+    "kind": "glyph",
+    "bases": [
+      180,
+      90,
+      270
+    ],
+    "solutions": [
+      2,
+      3,
+      1
+    ]
+  },
+  {
+    "id": "glyph-3",
+    "kind": "glyph",
+    "bases": [
+      270,
+      180,
+      90
+    ],
+    "solutions": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "id": "relay-1",
+    "kind": "relay",
+    "count": 3,
+    "gates": [
+      [
+        "AND",
+        [
+          "A",
+          "B"
+        ]
+      ],
+      [
+        "NOT",
+        [
+          "C"
+        ]
+      ]
+    ],
+    "warning": [
+      "COPY",
+      [
+        "C"
+      ]
+    ],
+    "solution": [
+      1,
+      1,
+      0
+    ],
+    "solutions": [
+      1,
+      1,
+      0
+    ]
+  },
+  {
+    "id": "relay-2",
+    "kind": "relay",
+    "count": 4,
+    "gates": [
+      [
+        "XOR",
+        [
+          "A",
+          "B"
+        ]
+      ],
+      [
+        "AND",
+        [
+          "B",
+          "C"
+        ]
+      ]
+    ],
+    "warning": [
+      "COPY",
+      [
+        "D"
+      ]
+    ],
+    "solution": [
+      0,
+      1,
+      1,
+      0
+    ],
+    "solutions": [
+      0,
+      1,
+      1,
+      0
+    ]
+  },
+  {
+    "id": "relay-3",
+    "kind": "relay",
+    "count": 5,
+    "gates": [
+      [
+        "XOR",
+        [
+          "A",
+          "B"
+        ]
+      ],
+      [
+        "AND",
+        [
+          "B",
+          "C"
+        ]
+      ],
+      [
+        "XOR",
+        [
+          "C",
+          "D"
+        ]
+      ],
+      [
+        "OR",
+        [
+          "D",
+          "E"
+        ]
+      ]
+    ],
+    "warning": [
+      "OR",
+      [
+        "A",
+        "D"
+      ]
+    ],
+    "solution": [
+      0,
+      1,
+      1,
+      0,
+      1
+    ],
+    "solutions": [
+      0,
+      1,
+      1,
+      0,
+      1
+    ]
+  }
+]

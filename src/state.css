@@ -1,0 +1,575 @@
+/* Finite puzzle states. Each rule reflects native input state; no script runs. */
+#lumen-1-form:not(:has(#lumen-1-s0:checked)):not(:has(#lumen-1-s1:checked)) #lumen-1-beam0,
+#lumen-1-form:not(:has(#lumen-1-s0:checked)):has(#lumen-1-s1:checked) #lumen-1-beam0,
+#lumen-1-form:has(#lumen-1-s0:checked):not(:has(#lumen-1-s1:checked)) #lumen-1-beam0,
+#lumen-1-form:has(#lumen-1-s0:checked):has(#lumen-1-s1:checked) #lumen-1-beam0 { display: block; }
+#lumen-1-form:not(:has(#lumen-1-s0:checked)):not(:has(#lumen-1-s1:checked)) #lumen-1-beam1,
+#lumen-1-form:not(:has(#lumen-1-s0:checked)):has(#lumen-1-s1:checked) #lumen-1-beam1 { display: block; }
+#lumen-1-form:has(#lumen-1-s0:checked):not(:has(#lumen-1-s1:checked)) #lumen-1-beam2,
+#lumen-1-form:has(#lumen-1-s0:checked):has(#lumen-1-s1:checked) #lumen-1-beam2 { display: block; }
+#lumen-1-form:has(#lumen-1-s0:checked):not(:has(#lumen-1-s1:checked)) #lumen-1-beam3 { display: block; }
+#lumen-1-form:has(#lumen-1-s0:checked):has(#lumen-1-s1:checked) #lumen-1-beam4 { display: block; }
+#lumen-1-form:has(#lumen-1-s0:checked):has(#lumen-1-s1:checked) #lumen-1-receiver0 { --received: 1; background: var(--beam-color); color: var(--receiver-ink); box-shadow: none; }
+#lumen-1-form:has(#lumen-1-s0:checked):has(#lumen-1-s1:checked) #lumen-1-receiver0 .off { display: none; }
+#lumen-1-form:has(#lumen-1-s0:checked):has(#lumen-1-s1:checked) #lumen-1-receiver0 .lit { display: inline; }
+#lumen-1-form:has(#lumen-1-s0:checked):has(#lumen-1-s1:checked) .success { display: block; }
+#lumen-1-form:has(#lumen-1-s0:checked):has(#lumen-1-s1:checked) .pending { display: none; }
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):not(:has(#lumen-2-s1:checked)):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam0,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):not(:has(#lumen-2-s1:checked)):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam0,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):not(:has(#lumen-2-s1:checked)):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam0,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):not(:has(#lumen-2-s1:checked)):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam0,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam0,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam0,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam0,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam0,
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam0,
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam0,
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam0,
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam0,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam0,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam0,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam0,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam0 { display: block; }
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):not(:has(#lumen-2-s1:checked)):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam1,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):not(:has(#lumen-2-s1:checked)):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam1,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):not(:has(#lumen-2-s1:checked)):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam1,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):not(:has(#lumen-2-s1:checked)):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam1,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam1,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam1,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam1,
+#lumen-2-form:not(:has(#lumen-2-s0:checked)):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam1,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam1 { display: block; }
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam2,
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam2,
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam2,
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam2,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam2,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam2,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam2,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam2 { display: block; }
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam3,
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam3,
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam3,
+#lumen-2-form:has(#lumen-2-s0:checked):not(:has(#lumen-2-s1:checked)):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam3 { display: block; }
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam4,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam4,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam4,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam4 { display: block; }
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam5,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam5 { display: block; }
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-beam6 { display: block; }
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):has(#lumen-2-s3:checked) #lumen-2-beam7 { display: block; }
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):not(:has(#lumen-2-s3:checked)) #lumen-2-beam8,
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):has(#lumen-2-s2:checked):has(#lumen-2-s3:checked) #lumen-2-beam8 { display: block; }
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-receiver0 { --received: 1; background: var(--beam-color); color: var(--receiver-ink); box-shadow: none; }
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-receiver0 .off { display: none; }
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) #lumen-2-receiver0 .lit { display: inline; }
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) .success { display: block; }
+#lumen-2-form:has(#lumen-2-s0:checked):has(#lumen-2-s1:checked):not(:has(#lumen-2-s2:checked)):not(:has(#lumen-2-s3:checked)) .pending { display: none; }
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam0,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam0,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam0,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam0,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam0,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam0,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam0,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam0,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam0,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam0,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam0,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam0,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam0,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam0,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam0,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam0 { display: block; }
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam1,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam1,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam1,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam1,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam1,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam1,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam1,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam1 { display: block; }
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam2,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam2,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam2,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam2,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam2,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam2,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam2,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam2,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam2,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam2,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam2,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam2,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam2,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam2,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam2,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam2 { display: block; }
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam3,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam3,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam3,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam3,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam3,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam3,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam3,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam3 { display: block; }
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam4,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam4,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam4,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam4,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam4,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam4,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam4,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam4 { display: block; }
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam5,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam5,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam5,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam5 { display: block; }
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam6,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam6,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam6,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam6 { display: block; }
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam7,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam7,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam7,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam7,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam7,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam7,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam7,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam7 { display: block; }
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam8,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam8,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam8,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam8 { display: block; }
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-beam9,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-beam9,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-beam9,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-beam9 { display: block; }
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver0,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-receiver0,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver0,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-receiver0 { --received: 1; background: var(--beam-color); color: var(--receiver-ink); box-shadow: none; }
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver0 .off,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-receiver0 .off,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver0 .off,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-receiver0 .off { display: none; }
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver0 .lit,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):not(:has(#lumen-3-s2:checked)):has(#lumen-3-s3:checked) #lumen-3-receiver0 .lit,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver0 .lit,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):has(#lumen-3-s3:checked) #lumen-3-receiver0 .lit { display: inline; }
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1 { --received: 1; background: var(--beam-color); color: var(--receiver-ink); box-shadow: none; }
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1 .off,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1 .off,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1 .off,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1 .off { display: none; }
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1 .lit,
+#lumen-3-form:not(:has(#lumen-3-s0:checked)):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1 .lit,
+#lumen-3-form:has(#lumen-3-s0:checked):not(:has(#lumen-3-s1:checked)):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1 .lit,
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) #lumen-3-receiver1 .lit { display: inline; }
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) .success { display: block; }
+#lumen-3-form:has(#lumen-3-s0:checked):has(#lumen-3-s1:checked):has(#lumen-3-s2:checked):not(:has(#lumen-3-s3:checked)) .pending { display: none; }
+#glyph-1-form:has(#glyph-1-r0-0:checked) .ring-0 { --turn: 90deg; }
+#glyph-1-form:has(#glyph-1-r0-1:checked) .ring-0 { --turn: 180deg; }
+#glyph-1-form:has(#glyph-1-r0-2:checked) .ring-0 { --turn: 270deg; }
+#glyph-1-form:has(#glyph-1-r0-3:checked) .ring-0 { --turn: 360deg; }
+#glyph-1-form:has(#glyph-1-r1-0:checked) .ring-1 { --turn: 270deg; }
+#glyph-1-form:has(#glyph-1-r1-1:checked) .ring-1 { --turn: 360deg; }
+#glyph-1-form:has(#glyph-1-r1-2:checked) .ring-1 { --turn: 450deg; }
+#glyph-1-form:has(#glyph-1-r1-3:checked) .ring-1 { --turn: 540deg; }
+#glyph-1-form:has(#glyph-1-r0-3:checked):has(#glyph-1-r1-1:checked) .success { display: block; }
+#glyph-1-form:has(#glyph-1-r0-3:checked):has(#glyph-1-r1-1:checked) .pending { display: none; }
+#glyph-1-form:has(#glyph-1-r0-3:checked):has(#glyph-1-r1-1:checked) .glyph-rim { --aligned: 1; box-shadow: 0 0 0 1px var(--game-mark); }
+#glyph-2-form:has(#glyph-2-r0-0:checked) .ring-0 { --turn: 180deg; }
+#glyph-2-form:has(#glyph-2-r0-1:checked) .ring-0 { --turn: 270deg; }
+#glyph-2-form:has(#glyph-2-r0-2:checked) .ring-0 { --turn: 360deg; }
+#glyph-2-form:has(#glyph-2-r0-3:checked) .ring-0 { --turn: 450deg; }
+#glyph-2-form:has(#glyph-2-r1-0:checked) .ring-1 { --turn: 90deg; }
+#glyph-2-form:has(#glyph-2-r1-1:checked) .ring-1 { --turn: 180deg; }
+#glyph-2-form:has(#glyph-2-r1-2:checked) .ring-1 { --turn: 270deg; }
+#glyph-2-form:has(#glyph-2-r1-3:checked) .ring-1 { --turn: 360deg; }
+#glyph-2-form:has(#glyph-2-r2-0:checked) .ring-2 { --turn: 270deg; }
+#glyph-2-form:has(#glyph-2-r2-1:checked) .ring-2 { --turn: 360deg; }
+#glyph-2-form:has(#glyph-2-r2-2:checked) .ring-2 { --turn: 450deg; }
+#glyph-2-form:has(#glyph-2-r2-3:checked) .ring-2 { --turn: 540deg; }
+#glyph-2-form:has(#glyph-2-r0-2:checked):has(#glyph-2-r1-3:checked):has(#glyph-2-r2-1:checked) .success { display: block; }
+#glyph-2-form:has(#glyph-2-r0-2:checked):has(#glyph-2-r1-3:checked):has(#glyph-2-r2-1:checked) .pending { display: none; }
+#glyph-2-form:has(#glyph-2-r0-2:checked):has(#glyph-2-r1-3:checked):has(#glyph-2-r2-1:checked) .glyph-rim { --aligned: 1; box-shadow: 0 0 0 1px var(--game-mark); }
+#glyph-3-form:has(#glyph-3-r0-0:checked) .ring-0 { --turn: 270deg; }
+#glyph-3-form:has(#glyph-3-r0-1:checked) .ring-0 { --turn: 360deg; }
+#glyph-3-form:has(#glyph-3-r0-2:checked) .ring-0 { --turn: 450deg; }
+#glyph-3-form:has(#glyph-3-r0-3:checked) .ring-0 { --turn: 540deg; }
+#glyph-3-form:has(#glyph-3-r1-0:checked) .ring-1 { --turn: 180deg; }
+#glyph-3-form:has(#glyph-3-r1-1:checked) .ring-1 { --turn: 270deg; }
+#glyph-3-form:has(#glyph-3-r1-2:checked) .ring-1 { --turn: 360deg; }
+#glyph-3-form:has(#glyph-3-r1-3:checked) .ring-1 { --turn: 450deg; }
+#glyph-3-form:has(#glyph-3-r2-0:checked) .ring-2 { --turn: 90deg; }
+#glyph-3-form:has(#glyph-3-r2-1:checked) .ring-2 { --turn: 180deg; }
+#glyph-3-form:has(#glyph-3-r2-2:checked) .ring-2 { --turn: 270deg; }
+#glyph-3-form:has(#glyph-3-r2-3:checked) .ring-2 { --turn: 360deg; }
+#glyph-3-form:has(#glyph-3-r0-1:checked):has(#glyph-3-r1-2:checked):has(#glyph-3-r2-3:checked) .success { display: block; }
+#glyph-3-form:has(#glyph-3-r0-1:checked):has(#glyph-3-r1-2:checked):has(#glyph-3-r2-3:checked) .pending { display: none; }
+#glyph-3-form:has(#glyph-3-r0-1:checked):has(#glyph-3-r1-2:checked):has(#glyph-3-r2-3:checked) .glyph-rim { --aligned: 1; box-shadow: 0 0 0 1px var(--game-mark); }
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) #relay-1-gate0 .lamp,
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):has(#relay-1-s2:checked) #relay-1-gate0 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) #relay-1-gate0 .off,
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):has(#relay-1-s2:checked) #relay-1-gate0 .off { display: none; }
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) #relay-1-gate0 .lit,
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):has(#relay-1-s2:checked) #relay-1-gate0 .lit { display: inline; }
+#relay-1-form:not(:has(#relay-1-s0:checked)):not(:has(#relay-1-s1:checked)):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .lamp,
+#relay-1-form:not(:has(#relay-1-s0:checked)):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .lamp,
+#relay-1-form:has(#relay-1-s0:checked):not(:has(#relay-1-s1:checked)):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .lamp,
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-1-form:not(:has(#relay-1-s0:checked)):not(:has(#relay-1-s1:checked)):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .off,
+#relay-1-form:not(:has(#relay-1-s0:checked)):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .off,
+#relay-1-form:has(#relay-1-s0:checked):not(:has(#relay-1-s1:checked)):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .off,
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .off { display: none; }
+#relay-1-form:not(:has(#relay-1-s0:checked)):not(:has(#relay-1-s1:checked)):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .lit,
+#relay-1-form:not(:has(#relay-1-s0:checked)):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .lit,
+#relay-1-form:has(#relay-1-s0:checked):not(:has(#relay-1-s1:checked)):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .lit,
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) #relay-1-gate1 .lit { display: inline; }
+#relay-1-form:not(:has(#relay-1-s0:checked)):not(:has(#relay-1-s1:checked)):has(#relay-1-s2:checked) #relay-1-gate2 .lamp,
+#relay-1-form:not(:has(#relay-1-s0:checked)):has(#relay-1-s1:checked):has(#relay-1-s2:checked) #relay-1-gate2 .lamp,
+#relay-1-form:has(#relay-1-s0:checked):not(:has(#relay-1-s1:checked)):has(#relay-1-s2:checked) #relay-1-gate2 .lamp,
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):has(#relay-1-s2:checked) #relay-1-gate2 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-1-form:not(:has(#relay-1-s0:checked)):not(:has(#relay-1-s1:checked)):has(#relay-1-s2:checked) #relay-1-gate2 .off,
+#relay-1-form:not(:has(#relay-1-s0:checked)):has(#relay-1-s1:checked):has(#relay-1-s2:checked) #relay-1-gate2 .off,
+#relay-1-form:has(#relay-1-s0:checked):not(:has(#relay-1-s1:checked)):has(#relay-1-s2:checked) #relay-1-gate2 .off,
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):has(#relay-1-s2:checked) #relay-1-gate2 .off { display: none; }
+#relay-1-form:not(:has(#relay-1-s0:checked)):not(:has(#relay-1-s1:checked)):has(#relay-1-s2:checked) #relay-1-gate2 .lit,
+#relay-1-form:not(:has(#relay-1-s0:checked)):has(#relay-1-s1:checked):has(#relay-1-s2:checked) #relay-1-gate2 .lit,
+#relay-1-form:has(#relay-1-s0:checked):not(:has(#relay-1-s1:checked)):has(#relay-1-s2:checked) #relay-1-gate2 .lit,
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):has(#relay-1-s2:checked) #relay-1-gate2 .lit { display: inline; }
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) .success { display: block; }
+#relay-1-form:has(#relay-1-s0:checked):has(#relay-1-s1:checked):not(:has(#relay-1-s2:checked)) .pending { display: none; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .lamp,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate0 .lamp,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .lamp,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate0 .lamp,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .lamp,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate0 .lamp,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .lamp,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate0 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .off,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate0 .off,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .off,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate0 .off,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .off,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate0 .off,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .off,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate0 .off { display: none; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .lit,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate0 .lit,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .lit,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate0 .lit,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .lit,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate0 .lit,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate0 .lit,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate0 .lit { display: inline; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate1 .lamp,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate1 .lamp,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate1 .lamp,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate1 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate1 .off,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate1 .off,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate1 .off,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate1 .off { display: none; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate1 .lit,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate1 .lit,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) #relay-2-gate1 .lit,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate1 .lit { display: inline; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .lamp,
+#relay-2-form:not(:has(#relay-2-s0:checked)):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .lamp,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .lamp,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .lamp,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .lamp,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .lamp,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .lamp,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .off,
+#relay-2-form:not(:has(#relay-2-s0:checked)):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .off,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .off,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .off,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .off,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .off,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .off,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .off { display: none; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .lit,
+#relay-2-form:not(:has(#relay-2-s0:checked)):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .lit,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .lit,
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .lit,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .lit,
+#relay-2-form:has(#relay-2-s0:checked):not(:has(#relay-2-s1:checked)):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .lit,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):not(:has(#relay-2-s2:checked)):has(#relay-2-s3:checked) #relay-2-gate2 .lit,
+#relay-2-form:has(#relay-2-s0:checked):has(#relay-2-s1:checked):has(#relay-2-s2:checked):has(#relay-2-s3:checked) #relay-2-gate2 .lit { display: inline; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) .success { display: block; }
+#relay-2-form:not(:has(#relay-2-s0:checked)):has(#relay-2-s1:checked):has(#relay-2-s2:checked):not(:has(#relay-2-s3:checked)) .pending { display: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .off { display: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate0 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate0 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate0 .lit { display: inline; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate1 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate1 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate1 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate1 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate1 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate1 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate1 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate1 .off { display: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate1 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate1 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate1 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate1 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate1 .lit { display: inline; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .off { display: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate2 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate2 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate2 .lit { display: inline; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .off { display: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate3 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate3 .lit { display: inline; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lamp,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lamp { background: var(--lamp-color); box-shadow: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .off,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .off { display: none; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):not(:has(#relay-3-s1:checked)):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):not(:has(#relay-3-s2:checked)):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):not(:has(#relay-3-s4:checked)) #relay-3-gate4 .lit,
+#relay-3-form:has(#relay-3-s0:checked):has(#relay-3-s1:checked):has(#relay-3-s2:checked):has(#relay-3-s3:checked):has(#relay-3-s4:checked) #relay-3-gate4 .lit { display: inline; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) .success { display: block; }
+#relay-3-form:not(:has(#relay-3-s0:checked)):has(#relay-3-s1:checked):has(#relay-3-s2:checked):not(:has(#relay-3-s3:checked)):has(#relay-3-s4:checked) .pending { display: none; }
