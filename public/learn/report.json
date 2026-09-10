@@ -1,0 +1,257 @@
+{
+  "schemaVersion": 1,
+  "pairId": "16ba3c89-307f-43e0-bf60-593608677950",
+  "kind": "scripted-demo",
+  "targetId": "relay-transfer",
+  "targetHash": "ab9a9ba22e9723eb75add848533bfcf4aa9c4793a95a76e5abb69617e9c5d6c0",
+  "generatedAt": "2026-09-10T03:23:35.567Z",
+  "protocol": {
+    "model": null,
+    "tokenLimit": null,
+    "timeLimitSeconds": null,
+    "promptId": null,
+    "contextIsolation": "unknown",
+    "priorExposure": "unknown"
+  },
+  "protocolProvenance": "declared-not-attested",
+  "baseline": {
+    "first": {
+      "attemptId": "0001-5bb04e34-19d2-4fa5-ab8c-0a1043a543e2",
+      "attemptHash": "d4c54747a629966e58dbba88e3df4e952984d857408509be7449750d49fa5c4a",
+      "status": "passed",
+      "errorCode": null,
+      "summary": {
+        "passed": 9,
+        "total": 9,
+        "completed": true
+      },
+      "evaluatorSeconds": 2.613,
+      "measurements": {
+        "tokens": null,
+        "agentSeconds": null,
+        "costUSD": null,
+        "provenance": "unknown",
+        "recordHash": null
+      }
+    },
+    "latest": {
+      "attemptId": "0001-5bb04e34-19d2-4fa5-ab8c-0a1043a543e2",
+      "attemptHash": "d4c54747a629966e58dbba88e3df4e952984d857408509be7449750d49fa5c4a",
+      "status": "passed",
+      "errorCode": null,
+      "summary": {
+        "passed": 9,
+        "total": 9,
+        "completed": true
+      },
+      "evaluatorSeconds": 2.613,
+      "measurements": {
+        "tokens": null,
+        "agentSeconds": null,
+        "costUSD": null,
+        "provenance": "unknown",
+        "recordHash": null
+      }
+    },
+    "attemptCount": 1,
+    "attempts": [
+      {
+        "attemptId": "0001-5bb04e34-19d2-4fa5-ab8c-0a1043a543e2",
+        "attemptHash": "d4c54747a629966e58dbba88e3df4e952984d857408509be7449750d49fa5c4a",
+        "status": "passed",
+        "errorCode": null,
+        "summary": {
+          "passed": 9,
+          "total": 9,
+          "completed": true
+        },
+        "evaluatorSeconds": 2.613,
+        "measurements": {
+          "tokens": null,
+          "agentSeconds": null,
+          "costUSD": null,
+          "provenance": "unknown",
+          "recordHash": null
+        }
+      }
+    ],
+    "cost": {
+      "attempts": 1,
+      "tokens": {
+        "knownSubtotal": 0,
+        "missing": 1,
+        "total": null
+      },
+      "agentSeconds": {
+        "knownSubtotal": 0,
+        "missing": 1,
+        "total": null
+      },
+      "costUSD": {
+        "knownSubtotal": 0,
+        "missing": 1,
+        "total": null
+      }
+    }
+  },
+  "recall": {
+    "first": {
+      "attemptId": "0001-e432b877-6ade-4ba1-bf7f-6a43d218b0f9",
+      "attemptHash": "940209521689cf89d8f898f254a77fd42573bc5df9592b37281c35f0f020c259",
+      "status": "passed",
+      "errorCode": null,
+      "summary": {
+        "passed": 9,
+        "total": 9,
+        "completed": true
+      },
+      "evaluatorSeconds": 2.546,
+      "measurements": {
+        "tokens": null,
+        "agentSeconds": null,
+        "costUSD": null,
+        "provenance": "unknown",
+        "recordHash": null
+      }
+    },
+    "latest": {
+      "attemptId": "0001-e432b877-6ade-4ba1-bf7f-6a43d218b0f9",
+      "attemptHash": "940209521689cf89d8f898f254a77fd42573bc5df9592b37281c35f0f020c259",
+      "status": "passed",
+      "errorCode": null,
+      "summary": {
+        "passed": 9,
+        "total": 9,
+        "completed": true
+      },
+      "evaluatorSeconds": 2.546,
+      "measurements": {
+        "tokens": null,
+        "agentSeconds": null,
+        "costUSD": null,
+        "provenance": "unknown",
+        "recordHash": null
+      }
+    },
+    "attemptCount": 1,
+    "attempts": [
+      {
+        "attemptId": "0001-e432b877-6ade-4ba1-bf7f-6a43d218b0f9",
+        "attemptHash": "940209521689cf89d8f898f254a77fd42573bc5df9592b37281c35f0f020c259",
+        "status": "passed",
+        "errorCode": null,
+        "summary": {
+          "passed": 9,
+          "total": 9,
+          "completed": true
+        },
+        "evaluatorSeconds": 2.546,
+        "measurements": {
+          "tokens": null,
+          "agentSeconds": null,
+          "costUSD": null,
+          "provenance": "unknown",
+          "recordHash": null
+        }
+      }
+    ],
+    "cost": {
+      "attempts": 1,
+      "tokens": {
+        "knownSubtotal": 0,
+        "missing": 1,
+        "total": null
+      },
+      "agentSeconds": {
+        "knownSubtotal": 0,
+        "missing": 1,
+        "total": null
+      },
+      "costUSD": {
+        "knownSubtotal": 0,
+        "missing": 1,
+        "total": null
+      }
+    }
+  },
+  "experience": [
+    {
+      "sourceTask": "relay-and",
+      "sourceAttempt": "0001-6c0a5c5e-a07f-4272-ad3b-fd183bad8dd7",
+      "reflectionHash": "5bf92413006d2a3c5c4abca0c930891f3bf83384bd3662dd435b88236326248b",
+      "observed": [
+        {
+          "caseId": "state-3",
+          "inputState": {
+            "A": true,
+            "B": true
+          },
+          "expected": [
+            {
+              "selector": "#lamp-on",
+              "on": true
+            }
+          ],
+          "observedOutputs": [
+            {
+              "selector": "#lamp-on",
+              "on": false,
+              "off": true
+            }
+          ],
+          "errorCodes": [
+            "output-mismatch:#lamp-on"
+          ]
+        }
+      ],
+      "hypothesis": "The source stylesheet never made the indicator visible when both inputs were on.",
+      "rule": "Express the complete Boolean condition using native checked state and verify every input combination.",
+      "applicability": "Fixed forms whose outputs depend on multiple checkbox states.",
+      "tags": [
+        "output-logic"
+      ],
+      "epistemicStatus": "agent-hypothesis"
+    }
+  ],
+  "sourcePractice": {
+    "taskId": "relay-and",
+    "cost": {
+      "attempts": 2,
+      "tokens": {
+        "knownSubtotal": 0,
+        "missing": 2,
+        "total": null
+      },
+      "agentSeconds": {
+        "knownSubtotal": 0,
+        "missing": 2,
+        "total": null
+      },
+      "costUSD": {
+        "knownSubtotal": 0,
+        "missing": 2,
+        "total": null
+      }
+    }
+  },
+  "totalScope": {
+    "attempts": 4,
+    "tokens": {
+      "knownSubtotal": 0,
+      "missing": 4,
+      "total": null
+    },
+    "agentSeconds": {
+      "knownSubtotal": 0,
+      "missing": 4,
+      "total": null
+    },
+    "costUSD": {
+      "knownSubtotal": 0,
+      "missing": 4,
+      "total": null
+    }
+  },
+  "interpretation": "Prescribed CSS walkthrough. No agent was run; this is not evidence of learning.",
+  "exposure": "Tasks and evaluator are public. Use isolated agent sessions and disclose prior exposure."
+}

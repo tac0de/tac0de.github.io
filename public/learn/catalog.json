@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "tasks": [
+    {
+      "id": "relay-and",
+      "version": "1.0.0",
+      "track": "relay-input-state",
+      "mode": "practice",
+      "objective": "Write CSS that displays #lamp-on only when both A and B are checked. Otherwise its display must be none. Keep inputs and reset usable.",
+      "assets": {
+        "html": "relay.html",
+        "starter": "starter.css"
+      },
+      "allowedEdits": [
+        "submission.css"
+      ],
+      "evaluatorVersion": "relay-visibility-v1",
+      "checks": {
+        "form": "#exercise",
+        "controls": [
+          {
+            "name": "A",
+            "selector": "#input-a",
+            "type": "checkbox",
+            "defaultChecked": false
+          },
+          {
+            "name": "B",
+            "selector": "#input-b",
+            "type": "checkbox",
+            "defaultChecked": false
+          }
+        ],
+        "outputs": [
+          {
+            "selector": "#lamp-on",
+            "when": {
+              "op": "AND",
+              "args": [
+                {
+                  "input": "A"
+                },
+                {
+                  "input": "B"
+                }
+              ]
+            },
+            "observable": "rendered-or-display-none"
+          }
+        ],
+        "cases": "all-boolean-combinations",
+        "reset": {
+          "selector": "#reset",
+          "expectedChecked": {
+            "A": false,
+            "B": false
+          }
+        },
+        "observation": {
+          "viewport": {
+            "width": 800,
+            "height": 600
+          },
+          "stableSamples": 3,
+          "intervalMs": 100,
+          "timeoutMs": 2000
+        }
+      }
+    },
+    {
+      "id": "relay-xor",
+      "version": "1.0.0",
+      "track": "relay-input-state",
+      "mode": "practice",
+      "objective": "Write CSS that displays #lamp-on only when exactly one of A and B is checked. Otherwise its display must be none. Keep inputs and reset usable.",
+      "assets": {
+        "html": "relay.html",
+        "starter": "starter.css"
+      },
+      "allowedEdits": [
+        "submission.css"
+      ],
+      "evaluatorVersion": "relay-visibility-v1",
+      "checks": {
+        "form": "#exercise",
+        "controls": [
+          {
+            "name": "A",
+            "selector": "#input-a",
+            "type": "checkbox",
+            "defaultChecked": false
+          },
+          {
+            "name": "B",
+            "selector": "#input-b",
+            "type": "checkbox",
+            "defaultChecked": false
+          }
+        ],
+        "outputs": [
+          {
+            "selector": "#lamp-on",
+            "when": {
+              "op": "XOR",
+              "args": [
+                {
+                  "input": "A"
+                },
+                {
+                  "input": "B"
+                }
+              ]
+            },
+            "observable": "rendered-or-display-none"
+          }
+        ],
+        "cases": "all-boolean-combinations",
+        "reset": {
+          "selector": "#reset",
+          "expectedChecked": {
+            "A": false,
+            "B": false
+          }
+        },
+        "observation": {
+          "viewport": {
+            "width": 800,
+            "height": 600
+          },
+          "stableSamples": 3,
+          "intervalMs": 100,
+          "timeoutMs": 2000
+        }
+      }
+    },
+    {
+      "id": "relay-transfer",
+      "version": "1.0.0",
+      "track": "relay-input-state",
+      "mode": "transfer",
+      "objective": "In the new nested form, display #signal-on only when both X and Y are checked. Keep native inputs and reset usable. Previous selector names do not exist here.",
+      "assets": {
+        "html": "transfer.html",
+        "starter": "starter.css"
+      },
+      "allowedEdits": [
+        "submission.css"
+      ],
+      "evaluatorVersion": "relay-visibility-v1",
+      "checks": {
+        "form": "#transfer",
+        "controls": [
+          {
+            "name": "X",
+            "selector": "#signal-x",
+            "type": "checkbox",
+            "defaultChecked": false
+          },
+          {
+            "name": "Y",
+            "selector": "#signal-y",
+            "type": "checkbox",
+            "defaultChecked": false
+          }
+        ],
+        "outputs": [
+          {
+            "selector": "#signal-on",
+            "when": {
+              "op": "AND",
+              "args": [
+                {
+                  "input": "X"
+                },
+                {
+                  "input": "Y"
+                }
+              ]
+            },
+            "observable": "rendered-or-display-none"
+          }
+        ],
+        "cases": "all-boolean-combinations",
+        "reset": {
+          "selector": "#restore",
+          "expectedChecked": {
+            "X": false,
+            "Y": false
+          }
+        },
+        "observation": {
+          "viewport": {
+            "width": 800,
+            "height": 600
+          },
+          "stableSamples": 3,
+          "intervalMs": 100,
+          "timeoutMs": 2000
+        }
+      }
+    }
+  ]
+}
